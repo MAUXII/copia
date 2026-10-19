@@ -31,6 +31,7 @@ knowledge/case-studies/<slug>.md   how it was copied (not checked, but expected)
   "tags": ["blur", "ios"],
   "author": { "name": "Your name", "github": "your-user" },
   "inspiration": { "author": "Original creator", "url": "https://original" },
+  "credits": [{ "author": "Secondary credit (optional)", "url": "https://…" }],
   "dependencies": [],
   "props": [{ "name": "layers", "type": "number", "default": "8", "description": "…" }],
   "createdAt": "2026-10-18"

@@ -2,6 +2,8 @@
 
 ## Sources
 
+- Original (credited by Skiper UI): Apple Human Interface Guidelines, Live Activities — https://developer.apple.com/design/human-interface-guidelines/live-activities
+- Also credited: animations.dev by Emil Kowalski — https://animations.dev/learn
 - Original: Apple, iPhone Dynamic Island (live activities).
 - Primary reference: Skiper UI skiper2 — https://skiper-ui.com/v1/skiper2
   (preview video: https://cdn.skiper-ui.com/video/v1/skiper2.mp4)

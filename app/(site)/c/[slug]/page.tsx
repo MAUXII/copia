@@ -86,6 +86,14 @@ export default async function ComponentPage({ params }: Params) {
           ) : (
             "Original component"
           )}
+          {meta.credits?.map((credit) => (
+            <span key={credit.url}>
+              {" · "}
+              <a href={credit.url} target="_blank" rel="noreferrer" className="text-foreground underline-offset-4 hover:underline">
+                {credit.author}
+              </a>
+            </span>
+          ))}
           {" · "}recreated by{" "}
           <a href={`https://github.com/${meta.author.github}`} className="text-foreground underline-offset-4 hover:underline">
             {meta.author.name}

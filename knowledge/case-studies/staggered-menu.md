@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original (credited by Skiper UI as "Nike-inspired"): Nike — https://www.nike.com
 - Original: Nike run event pages (mobile menu over a poster).
 - Primary reference: Skiper UI skiper13 — https://skiper-ui.com/v1/skiper13
   (preview: https://cdn.skiper-ui.com/video/v1/skiper13.mp4)

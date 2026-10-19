@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original: Skiper UI skiper47 (it credits no one; built with Swiper) — https://skiper-ui.com/v1/skiper47
 - Original: Apple Cover Flow (iTunes / macOS Finder).
 - Primary reference: Skiper UI skiper47 — https://skiper-ui.com/v1/skiper47
   (preview: https://cdn.skiper-ui.com/video/v1/skiper47.mp4)

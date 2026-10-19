@@ -3,6 +3,12 @@
 Copia exists because other people made great things first. Credit is not
 optional.
 
+0. **Copy the reference's own attribution.** If the version you studied says
+   "Inspired by X" (Skiper UI shows it under **Show Info → Attribution**), X
+   is the original: put X in `inspiration`, not the site you studied. Extra
+   names it credits ("built while learning from …", "micro-interactions from
+   …") go in `meta.json` → `credits`. Only when the reference credits no one
+   does the reference itself become the `inspiration`.
 1. **Original creator** goes in `meta.json` → `inspiration` (`author`, `url`).
    This is who invented the interaction: Apple for the Dynamic Island, Vercel
    for its tooltip, a designer for an Awwwards effect.

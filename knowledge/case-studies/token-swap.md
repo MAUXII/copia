@@ -2,6 +2,8 @@
 
 ## Sources
 
+- Original (credited by Skiper UI): Family — https://family.co
+- Also credited: micro-interactions from Jakub Krehel — https://jakub.kr
 - Original: Aave app swap card (app.aave.com).
 - Primary reference: Skiper UI skiper22 — https://skiper-ui.com/v1/skiper22
   (preview: https://cdn.skiper-ui.com/video/v1/skiper22.mp4)

@@ -92,8 +92,11 @@ When REA is connected, compare your preview page with the reference using
 
 ## 7. Credit everyone
 
-Follow [crediting](references/crediting.md). `meta.json` → `inspiration`
-names the original creator and links the original. Also credit the version
+Follow [crediting](references/crediting.md). First read the reference's own
+attribution (on Skiper UI: **Show Info → Attribution**) and copy it:
+`meta.json` → `inspiration` names whoever the reference credits, and
+`credits` lists any secondary names. Only if the reference credits no one is
+the reference itself the inspiration. Also credit the version
 you studied when it is not the original (for example: original by Apple,
 studied via Skiper UI and Motion Primitives).
 

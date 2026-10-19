@@ -3,14 +3,44 @@
   "name": "Toolbar Tooltip",
   "description": "Vercel-style floating toolbar where one shared tooltip glides between buttons, resizing to fit labels and keyboard shortcuts; works with focus and keyboard.",
   "category": "navigation",
-  "tags": ["vercel", "tooltip", "toolbar", "kbd", "shared layout"],
-  "author": { "name": "Copia", "github": "MAUXII" },
-  "inspiration": { "author": "Vercel (toolbar), studied via Skiper UI skiper43", "url": "https://skiper-ui.com/v1/skiper43" },
-  "dependencies": ["motion", "lucide-react"],
+  "tags": [
+    "vercel",
+    "tooltip",
+    "toolbar",
+    "kbd",
+    "shared layout"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Vercel",
+    "url": "https://vercel.com/"
+  },
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
   "props": [
-    { "name": "items", "type": "{ label, icon, shortcut?, onClick? }[]", "default": "-", "description": "Buttons in the toolbar." },
-    { "name": "delay", "type": "number", "default": "350", "description": "Delay before the first tooltip (ms); later ones are instant." },
-    { "name": "side", "type": "\"top\" | \"bottom\"", "default": "\"top\"", "description": "Where the tooltip appears." }
+    {
+      "name": "items",
+      "type": "{ label, icon, shortcut?, onClick? }[]",
+      "default": "-",
+      "description": "Buttons in the toolbar."
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "default": "350",
+      "description": "Delay before the first tooltip (ms); later ones are instant."
+    },
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\"",
+      "default": "\"top\"",
+      "description": "Where the tooltip appears."
+    }
   ],
   "createdAt": "2026-10-18"
 }

@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original (credited by Skiper UI): Vercel — https://vercel.com/
 - Original: Vercel toolbar (vercel.com preview toolbar).
 - Primary reference: Skiper UI skiper43 — https://skiper-ui.com/v1/skiper43
   (preview: https://cdn.skiper-ui.com/video/v1/skiper43.mp4)

@@ -3,17 +3,68 @@
   "name": "Dynamic Island",
   "description": "iPhone-style island that morphs between live activities: ring/silent, timer with rolling digits, recording, music, plus call, notification and custom content.",
   "category": "effects",
-  "tags": ["apple", "ios", "morph", "spring", "live activity"],
-  "author": { "name": "Copia", "github": "MAUXII" },
-  "inspiration": { "author": "Apple (iPhone Dynamic Island), studied via Skiper UI skiper2", "url": "https://skiper-ui.com/v1/skiper2" },
-  "dependencies": ["motion", "lucide-react"],
+  "tags": [
+    "apple",
+    "ios",
+    "morph",
+    "spring",
+    "live activity"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Apple (Human Interface Guidelines: Live Activities)",
+    "url": "https://developer.apple.com/design/human-interface-guidelines/live-activities"
+  },
+  "credits": [
+    {
+      "author": "animations.dev (Emil Kowalski)",
+      "url": "https://animations.dev/learn"
+    }
+  ],
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
   "props": [
-    { "name": "view", "type": "\"idle\" | \"ring\" | \"silent\" | \"timer\" | \"recording\" | \"music\" | \"call\" | \"notification\"", "default": "\"idle\"", "description": "Activity to show; changing it morphs the island." },
-    { "name": "timerSeconds", "type": "number", "default": "60", "description": "Countdown length for the timer view." },
-    { "name": "track", "type": "{ title, artist }", "default": "Glow Echo", "description": "Track on the music view." },
-    { "name": "caller", "type": "string", "default": "\"Maurício\"", "description": "Name on the call view." },
-    { "name": "notification", "type": "{ app, message }", "default": "Copia message", "description": "Content of the notification view." },
-    { "name": "children + size", "type": "ReactNode + { width, height, radius? }", "default": "-", "description": "Custom content with its own size." }
+    {
+      "name": "view",
+      "type": "\"idle\" | \"ring\" | \"silent\" | \"timer\" | \"recording\" | \"music\" | \"call\" | \"notification\"",
+      "default": "\"idle\"",
+      "description": "Activity to show; changing it morphs the island."
+    },
+    {
+      "name": "timerSeconds",
+      "type": "number",
+      "default": "60",
+      "description": "Countdown length for the timer view."
+    },
+    {
+      "name": "track",
+      "type": "{ title, artist }",
+      "default": "Glow Echo",
+      "description": "Track on the music view."
+    },
+    {
+      "name": "caller",
+      "type": "string",
+      "default": "\"Maurício\"",
+      "description": "Name on the call view."
+    },
+    {
+      "name": "notification",
+      "type": "{ app, message }",
+      "default": "Copia message",
+      "description": "Content of the notification view."
+    },
+    {
+      "name": "children + size",
+      "type": "ReactNode + { width, height, radius? }",
+      "default": "-",
+      "description": "Custom content with its own size."
+    }
   ],
   "createdAt": "2026-10-18"
 }

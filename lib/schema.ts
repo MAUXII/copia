@@ -17,6 +17,8 @@ export const MetaSchema = z.object({
     author: z.string().min(1),
     url: z.url().nullable(),
   }),
+  /** Extra people or places the reference itself credits (secondary inspirations). */
+  credits: z.array(z.object({ author: z.string().min(1), url: z.url() })).optional(),
   dependencies: z.array(z.string()),
   props: z.array(
     z.object({

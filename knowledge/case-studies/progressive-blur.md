@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original (credited by Skiper UI): Devouring Details by Rauno Freiberg — https://devouringdetails.com/
 - Primary reference (the look we copy): Skiper UI skiper41 —
   https://skiper-ui.com/v1/skiper41
 - Original idea: Apple, iOS materials and navigation bars —

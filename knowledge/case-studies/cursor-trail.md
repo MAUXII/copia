@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original (credited by Skiper UI): BeFreaky by David Denni — https://www.befreaky.co/
 - Original: image cursor trails common on agency and portfolio sites
   (Awwwards).
 - Primary reference: Skiper UI skiper18 — https://skiper-ui.com/v1/skiper18

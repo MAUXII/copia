@@ -2,6 +2,7 @@
 
 ## Sources
 
+- Original: Skiper UI skiper16 (it credits no one) — https://skiper-ui.com/v1/skiper16
 - Original: stacked scroll cards popularized by Apple Wallet and many
   landing pages.
 - Primary reference: Skiper UI skiper16 — https://skiper-ui.com/v1/skiper16
