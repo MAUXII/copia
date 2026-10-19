@@ -1,0 +1,18 @@
+{
+  "slug": "staggered-menu",
+  "name": "Staggered Menu",
+  "description": "Nike-style menu: a frosted glass panel unfolds under the bar, links cascade in with blur, the MENU/CLOSE label rolls; Escape closes it, open state can be controlled.",
+  "category": "navigation",
+  "tags": ["nike", "menu", "mobile", "stagger", "glass"],
+  "author": { "name": "Copia", "github": "MAUXII" },
+  "inspiration": { "author": "Nike (run event menu), studied via Skiper UI skiper13", "url": "https://skiper-ui.com/v1/skiper13" },
+  "dependencies": ["motion"],
+  "props": [
+    { "name": "links", "type": "{ label, href, meta? }[]", "default": "-", "description": "Big links; meta renders as a superscript." },
+    { "name": "logo", "type": "ReactNode", "default": "COPIA", "description": "Brand on the left of the bar." },
+    { "name": "footer", "type": "{ label, href }[]", "default": "[]", "description": "Small links under the panel." },
+    { "name": "open / onOpenChange", "type": "boolean / (open) => void", "default": "uncontrolled", "description": "Control the open state." },
+    { "name": "accent", "type": "string", "default": "\"#ff2a1f\"", "description": "Color of the big links." }
+  ],
+  "createdAt": "2026-10-18"
+}

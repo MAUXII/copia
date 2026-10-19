@@ -1,0 +1,12 @@
+{
+  "slug": "{{slug}}",
+  "name": "{{Name}}",
+  "description": "Describe what {{Name}} does in one sentence.",
+  "category": "{{category}}",
+  "tags": [],
+  "author": { "name": "Your name", "github": "your-github-user" },
+  "inspiration": { "author": "original", "url": null },
+  "dependencies": [],
+  "props": [],
+  "createdAt": "{{date}}"
+}

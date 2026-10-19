@@ -1,0 +1,33 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: npm ci
+      - name: Unit tests
+        run: npx vitest run --exclude tests/preview.test.ts
+      - name: Lint and types
+        run: npm run lint && npx tsc --noEmit
+      - name: Component checks
+        run: npm run check
+      - name: Build (registry + site)
+        run: npm run build
+      - name: Install changed components into a fresh app
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          slugs=$(git diff --name-only origin/${{ github.base_ref }} -- registry | cut -d/ -f2 | sort -u | while read s; do [ -d "registry/$s" ] && echo "$s"; done)
+          if [ -n "$slugs" ]; then bash scripts/smoke-install.sh $slugs; else echo "No component changes"; fi

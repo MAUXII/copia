@@ -1,0 +1,19 @@
+{
+  "slug": "card-stack-scroll",
+  "name": "Card Stack Scroll",
+  "description": "Cards pin to the top and pile into a stack as you scroll, each buried card shrinking and dimming; peek, scale step and an optional auto-scroll.",
+  "category": "cards",
+  "tags": ["scroll", "sticky", "stack", "cards"],
+  "author": { "name": "Copia", "github": "MAUXII" },
+  "inspiration": { "author": "Stacked scroll cards (Apple Wallet style), studied via Skiper UI skiper16", "url": "https://skiper-ui.com/v1/skiper16" },
+  "dependencies": ["motion"],
+  "props": [
+    { "name": "items", "type": "ReactNode[]", "default": "-", "description": "Card contents." },
+    { "name": "height", "type": "number", "default": "360", "description": "Height of the scroll area (px)." },
+    { "name": "cardHeight", "type": "number", "default": "200", "description": "Card height (px)." },
+    { "name": "peek", "type": "number", "default": "14", "description": "Offset between stacked cards (px)." },
+    { "name": "scaleStep", "type": "number", "default": "0.05", "description": "Shrink per buried card." },
+    { "name": "autoScroll", "type": "number", "default": "-", "description": "Auto-scroll speed (px/s) until the user interacts." }
+  ],
+  "createdAt": "2026-10-18"
+}

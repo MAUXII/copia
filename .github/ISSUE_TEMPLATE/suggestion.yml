@@ -1,0 +1,21 @@
+name: Suggest a component
+description: A component you'd like Copia to recreate
+labels: ["suggestion"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      placeholder: Elastic slider
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What does it do?
+      placeholder: A slider that stretches when you drag past the end…
+  - type: input
+    id: reference
+    attributes:
+      label: Where did you see it?
+      placeholder: https://…

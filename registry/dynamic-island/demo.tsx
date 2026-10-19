@@ -1,0 +1,38 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { DynamicIsland, type IslandView } from "./dynamic-island"
+
+const VIEWS: IslandView[] = ["idle", "ring", "silent", "timer", "recording", "call", "music", "notification"]
+
+export default function Demo() {
+  const [index, setIndex] = useState(1)
+  const [auto, setAuto] = useState(true)
+
+  useEffect(() => {
+    if (!auto) return
+    const id = setInterval(() => setIndex((i) => (i + 1) % VIEWS.length), 1400)
+    return () => clearInterval(id)
+  }, [auto])
+
+  return (
+    <div className="flex h-[280px] w-[440px] max-w-full flex-col items-center justify-between py-4">
+      <DynamicIsland view={VIEWS[index]} />
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {VIEWS.map((view, i) => (
+          <button
+            key={view}
+            type="button"
+            onClick={() => {
+              setAuto(false)
+              setIndex(i)
+            }}
+            className={`rounded-full border px-2.5 py-1 text-[11px] capitalize transition-colors ${i === index ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {view}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}

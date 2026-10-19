@@ -1,0 +1,15 @@
+name: I opened a pull request
+description: Let the maintainers know about your pull request
+labels: ["pr-opened"]
+body:
+  - type: input
+    id: pr_url
+    attributes:
+      label: Pull request link
+      placeholder: https://github.com/MAUXII/copia/pull/12
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything we should know?

@@ -1,0 +1,12 @@
+{
+  "slug": "ok-button",
+  "name": "OK Button",
+  "description": "Fixture button used by tests.",
+  "category": "buttons",
+  "tags": ["fixture"],
+  "author": { "name": "Copia", "github": "MAUXII" },
+  "inspiration": { "author": "original", "url": null },
+  "dependencies": [],
+  "props": [],
+  "createdAt": "2026-10-13"
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "token-swap",
+  "name": "Token Swap",
+  "description": "Aave-style swap card where typed amounts and every derived value roll in digit by digit with blur; use-max, insufficient-balance state and a USD/token input toggle.",
+  "category": "cards",
+  "tags": ["aave", "crypto", "swap", "number", "input"],
+  "author": { "name": "Copia", "github": "MAUXII" },
+  "inspiration": { "author": "Aave (app swap), studied via Skiper UI skiper22", "url": "https://skiper-ui.com/v1/skiper22" },
+  "dependencies": ["motion", "lucide-react"],
+  "props": [
+    { "name": "from", "type": "Token", "default": "ETH", "description": "Token being sold: { symbol, name, balance, priceUsd, color }." },
+    { "name": "to", "type": "Token", "default": "AAVE", "description": "Token being bought." },
+    { "name": "value / onValueChange", "type": "string / (v) => void", "default": "uncontrolled", "description": "Control the typed amount." },
+    { "name": "AnimatedText", "type": "export", "default": "-", "description": "The digit animation, reusable on its own." }
+  ],
+  "createdAt": "2026-10-18"
+}

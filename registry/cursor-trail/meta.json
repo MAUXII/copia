@@ -1,0 +1,18 @@
+{
+  "slug": "cursor-trail",
+  "name": "Cursor Trail",
+  "description": "Drops images or stickers along the cursor path that pop in with a spring and shrink away; any ReactNode, spacing, lifetime and cap configurable.",
+  "category": "effects",
+  "tags": ["cursor", "trail", "stickers", "images", "awwwards"],
+  "author": { "name": "Copia", "github": "MAUXII" },
+  "inspiration": { "author": "Image cursor trails on agency sites, studied via Skiper UI skiper18", "url": "https://skiper-ui.com/v1/skiper18" },
+  "dependencies": ["motion", "lucide-react"],
+  "props": [
+    { "name": "items", "type": "ReactNode[]", "default": "-", "description": "What is dropped: images, stickers, emoji." },
+    { "name": "spacing", "type": "number", "default": "60", "description": "Pixels between two drops." },
+    { "name": "lifetime", "type": "number", "default": "900", "description": "Milliseconds before a drop shrinks away." },
+    { "name": "max", "type": "number", "default": "14", "description": "Maximum drops on screen." },
+    { "name": "size", "type": "number", "default": "96", "description": "Drop size in pixels." }
+  ],
+  "createdAt": "2026-10-18"
+}

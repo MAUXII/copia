@@ -1,0 +1,67 @@
+{
+  "slug": "progressive-blur",
+  "name": "Progressive Blur",
+  "description": "Text melts into blur at the page edges as it scrolls, like iOS. Stacked layers, any edge, exponential curve, viewport-pinned mode and optional tint.",
+  "category": "effects",
+  "tags": [
+    "blur",
+    "ios",
+    "backdrop-filter",
+    "mask",
+    "scroll"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Skiper UI (skiper41), after iOS",
+    "url": "https://skiper-ui.com/v1/skiper41"
+  },
+  "dependencies": [],
+  "props": [
+    {
+      "name": "direction",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\"",
+      "default": "\"bottom\"",
+      "description": "Edge the blur grows toward."
+    },
+    {
+      "name": "layers",
+      "type": "number",
+      "default": "8",
+      "description": "Stacked blur layers; 6–10 looks smooth."
+    },
+    {
+      "name": "maxBlur",
+      "type": "number",
+      "default": "24",
+      "description": "Blur radius at the edge, in pixels."
+    },
+    {
+      "name": "curve",
+      "type": "\"linear\" | \"exponential\"",
+      "default": "\"exponential\"",
+      "description": "How blur grows across layers."
+    },
+    {
+      "name": "tint",
+      "type": "boolean",
+      "default": "false",
+      "description": "Fade to the background color on top of the blur."
+    },
+    {
+      "name": "fixed",
+      "type": "boolean",
+      "default": "false",
+      "description": "Pin to the viewport edge for a page-wide effect."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "default": "-",
+      "description": "Size the blur area, e.g. h-32 or w-24."
+    }
+  ],
+  "createdAt": "2026-10-18"
+}

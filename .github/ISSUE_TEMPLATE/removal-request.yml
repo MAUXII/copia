@@ -1,0 +1,27 @@
+name: Credit change or removal request
+description: You created something recreated here and want the credit changed or the component removed
+labels: ["removal"]
+body:
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      placeholder: https://copia-ui.vercel.app/c/<slug>
+    validations:
+      required: true
+  - type: dropdown
+    id: request
+    attributes:
+      label: What would you like?
+      options:
+        - Fix or add credit
+        - Remove the component
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Link to your original work and how you'd like to be credited.
+    validations:
+      required: true

@@ -1,0 +1,63 @@
+{
+  "slug": "perspective-carousel",
+  "name": "Perspective Carousel",
+  "description": "Cover-flow carousel where the center card is flat and large while neighbours shrink and turn away; wraps around, drag, arrow keys, dots and autoplay.",
+  "category": "cards",
+  "tags": [
+    "carousel",
+    "cover flow",
+    "3d",
+    "albums",
+    "drag"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Apple Cover Flow, studied via Skiper UI skiper47",
+    "url": "https://skiper-ui.com/v1/skiper47"
+  },
+  "dependencies": [
+    "motion"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "ReactNode[]",
+      "default": "-",
+      "description": "Cards (covers, images, anything)."
+    },
+    {
+      "name": "size",
+      "type": "number",
+      "default": "220",
+      "description": "Card size in pixels."
+    },
+    {
+      "name": "spacing",
+      "type": "number",
+      "default": "0.78",
+      "description": "Distance between card centers as a fraction of size."
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "default": "-",
+      "description": "Advance every N ms; pauses on hover."
+    },
+    {
+      "name": "pauseOnHover",
+      "type": "boolean",
+      "default": "true",
+      "description": "Pause autoplay while hovered."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "\"Carousel\"",
+      "description": "Accessible name."
+    }
+  ],
+  "createdAt": "2026-10-18"
+}

@@ -1,0 +1,5 @@
+import { {{Component}} } from "./{{slug}}"
+
+export default function Demo() {
+  return <{{Component}}>{{Name}}</{{Component}}>
+}

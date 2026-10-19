@@ -1,0 +1,164 @@
+# Techniques
+
+How the effects people copy are actually made. Each entry: the idea, the
+numbers that matter, and where it was seen. Add a section whenever a copy
+teaches you something new.
+
+## Progressive blur
+
+**Idea.** Blur that grows smoothly toward an edge, like iOS navigation bars.
+`backdrop-filter` cannot vary across one element, so stack layers.
+
+**Single-layer version** (seen in Skiper UI skiper41): one element with
+`backdrop-filter: blur(4–6px)` and `mask-image: linear-gradient(<edge>, #000
+25–50%, transparent)`. Cheap, but the blur is constant where visible; only its
+opacity fades.
+
+**Stacked version** (seen in Motion Primitives): `N` layers. Layer `i` has
+`backdrop-filter: blur(i × step)` and a mask that is a band:
+
+```
+segment = 1 / (N + 1)
+mask(i) = linear-gradient(<direction>,
+  transparent  i      × segment,
+  black       (i + 1) × segment,
+  black       (i + 2) × segment,
+  transparent (i + 3) × segment)
+```
+
+Neighbouring bands overlap, so the eye sees a continuous ramp. Motion
+Primitives uses 8 layers and linear steps (0, 6, 12 … 42px or 0, 0.5, 1 …).
+
+**Improvements used in Copia:** exponential steps (`max × (i/N)²`) look more
+natural than linear ones; an optional tint gradient on top hides banding on
+busy content; any of the four edges.
+
+**Edge bleed.** `backdrop-filter` samples pixels outside its box, so dark
+page color leaks into the corners of a light, rounded container. Make the
+container a backdrop root, for example `clip-path: inset(0 round 1rem)`, so
+the blur only sees its own content.
+
+**Costs.** Each layer re-samples what is behind it. 6–10 layers is the sweet
+spot; more is slower without looking better.
+
+## Morphing container (Dynamic Island)
+
+**Idea.** One shape changes size and corner radius while its content swaps,
+so it feels like the same object reshaping.
+
+**Mechanism.** Animate `width`, `height`, `borderRadius` on one element with
+`overflow: hidden`. Put each state's content in its own layer inside
+`AnimatePresence mode="popLayout"`, absolutely positioned. Enter with
+opacity + `filter: blur(4px) → 0` + scale 0.92 → 1 after a short delay;
+exit fast (≈0.15 s) so states never overlap visibly.
+
+**Numbers.** Skiper UI uses `{ type: "spring", bounce: 0.35–0.5 }`; Copia
+uses bounce 0.35, duration 0.55 for the shape and bounce 0.3, delay 0.08 for
+content.
+
+**Seen in.** Apple Dynamic Island; Skiper UI skiper2.
+
+**Pitfalls.** Do not combine Motion's `layout` prop with explicit
+width/height animation on the same element. Turn the morph off for reduced
+motion.
+
+## Rolling digits
+
+**Idea.** Numbers that change roll vertically like an odometer.
+
+**Mechanism.** Render each digit in a fixed-width, `overflow: hidden` slot.
+Key the inner element by the digit value inside `AnimatePresence`; enter from
+`y: 100%`, exit to `y: -100%`, optional 2px blur in motion.
+
+**Seen in.** Skiper UI skiper2 timer.
+
+## Shared tooltip (one tooltip, many triggers)
+
+**Idea.** A toolbar has one tooltip that glides to whichever button is
+hovered, instead of one tooltip per button.
+
+**Mechanism.** Store the active index and the trigger's center
+(`offsetLeft + offsetWidth / 2`). Animate the tooltip's `x` to that center
+with a spring; give the inner pill Motion `layout` so its width follows the
+label; crossfade labels with `AnimatePresence mode="popLayout"`. Delay only
+the first appearance; keep a "warm" flag while the pointer is inside.
+
+**Seen in.** Vercel toolbar; Skiper UI skiper43.
+
+## Distance-based spawning (cursor trails)
+
+**Idea.** Drop elements along a pointer path at even spacing.
+
+**Mechanism.** Compare the pointer position with the last drop and spawn
+only after `spacing` pixels (`Math.hypot`). Remove each drop after a fixed
+lifetime and cap the count. Distance beats time-based spawning: the trail
+looks the same at any speed.
+
+**Seen in.** Agency sites; Skiper UI skiper18.
+
+## Animated input text
+
+**Idea.** A number input whose digits animate as you type.
+
+**Mechanism.** Keep a real `<input>` on top with `color: transparent` and a
+visible caret; render the value underneath as characters keyed by
+`index-char` inside `AnimatePresence`, entering from below with blur.
+
+**Seen in.** Aave swap; Skiper UI skiper22.
+
+## Cover flow
+
+**Idea.** A row where the active item is big and flat and neighbours turn
+away in 3D.
+
+**Mechanism.** Absolutely position every item at the center and animate from
+its signed, wrapped distance to the active index: `x = offset × size ×
+spacing`, `scale` down per step, `rotateY = -offset × ~22°` inside a
+`perspective` parent, dim off-center items, hide beyond ±2.
+
+**Seen in.** Apple Cover Flow; Skiper UI skiper47.
+
+## Sticky stacking
+
+**Idea.** Cards stick and pile up while scrolling.
+
+**Mechanism.** `position: sticky; top: base + i × peek` on each card; drive
+scale/brightness of buried cards from the container's scroll progress.
+
+**Seen in.** Skiper UI skiper16.
+
+## Clip-path reveal (menus, panels)
+
+**Idea.** A panel unrolls from an edge without layout jumps.
+
+**Mechanism.** Animate `clip-path: inset(0 0 100% 0 round R)` to
+`inset(0 0 0% 0 round R)` with an ease-out-expo curve (`[0.22, 1, 0.36, 1]`);
+stagger children in after ~150 ms; reverse order on exit.
+
+**Seen in.** Nike; Skiper UI skiper13.
+
+## Border beam (light travelling around a border)
+
+**Idea.** A short comet of light runs around an element's rounded border.
+**Mechanism.** Ring = transparent border + `mask: linear-gradient(transparent,transparent) padding-box, linear-gradient(#000,#000) border-box; mask-composite: intersect`. Inside it, a square with `linear-gradient(to left, from, to, transparent)` rides `offset-path: rect(0 auto auto 0 round R)` while `offset-distance` goes 0% → 100% linearly. Alternative: `@property --angle` + `conic-gradient(from var(--angle))` on the border box.
+**Numbers.** Magic UI: 50 px beam, 6 s lap, linear, 1 px border. Copia: 60 px, 4 s, 3x on hover eased with ~180 ms time constant; halo = same beam blurred 14 px at 45% behind an opaque face.
+**Seen in.** Magic UI Border Beam; Copia `glow-border-button`.
+**Pitfalls.** To change speed without a jump, drive `offset-distance` from `useAnimationFrame` instead of changing a Motion `duration` (that restarts the loop). An inset `box-shadow` on an `isolate` parent paints under its negative-z children, so put the resting ring on the face layer.
+
+## Recording tip
+
+The preview recorder uses Chrome's screencast, which only sends frames when
+the page repaints. Components that pause while hovered (carousels, marquees)
+need a `pauseOnHover={false}` demo, or the preview freezes.
+
+## Template for new entries
+
+```
+## <Technique name>
+
+**Idea.** One or two sentences.
+**Mechanism.** Layers, properties, formulas.
+**Numbers.** Durations, easings, springs, sizes.
+**Seen in.** Links.
+**Pitfalls.** Performance, browser support, accessibility.
+```

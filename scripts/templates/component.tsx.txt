@@ -1,0 +1,9 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+
+export type {{Component}}Props = React.ComponentProps<"div">
+
+export function {{Component}}({ className, ...props }: {{Component}}Props) {
+  return <div className={cn("text-foreground", className)} {...props} />
+}

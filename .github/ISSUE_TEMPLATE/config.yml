@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Browse components
+    url: https://copia-ui.vercel.app
+    about: See what Copia has already copied.
