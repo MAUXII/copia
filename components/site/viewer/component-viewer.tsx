@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import { Code2, Expand, Home, Info, Moon, RotateCcw, Shrink, Sun } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { cn } from "@/lib/utils"
+import { CurvedScrollbar } from "./curved-scrollbar"
 import { InstallCommand } from "./install-command"
 
 type Props = {
@@ -48,13 +49,18 @@ function DockButton({ label, onClick, active, children }: { label: string; onCli
 
 /** Full-screen component page: the demo fills the viewport, specs slide in from the left. */
 export function ComponentViewer({ name, installTarget, preview, info }: Props) {
-  const [panel, setPanel] = useState(false)
+  // Docs column open by default on desktop, like Componentry; closed on small screens.
+  const [panel, setPanel] = useState(true)
+  const root = useRef<HTMLDivElement>(null)
+  const docs = useRef<HTMLDivElement>(null)
+  const card = useRef<HTMLElement>(null)
   const [focus, setFocus] = useState(false)
   const [light, setLight] = useState(false)
   const [run, setRun] = useState(0)
   const [hint, setHint] = useState(false)
 
   useEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) setPanel(false)
     try {
       setHint(localStorage.getItem("copia:hint-seen") !== "1")
     } catch {
@@ -82,54 +88,53 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
   }
 
   return (
-    <div className="dark flex h-dvh flex-col overflow-hidden bg-[#070707] text-neutral-100">
-      {/* Top bar: breadcrumb on the page background, like Componentry. Hidden in full screen. */}
-      {!focus && (
-        <header className="flex h-14 shrink-0 items-center px-3">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label={panel ? "Hide details" : "Show details"}
-              aria-expanded={panel}
-              onClick={() => openPanel(!panel)}
-              className="grid size-8 place-items-center rounded text-white/50 transition-colors hover:text-white"
-            >
-              <SidebarIcon open={panel} />
-            </button>
-            <span className="flex items-center gap-2 text-[15px]">
-              <Link href="/#components" className="text-white/45 transition-colors hover:text-white/80">
-                Components
-              </Link>
-              <span aria-hidden className="text-white/45">
-                ›
-              </span>
-              <span className="font-medium text-white/60">{name}</span>
-            </span>
-          </nav>
-        </header>
-      )}
+    <div ref={root} className="dark relative flex h-dvh overflow-hidden bg-[#070707] text-neutral-100">
+      <AnimatePresence initial={false}>
+        {panel && !focus && (
+          <motion.aside
+            key="panel"
+            aria-label={`${name} details`}
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: "min(46vw, 640px)", opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: PANEL_EASE }}
+            className="h-full shrink-0 overflow-hidden max-md:absolute max-md:inset-0 max-md:z-30 max-md:!w-full max-md:bg-[#070707]"
+          >
+            <div ref={docs} className="h-full w-[min(46vw,640px)] overflow-y-auto [scrollbar-width:none] max-md:w-full [&::-webkit-scrollbar]:hidden">
+              {/* Breadcrumb lives in the docs column only; content blurs as it scrolls under it. */}
+              <header className="sticky top-0 z-10 flex h-14 items-center bg-[#070707]/70 px-3 backdrop-blur-md">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Hide details"
+                    aria-expanded
+                    onClick={() => openPanel(false)}
+                    className="grid size-8 place-items-center rounded text-white/50 transition-colors hover:text-white"
+                  >
+                    <SidebarIcon open />
+                  </button>
+                  <span className="flex items-center gap-2 text-[15px]">
+                    <Link href="/#components" className="text-white/45 transition-colors hover:text-white/80">
+                      Components
+                    </Link>
+                    <span aria-hidden className="text-white/45">
+                      ›
+                    </span>
+                    <span className="font-medium text-white/60">{name}</span>
+                  </span>
+                </nav>
+              </header>
+              <div className="px-8 pt-8 pb-16 max-md:px-5">{info}</div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
-      <div className="flex min-h-0 flex-1">
-        <AnimatePresence initial={false}>
-          {panel && (
-            <motion.aside
-              key="panel"
-              aria-label={`${name} details`}
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "min(46vw, 640px)", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.5, ease: PANEL_EASE }}
-              className="h-full shrink-0 overflow-hidden max-md:absolute max-md:inset-x-0 max-md:top-14 max-md:bottom-0 max-md:z-30 max-md:!w-full max-md:bg-[#070707]"
-            >
-              <div className="h-full w-[min(46vw,640px)] overflow-y-auto px-8 pt-6 pb-16 max-md:w-full max-md:px-5">{info}</div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
-
-        <motion.main
+      <motion.main
+          ref={card}
           layout
           transition={{ duration: 0.5, ease: PANEL_EASE }}
-          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "mx-3 mb-3 rounded-2xl", panel && "max-md:hidden")}
+          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "m-3 rounded-2xl", !focus && panel && "ml-0 max-md:hidden")}
         >
           {/* The demo owns the whole area; if it is taller, this area scrolls (never a box inside). */}
           <div
@@ -196,7 +201,8 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
             )}
           </AnimatePresence>
         </motion.main>
-      </div>
+
+      {panel && !focus && <CurvedScrollbar scroller={docs} card={card} container={root} radius={16} />}
     </div>
   )
 }
