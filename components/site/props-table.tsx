@@ -16,9 +16,9 @@ export function PropsTable({ props }: { props: Meta["props"] }) {
         <tbody>
           {props.map((prop) => (
             <tr key={prop.name} className="odd:bg-white/[0.02]">
-              <td className="px-4 py-3 font-mono text-[13px]">{prop.name}</td>
-              <td className="px-4 py-3 font-mono text-[13px] text-muted-foreground">{prop.type}</td>
-              <td className="px-4 py-3 font-mono text-[13px] text-muted-foreground">{prop.default}</td>
+              <td className="px-4 py-3 font-mono text-[13px] text-[#ff7a45]">{prop.name}</td>
+              <td className="px-4 py-3 font-mono text-[13px] text-[#7ee8e2]">{prop.type}</td>
+              <td className="px-4 py-3 font-mono text-[13px] text-[#ffb86b]">{prop.default}</td>
               <td className="px-4 py-3 text-muted-foreground">{prop.description}</td>
             </tr>
           ))}

@@ -36,6 +36,16 @@ export function installCommand(manager: Manager, target: string) {
   return `${MANAGERS[manager]} ${target}`
 }
 
+/** The command with the runner muted and the component in the brand color. */
+function ColoredCommand({ manager, target }: { manager: Manager; target: string }) {
+  const [runner, ...rest] = MANAGERS[manager].split(" ")
+  return (
+    <>
+      <span className="text-[#ff7a45]">{runner}</span> <span className="text-neutral-400">{rest.join(" ")}</span> <span className="text-[#ffc48a]">{target}</span>
+    </>
+  )
+}
+
 /** Package-manager picker + install command + copy, as a pill. */
 export function InstallCommand({ target, className }: { target: string; className?: string }) {
   const [manager, setManager] = useManager()
@@ -57,7 +67,9 @@ export function InstallCommand({ target, className }: { target: string; classNam
         </select>
         <ChevronsUpDown className="pointer-events-none absolute right-1.5 size-3 text-neutral-400" aria-hidden />
       </label>
-      <code className="min-w-0 flex-1 truncate">{command}</code>
+      <code className="min-w-0 flex-1 truncate">
+        <ColoredCommand manager={manager} target={target} />
+      </code>
       <CopyButton value={command} label="Copy install command" className="text-neutral-400 hover:bg-white/10 hover:text-white" />
     </div>
   )
@@ -75,15 +87,17 @@ export function InstallTabs({ target }: { target: string }) {
             key={m}
             type="button"
             onClick={() => setManager(m)}
-            className={cn("rounded-md px-2.5 py-1.5 text-xs transition-colors", m === manager ? "bg-white/10 text-white" : "text-neutral-500 hover:text-neutral-200")}
+            className={cn("rounded-md px-2.5 py-1.5 text-xs transition-colors", m === manager ? "bg-[#ff4d1c]/15 text-[#ffc48a]" : "text-neutral-500 hover:text-neutral-200")}
           >
             {m}
           </button>
         ))}
         <CopyButton value={command} label="Copy install command" className="ml-auto text-neutral-400 hover:bg-white/10 hover:text-white" />
       </div>
-      <pre className="overflow-x-auto p-3 font-mono text-[13px] text-neutral-300">
-        <code>{command}</code>
+      <pre className="overflow-x-auto p-3 font-mono text-[13px] [scrollbar-width:none]">
+        <code>
+          <ColoredCommand manager={manager} target={target} />
+        </code>
       </pre>
     </div>
   )

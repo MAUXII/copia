@@ -9,6 +9,7 @@ import { ComponentViewer } from "@/components/site/viewer/component-viewer"
 import { InstallTabs } from "@/components/site/viewer/install-command"
 import { demos } from "@/lib/demos"
 import { buildPrompt } from "@/lib/prompt"
+import { highlightCode } from "@/lib/highlight"
 import { getComponent, getComponents, readSource } from "@/lib/registry"
 import { NAMESPACE, REPO_URL, SITE_URL } from "@/lib/site"
 
@@ -31,7 +32,10 @@ const INTERACTIONS = ["hover", "cursor", "scroll", "click", "drag", "keyboard", 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3 py-7 first:pt-0">
-      <h2 className="font-mono text-[11px] tracking-[0.14em] text-neutral-500 uppercase">{title}</h2>
+      <h2 className="flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-neutral-500 uppercase">
+        <span aria-hidden className="size-1.5 rounded-full bg-[#ff4d1c]" />
+        {title}
+      </h2>
       <div className="text-[15px] leading-relaxed text-neutral-300">{children}</div>
     </section>
   )
@@ -62,13 +66,14 @@ export default async function ComponentPage({ params }: Params) {
   const usage = readSource(slug, "demo")
   const source = readSource(slug, "component")
   const interaction = meta.tags.filter((t) => INTERACTIONS.includes(t.toLowerCase()))
+  const [usageHtml, sourceHtml] = await Promise.all([highlightCode(usage), highlightCode(source)])
 
   const info = (
     <div className="flex flex-col">
       <h1 className="text-3xl font-medium tracking-tight">{meta.name}</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-neutral-400">{meta.description}</p>
       <div className="mt-4 mb-10 flex flex-wrap gap-2">
-        <CopyButton value={buildPrompt(meta, registryUrl, usage)} label="Copy prompt for your AI editor" className="h-8 w-auto gap-1.5 rounded-lg bg-white/[0.06] px-3 text-xs text-neutral-300 hover:bg-white/10">
+        <CopyButton value={buildPrompt(meta, registryUrl, usage)} label="Copy prompt for your AI editor" className="h-8 w-auto gap-1.5 rounded-lg bg-[#ff4d1c]/15 px-3 text-xs text-[#ffc48a] hover:bg-[#ff4d1c]/25 hover:text-[#ffd9b3]">
           Copy prompt
         </CopyButton>
         <span className="self-center text-xs text-neutral-500">Copy a ready prompt for Claude Code, Codex or Cursor</span>
@@ -81,24 +86,32 @@ export default async function ComponentPage({ params }: Params) {
       <Section title="Dependencies">
         <div className="flex flex-wrap gap-2">
           {["react", "tailwindcss", ...meta.dependencies].map((dep) => (
-            <span key={dep} className="rounded-md bg-white/5 px-2 py-0.5 font-mono text-[13px]">
+            <span key={dep} className="rounded-md bg-[#ff4d1c]/10 px-2 py-0.5 font-mono text-[13px] text-[#ffc48a]">
               {dep}
             </span>
           ))}
         </div>
       </Section>
 
-      <Section title="Interaction type">{interaction.length ? interaction.join(" · ") : meta.category}</Section>
+      <Section title="Interaction type">
+        <div className="flex flex-wrap gap-2">
+          {(interaction.length ? interaction : [meta.category]).map((kind) => (
+            <span key={kind} className="rounded-full bg-[#7ee8e2]/10 px-2.5 py-0.5 text-[13px] text-[#7ee8e2] capitalize">
+              {kind}
+            </span>
+          ))}
+        </div>
+      </Section>
 
       <Section title="Install via CLI">
         <InstallTabs target={`${NAMESPACE}/${slug}`} />
         <p className="mt-2 text-xs text-neutral-500">
-          Without the namespace: <code className="font-mono">npx shadcn@latest add {registryUrl}</code>
+          Without the namespace: <code className="font-mono text-neutral-400">npx shadcn@latest add <span className="text-[#ffc48a]">{registryUrl}</span></code>
         </p>
       </Section>
 
       <Section title="How to use">
-        <CodeBlock code={usage} label="demo.tsx" />
+        <CodeBlock code={usage} html={usageHtml} label="demo.tsx" />
       </Section>
 
       {meta.props.length > 0 && (
@@ -150,7 +163,7 @@ export default async function ComponentPage({ params }: Params) {
       </Section>
 
       <Section title="Source code">
-        <CodeBlock code={source} label={`${slug}.tsx`} collapsible />
+        <CodeBlock code={source} html={sourceHtml} label={`${slug}.tsx`} collapsible />
       </Section>
 
       <Section title="Keep in mind">

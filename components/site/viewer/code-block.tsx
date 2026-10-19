@@ -4,8 +4,8 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { CopyButton } from "../copy-button"
 
-/** Code with a copy button; long code starts collapsed. */
-export function CodeBlock({ code, label, collapsible = false }: { code: string; label: string; collapsible?: boolean }) {
+/** Code with a copy button; long code starts collapsed. `html` is pre-highlighted on the server. */
+export function CodeBlock({ code, html, label, collapsible = false }: { code: string; html?: string; label: string; collapsible?: boolean }) {
   const [open, setOpen] = useState(!collapsible)
   return (
     <div className="relative overflow-hidden rounded-xl bg-white/[0.04]">
@@ -13,9 +13,16 @@ export function CodeBlock({ code, label, collapsible = false }: { code: string; 
         <span className="font-mono">{label}</span>
         <CopyButton value={code} label={`Copy ${label}`} className="text-neutral-400 hover:bg-white/10 hover:text-white" />
       </div>
-      <pre className={cn("overflow-auto p-3 font-mono text-[12.5px] leading-relaxed text-neutral-300", !open && "max-h-56")}>
-        <code>{code}</code>
-      </pre>
+      {html ? (
+        <div
+          className={cn("overflow-auto font-mono text-[12.5px] leading-relaxed [&_pre]:!bg-transparent [&_pre]:p-3 [&_pre]:pt-0", !open && "max-h-56")}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      ) : (
+        <pre className={cn("overflow-auto p-3 pt-0 font-mono text-[12.5px] leading-relaxed text-neutral-300", !open && "max-h-56")}>
+          <code>{code}</code>
+        </pre>
+      )}
       {collapsible && (
         <button
           type="button"
