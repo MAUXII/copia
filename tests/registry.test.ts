@@ -17,7 +17,8 @@ describe("MetaSchema", () => {
     expect(MetaSchema.safeParse({ ...okMeta, slug: "Magnetic Button" }).success).toBe(false)
   })
   it("rejects missing inspiration", () => {
-    const { inspiration: _, ...rest } = okMeta
+    const rest = { ...okMeta }
+    delete rest.inspiration
     expect(MetaSchema.safeParse(rest).success).toBe(false)
   })
 })

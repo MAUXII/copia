@@ -19,6 +19,8 @@ jobs:
       - run: npm ci
       - name: Unit tests
         run: npx vitest run --exclude tests/preview.test.ts
+      - name: Generate registry (registry.json, public/r, lib/demos.ts)
+        run: npm run registry
       - name: Lint and types
         run: npm run lint && npx tsc --noEmit
       - name: Component checks
