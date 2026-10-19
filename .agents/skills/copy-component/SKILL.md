@@ -68,6 +68,12 @@ npm run new <slug>
 - `demo.tsx` shows the component at its best in ~5 seconds of cursor motion
   (the preview recorder moves the pointer in from the left and circles the
   center).
+- **The demo fills the whole preview area. Never draw a box, frame, border
+  or inner scroll window around it.** Its root is `flex-1` (e.g.
+  `grid flex-1 place-items-center` for centered components). If the effect
+  needs scrolling, make the demo taller than the screen and let the page
+  scroll: components must use the existing scroller (window or scrolling
+  parent), never create their own.
 
 ### Images in the demo
 

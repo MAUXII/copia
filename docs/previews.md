@@ -20,7 +20,8 @@ ffmpeg (required on your PATH).
 
 - Show the effect without clicks: hover, an auto-cycling state, or a slow
   auto-scroll that stops when the user interacts.
-- Fit the demo in roughly 440×300 CSS pixels.
+- Fill the whole area: the demo root is `flex-1`; no boxes, borders or
+  inner scroll windows. Scrolling effects make the page itself taller.
 - Do not pause animations on hover in the demo (the cursor stays over it).
 - Check the poster after recording; if the effect is not visible, fix the
   demo, not the recorder.
