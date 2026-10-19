@@ -10,7 +10,7 @@ const items = STICKERS.map((name) => (
 
 export default function Demo() {
   return (
-    <CursorTrail items={items} size={110} spacing={45} className="grid h-[300px] w-[440px] max-w-full place-items-center rounded-2xl border bg-background">
+    <CursorTrail items={items} size={110} spacing={45} className="grid flex-1 place-items-center">
       <span className="text-center text-[10px] tracking-widest text-muted-foreground uppercase">
         Move your mouse
         <br />

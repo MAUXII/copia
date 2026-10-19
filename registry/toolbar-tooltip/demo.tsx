@@ -12,7 +12,7 @@ const items = [
 
 export default function Demo() {
   return (
-    <div className="grid h-40 place-items-center">
+    <div className="grid flex-1 place-items-center p-6">
       <ToolbarTooltip items={items} delay={150} className="scale-[1.6]" />
     </div>
   )

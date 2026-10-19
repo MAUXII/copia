@@ -16,7 +16,7 @@ export default function Demo() {
   }, [auto])
 
   return (
-    <div className="flex h-[280px] w-[440px] max-w-full flex-col items-center justify-between py-4">
+    <div className="flex flex-1 flex-col items-center justify-center gap-16 p-6">
       <DynamicIsland view={VIEWS[index]} />
       <div className="flex flex-wrap justify-center gap-1.5">
         {VIEWS.map((view, i) => (

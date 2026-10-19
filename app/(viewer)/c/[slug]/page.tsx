@@ -30,7 +30,7 @@ const INTERACTIONS = ["hover", "cursor", "scroll", "click", "drag", "keyboard", 
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-white/10 py-7 first:border-t-0 first:pt-0">
+    <section className="flex flex-col gap-3 py-7 first:pt-0">
       <h2 className="font-mono text-[11px] tracking-[0.14em] text-neutral-500 uppercase">{title}</h2>
       <div className="text-[15px] leading-relaxed text-neutral-300">{children}</div>
     </section>
@@ -68,7 +68,7 @@ export default async function ComponentPage({ params }: Params) {
       <h1 className="text-3xl font-medium tracking-tight">{meta.name}</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-neutral-400">{meta.description}</p>
       <div className="mt-4 mb-10 flex flex-wrap gap-2">
-        <CopyButton value={buildPrompt(meta, registryUrl, usage)} label="Copy prompt for your AI editor" className="h-8 w-auto gap-1.5 rounded-lg border border-white/10 px-3 text-xs text-neutral-300 hover:bg-white/10">
+        <CopyButton value={buildPrompt(meta, registryUrl, usage)} label="Copy prompt for your AI editor" className="h-8 w-auto gap-1.5 rounded-lg bg-white/[0.06] px-3 text-xs text-neutral-300 hover:bg-white/10">
           Copy prompt
         </CopyButton>
         <span className="self-center text-xs text-neutral-500">Copy a ready prompt for Claude Code, Codex or Cursor</span>
@@ -173,7 +173,7 @@ export default async function ComponentPage({ params }: Params) {
         </ul>
       </Section>
 
-      <nav className="mt-4 flex justify-between border-t border-white/10 pt-7 text-sm">
+      <nav className="mt-8 flex justify-between text-sm">
         <Link href={`/c/${previous.slug}`} className="group flex flex-col gap-1">
           <span className="flex items-center gap-1 font-mono text-[11px] tracking-[0.14em] text-neutral-500 uppercase">
             <ChevronLeft className="size-3.5" aria-hidden /> Previous

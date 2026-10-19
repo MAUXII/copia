@@ -16,7 +16,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ slug: 
   if (!load) notFound()
   const { default: Demo } = await load()
   return (
-    <main className="dark grid min-h-screen place-items-center bg-background p-4 text-foreground">
+    <main className="dark flex min-h-screen w-full flex-col bg-background text-foreground">
       <Demo />
     </main>
   )

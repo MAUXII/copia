@@ -142,8 +142,7 @@
 }
 @layer components {
   .panel-flat {
-    background: #141416;
-    border: 1px solid rgb(255 255 255 / 0.08);
+    background: #161618;
   }
   .keycap {
     position: relative;

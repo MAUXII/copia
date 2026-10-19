@@ -21,7 +21,7 @@ export default function Demo() {
   }, [auto])
 
   return (
-    <div onPointerDown={() => setAuto(false)} onKeyDown={() => setAuto(false)}>
+    <div className="grid flex-1 place-items-center p-6" onPointerDown={() => setAuto(false)} onKeyDown={() => setAuto(false)}>
       <TokenSwap value={value} onValueChange={setValue} />
     </div>
   )

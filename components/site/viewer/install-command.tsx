@@ -68,14 +68,14 @@ export function InstallTabs({ target }: { target: string }) {
   const [manager, setManager] = useManager()
   const command = installCommand(manager, target)
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
-      <div className="flex items-center gap-1 border-b border-white/10 px-2">
+    <div className="overflow-hidden rounded-xl bg-white/[0.04]">
+      <div className="flex items-center gap-1 px-2 pt-1">
         {(Object.keys(MANAGERS) as Manager[]).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setManager(m)}
-            className={cn("-mb-px border-b px-2.5 py-2 text-xs transition-colors", m === manager ? "border-white text-white" : "border-transparent text-neutral-500 hover:text-neutral-200")}
+            className={cn("rounded-md px-2.5 py-1.5 text-xs transition-colors", m === manager ? "bg-white/10 text-white" : "text-neutral-500 hover:text-neutral-200")}
           >
             {m}
           </button>

@@ -8,8 +8,8 @@ import { CopyButton } from "../copy-button"
 export function CodeBlock({ code, label, collapsible = false }: { code: string; label: string; collapsible?: boolean }) {
   const [open, setOpen] = useState(!collapsible)
   return (
-    <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
-      <div className="flex items-center justify-between border-b border-white/10 py-1 pr-1 pl-3 text-xs text-neutral-500">
+    <div className="relative overflow-hidden rounded-xl bg-white/[0.04]">
+      <div className="flex items-center justify-between py-1 pr-1 pl-3 text-xs text-neutral-500">
         <span className="font-mono">{label}</span>
         <CopyButton value={code} label={`Copy ${label}`} className="text-neutral-400 hover:bg-white/10 hover:text-white" />
       </div>
@@ -20,7 +20,7 @@ export function CodeBlock({ code, label, collapsible = false }: { code: string; 
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={cn("w-full border-t border-white/10 py-2 text-xs text-neutral-400 hover:text-white", !open && "absolute bottom-0 bg-gradient-to-t from-neutral-950 via-neutral-950/90 to-transparent pt-8")}
+          className={cn("w-full py-2 text-xs text-neutral-400 hover:text-white", !open && "absolute bottom-0 bg-gradient-to-t from-neutral-950 via-neutral-950/90 to-transparent pt-8")}
         >
           {open ? "Collapse" : "Expand code"}
         </button>

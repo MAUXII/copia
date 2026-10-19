@@ -1,7 +1,7 @@
 {
   "slug": "progressive-blur",
   "name": "Progressive Blur",
-  "description": "Text melts into blur at the page edges as it scrolls, like iOS. Stacked layers, any edge, exponential curve, viewport-pinned mode and optional tint.",
+  "description": "Text melts into blur at the page edges as it scrolls, like iOS. Stacked layers, any edge, exponential curve, sticky and viewport-pinned modes, optional tint.",
   "category": "effects",
   "tags": [
     "blur",
@@ -55,6 +55,12 @@
       "type": "boolean",
       "default": "false",
       "description": "Pin to the viewport edge for a page-wide effect."
+    },
+    {
+      "name": "sticky",
+      "type": "boolean",
+      "default": "false",
+      "description": "Stick to the top or bottom of whatever scrolls (page or scrolling parent)."
     },
     {
       "name": "className",

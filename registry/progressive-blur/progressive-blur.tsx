@@ -15,6 +15,12 @@ export type ProgressiveBlurProps = React.ComponentProps<"div"> & {
   tint?: boolean
   /** Pin to the viewport edge instead of the nearest `relative` parent (page-wide effect). */
   fixed?: boolean
+  /**
+   * Stick to the top or bottom edge of whatever scrolls (the page or a scrolling
+   * parent) while content moves under it. Place it first (top) or last (bottom)
+   * inside the scrolling content.
+   */
+  sticky?: boolean
 }
 
 const GRADIENT_DIRECTION: Record<Direction, string> = {
@@ -45,6 +51,7 @@ export function ProgressiveBlur({
   curve = "exponential",
   tint = false,
   fixed = false,
+  sticky = false,
   className,
   style,
   ...props
@@ -53,7 +60,7 @@ export function ProgressiveBlur({
   const segment = 1 / (layers + 1)
   const pct = (n: number) => `${(n * segment * 100).toFixed(3)}%`
 
-  return (
+  const blur = (
     <div aria-hidden className={cn("pointer-events-none z-10", fixed ? "fixed" : "absolute", EDGE_CLASS[direction], className)} style={style} {...props}>
       {Array.from({ length: layers }, (_, i) => {
         const t = (i + 1) / layers
@@ -70,4 +77,10 @@ export function ProgressiveBlur({
       {tint && <div className="absolute inset-0" style={{ background: `linear-gradient(${gradient}, transparent 20%, var(--background))` }} />}
     </div>
   )
+
+  // A zero-height sticky wrapper keeps the blur glued to the scroller's edge without taking space.
+  if (sticky && (direction === "top" || direction === "bottom")) {
+    return <div className={cn("pointer-events-none sticky z-10 h-0", direction === "top" ? "top-0" : "bottom-0")}>{blur}</div>
+  }
+  return blur
 }

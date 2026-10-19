@@ -9,5 +9,9 @@ const items = PHOTOS.map((name) => (
 ))
 
 export default function Demo() {
-  return <PerspectiveCarousel items={items} size={170} autoplay={1200} pauseOnHover={false} label="Albums" />
+  return (
+    <div className="grid flex-1 place-items-center overflow-hidden p-6">
+      <PerspectiveCarousel items={items} size={200} autoplay={1200} pauseOnHover={false} label="Albums" />
+    </div>
+  )
 }
