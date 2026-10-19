@@ -15,7 +15,7 @@ export function ThemeToggle() {
           // storage blocked: the toggle still works for this visit
         }
       }}
-      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-highlight"
+      className="inline-flex size-8 items-center justify-center rounded-md text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-highlight"
     >
       <Sun className="hidden size-4 dark:block" />
       <Moon className="size-4 dark:hidden" />

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getStars } from "@/lib/github"
 import { REPO_URL } from "@/lib/site"
 import { Logo } from "./logo"
+import { LocalTime, NavLinks } from "./nav-links"
 import { ThemeToggle } from "./theme-toggle"
 
 function GitHubIcon() {
@@ -12,35 +13,29 @@ function GitHubIcon() {
   )
 }
 
-/** Floating pill nav, fixed over the page. */
+/** Luma-style nav: full width, transparent with a backdrop blur, no border. */
 export async function Nav() {
   const stars = await getStars()
   return (
-    <header className="fixed inset-x-0 top-3 z-50 px-4">
-      <nav className="mx-auto flex h-12 max-w-4xl items-center gap-6 rounded-2xl border border-white/10 bg-neutral-950/70 pr-2 pl-4 text-sm text-neutral-400 backdrop-blur-xl">
-        <Link href="/" className="text-neutral-50">
+    <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-[16px]">
+      <nav className="flex h-[53px] items-center gap-7 px-4 sm:px-5">
+        <Link href="/" className="text-white">
           <Logo />
         </Link>
-        <div className="ml-auto hidden items-center gap-5 sm:flex">
-          <Link href="/#components" className="transition-colors hover:text-neutral-50">
-            Components
-          </Link>
-          <Link href="/suggest" className="transition-colors hover:text-neutral-50">
-            Suggest
-          </Link>
-        </div>
-        <div className="ml-auto flex items-center gap-1 sm:ml-0">
+        <NavLinks />
+        <div className="ml-auto flex items-center gap-4">
+          <LocalTime />
+          <ThemeToggle />
           <a
             href={REPO_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white/5 px-2.5 text-neutral-300 transition-colors hover:text-neutral-50"
+            className="inline-flex h-[30px] items-center gap-1.5 rounded-[15px] bg-white/[0.08] px-2.5 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.14] hover:text-white"
           >
             <GitHubIcon />
-            {stars !== null && <span className="font-mono text-xs tabular-nums">{stars.toLocaleString("en")}</span>}
-            <span className="sr-only">GitHub</span>
+            {stars !== null ? <span className="tabular-nums">{stars.toLocaleString("en")}</span> : <span>GitHub</span>}
+            <span className="sr-only">Star Copia on GitHub</span>
           </a>
-          <ThemeToggle />
         </div>
       </nav>
     </header>
