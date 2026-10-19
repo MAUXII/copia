@@ -117,7 +117,7 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
             exit={{ opacity: 0, y: -8 }}
             className="absolute top-5 left-5 z-40 flex items-center gap-3 text-[15px]"
           >
-            <button type="button" aria-label={panel ? "Hide details" : "Show details"} onClick={() => openPanel(!panel)} className="glass grid size-9 place-items-center rounded-xl text-neutral-200 hover:text-white">
+            <button type="button" aria-label={panel ? "Hide details" : "Show details"} onClick={() => openPanel(!panel)} className="panel-flat grid size-9 place-items-center rounded-xl text-neutral-200 hover:text-white">
               <PanelLeft className="size-4" />
             </button>
             <span className={cn("flex items-center gap-2", light && !panel ? "text-neutral-500" : "text-neutral-400")}>
@@ -132,7 +132,7 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
       </AnimatePresence>
 
       {/* Dock */}
-      <div className={cn("glass absolute top-4 right-4 z-40 flex items-center gap-0.5 rounded-2xl p-1 transition-opacity", focus && "opacity-40 hover:opacity-100")}>
+      <div className={cn("panel-flat absolute top-4 right-4 z-40 flex items-center gap-0.5 rounded-2xl p-1 transition-opacity", focus && "opacity-40 hover:opacity-100")}>
         <Link href="/" aria-label="Home" title="Home" className="grid size-9 place-items-center rounded-xl text-neutral-300 hover:bg-white/10 hover:text-white">
           <Home className="size-4" />
         </Link>
@@ -181,7 +181,7 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
             exit={{ opacity: 0, y: 10 }}
             className="absolute inset-x-0 bottom-5 z-30 flex justify-center px-4"
           >
-            <InstallCommand target={installTarget} className="glass w-full max-w-xl" />
+            <InstallCommand target={installTarget} className="panel-flat w-full max-w-xl" />
           </motion.div>
         )}
       </AnimatePresence>
