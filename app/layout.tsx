@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
-import { Fraunces, Geist, Geist_Mono } from "next/font/google"
+import { Caveat, Fraunces, Geist, Geist_Mono } from "next/font/google"
 import { SITE_URL } from "@/lib/site"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], style: ["italic"] })
+const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,7 +19,7 @@ const themeScript = `try{if(localStorage.getItem("theme")==="light")document.doc
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${caveat.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
