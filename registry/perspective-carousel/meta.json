@@ -59,5 +59,43 @@
       "description": "Accessible name."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "assets": [
+    {
+      "file": "crimson-contemplation.webp",
+      "author": "pablostanley",
+      "source": "https://www.lummi.ai/photo/crimson-contemplation-5sozs",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "artistic-orchid.webp",
+      "author": "ms.designs.0711",
+      "source": "https://www.lummi.ai/photo/artistic-orchid-close-up-pv618",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "elegant-red-portrait.webp",
+      "author": "axelnascimentto",
+      "source": "https://www.lummi.ai/photo/elegant-red-portrait-lx5ig",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "white-flowers-on-black.webp",
+      "author": "clemara_studio",
+      "source": "https://www.lummi.ai/photo/white-flowers-on-black-1byya",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "red-light-portrait.webp",
+      "author": "harshworks",
+      "source": "https://www.lummi.ai/photo/red-light-portrait-lstku",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "fiery-profile.webp",
+      "author": "ibis_design",
+      "source": "https://www.lummi.ai/photo/fiery-profile-portrait-fatsu",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ]
 }

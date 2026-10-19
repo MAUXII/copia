@@ -73,7 +73,22 @@ export default async function ComponentPage({ params }: Params) {
         </section>
       )}
 
-      <section className="mt-12 flex flex-col gap-1 rounded-2xl border p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
+      {meta.assets && meta.assets.length > 0 && (
+        <p className="mt-12 text-xs text-muted-foreground">
+          Demo images:{" "}
+          {[...new Map(meta.assets.map((a) => [a.author, a])).values()].map((asset, i, all) => (
+            <span key={asset.author}>
+              <a href={asset.source} target="_blank" rel="noreferrer" className="underline-offset-4 hover:text-foreground hover:underline">
+                {asset.author}
+              </a>
+              {i < all.length - 1 ? ", " : ""}
+            </span>
+          ))}
+          . Not part of the MIT license.
+        </p>
+      )}
+
+      <section className="mt-4 flex flex-col gap-1 rounded-2xl border p-5 text-sm sm:flex-row sm:items-center sm:justify-between">
         <span className="text-muted-foreground">
           {meta.inspiration.url ? (
             <>

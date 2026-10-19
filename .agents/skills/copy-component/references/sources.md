@@ -52,6 +52,13 @@ Shoogle, Skiper UI and most library catalogs render results with
 JavaScript. A plain HTTP fetch returns an empty page; use a real browser
 (REA's `npm run rea:browser <url>`, Playwright, or your agent's browser tool).
 
+## Images for demos
+
+| Source | How | License |
+|---|---|---|
+| The reference itself | Read image URLs from the DOM (`<img>`, `background-image`) | Belongs to its author: demo use with credit only |
+| Lummi | `https://www.lummi.ai/s/photo/<terms>`; free files live on `assets.lummi.ai` | Free for personal and commercial use; no reselling or stock-site bundling |
+
 ## Writing down what you found
 
 For each candidate: link, author, one line on the mechanism if visible, and

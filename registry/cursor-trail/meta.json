@@ -54,5 +54,79 @@
       "description": "Drop size in pixels."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "assets": [
+    {
+      "file": "miro.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "amazon.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "wearos.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "microsoft.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "peer.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "zonda.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "skidubai.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "trefontane.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "lfc.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "dac.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "marcomartini.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    },
+    {
+      "file": "bg.svg",
+      "author": "David Denni (BeFreaky)",
+      "source": "https://www.befreaky.co/",
+      "license": "© David Denni — demo use with credit, not MIT"
+    }
+  ]
 }

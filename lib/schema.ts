@@ -19,6 +19,10 @@ export const MetaSchema = z.object({
   }),
   /** Extra people or places the reference itself credits (secondary inspirations). */
   credits: z.array(z.object({ author: z.string().min(1), url: z.url() })).optional(),
+  /** Credits for images used by the demo (files in public/demo/<slug>/). */
+  assets: z
+    .array(z.object({ file: z.string().min(1), author: z.string().min(1), source: z.url(), license: z.string().min(1) }))
+    .optional(),
   dependencies: z.array(z.string()),
   props: z.array(
     z.object({

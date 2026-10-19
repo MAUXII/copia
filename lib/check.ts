@@ -88,7 +88,7 @@ function checkPreviews(slug: string, previewsDir: string): Problem[] {
   return problems
 }
 
-export function checkComponent(dir: string, previewsDir: string): Problem[] {
+export function checkComponent(dir: string, previewsDir: string, demoAssetsDir = path.join("public", "demo", path.basename(dir))): Problem[] {
   const folder = path.basename(dir)
   const problems: Problem[] = []
   const at = (file: string) => `registry/${folder}/${file}`
@@ -108,6 +108,7 @@ export function checkComponent(dir: string, previewsDir: string): Problem[] {
   }
 
   let dependencies: string[] = []
+  let credited: string[] = []
   const metaFile = path.join(dir, "meta.json")
   if (existsSync(metaFile)) {
     let raw: unknown
@@ -128,6 +129,7 @@ export function checkComponent(dir: string, previewsDir: string): Problem[] {
         }
       } else {
         dependencies = result.data.dependencies
+        credited = (result.data.assets ?? []).map((a) => a.file)
         if (result.data.slug !== folder) {
           problems.push({ file: at("meta.json"), rule: `folder name must match meta.slug ("${folder}" vs "${result.data.slug}")`, fix: "Rename the folder or fix meta.slug." })
         }
@@ -152,6 +154,18 @@ export function checkComponent(dir: string, previewsDir: string): Problem[] {
   for (const pkg of used) {
     if (!dependencies.includes(pkg)) {
       problems.push({ file: at("meta.json"), rule: `"${pkg}" must be listed in meta.dependencies`, fix: `Add "${pkg}" to the dependencies array.` })
+    }
+  }
+
+  if (existsSync(demoAssetsDir)) {
+    for (const file of readdirSync(demoAssetsDir).filter((f) => !IGNORED_FILES.has(f) && !f.startsWith("NOTICE"))) {
+      if (!credited.includes(file)) {
+        problems.push({
+          file: `public/demo/${folder}/${file}`,
+          rule: `${file} is not credited in meta.assets`,
+          fix: 'Add { "file", "author", "source", "license" } for it to meta.json → assets.',
+        })
+      }
     }
   }
 

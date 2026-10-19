@@ -27,4 +27,4 @@ position.
 
 - Drag/swipe (Motion `drag="x"`), arrow keys, clickable cards and dots.
 - Autoplay with `pauseOnHover`; reduced motion removes the 3D turn.
-- Generated typographic covers in the demo (no third-party images).
+- Demo uses free Lummi photos with a similar look to the reference (credited in `meta.json` → `assets`).

@@ -142,6 +142,26 @@ describe("checkComponent", () => {
   })
 })
 
+describe("demo assets", () => {
+  it("requires every file in the demo assets folder to be credited in meta.assets", () => {
+    const { dir } = setup("assets-missing")
+    const assets = path.join(work, "assets-missing-demo")
+    mkdirSync(assets)
+    writeFileSync(path.join(assets, "photo.webp"), "x")
+    expect(rules(checkComponent(dir, previews, assets))).toMatch(/photo\.webp is not credited in meta\.assets/)
+  })
+
+  it("passes when every demo asset is credited", () => {
+    const { dir } = setup("assets-ok", (d) =>
+      editMeta(d, (m) => (m.assets = [{ file: "photo.webp", author: "Someone", source: "https://example.com/photo", license: "Lummi" }])),
+    )
+    const assets = path.join(work, "assets-ok-demo")
+    mkdirSync(assets)
+    writeFileSync(path.join(assets, "photo.webp"), "x")
+    expect(checkComponent(dir, previews, assets)).toEqual([])
+  })
+})
+
 describe("checkAll", () => {
   it("rejects duplicate slugs across folders", () => {
     const { root } = setup("dupe")

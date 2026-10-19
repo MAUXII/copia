@@ -58,5 +58,37 @@
       "description": "Auto-scroll speed (px/s) until the user interacts."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "assets": [
+    {
+      "file": "intense-eye.webp",
+      "author": "westkast",
+      "source": "https://www.lummi.ai/photo/intense-eye-close-up-gbx9c",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "textured-glass.webp",
+      "author": "nikadominguez_",
+      "source": "https://www.lummi.ai/photo/textured-glass-surface-se_y_",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "contrasting-vision.webp",
+      "author": "berol-oac",
+      "source": "https://www.lummi.ai/photo/contrasting-vision-ku-jk",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "metallic-droplets.webp",
+      "author": "nikadominguez_",
+      "source": "https://www.lummi.ai/photo/floating-metallic-droplets-cdwx",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "close-up-eye.webp",
+      "author": "rena",
+      "source": "https://www.lummi.ai/photo/close-up-eye-portrait-axhc4",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ]
 }

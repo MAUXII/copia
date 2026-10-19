@@ -26,4 +26,4 @@ pixels above the next.
 
 - Self-contained scroll area (`height`), `peek`, `scaleStep`, `cardHeight`.
 - Optional `autoScroll` that stops on wheel, touch or pointer down.
-- Gradient cards in the demo (no third-party images).
+- Demo uses free Lummi photos with a similar look to the reference (credited in `meta.json` → `assets`).

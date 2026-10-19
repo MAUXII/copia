@@ -69,6 +69,24 @@ npm run new <slug>
   (the preview recorder moves the pointer in from the left and circles the
   center).
 
+### Images in the demo
+
+Never fake photos with gradients or code when the reference uses images.
+Use real images, in this order:
+
+1. **The reference's own images** (the stickers on BeFreaky, the covers on
+   the original site), when the effect depends on them. Credit the author.
+2. **Similar real images from [Lummi](https://www.lummi.ai)** (free for
+   personal and commercial use; credit appreciated). Search
+   `https://www.lummi.ai/s/photo/<terms>` for a matching look, use only free
+   images (`assets.lummi.ai/...`, not `/api/pro/...`), and download a
+   resized WebP: `https://assets.lummi.ai/assets/<id>?auto=format&w=800&fm=webp`.
+
+Put files in `public/demo/<slug>/` and credit every one in `meta.json` →
+`assets` (`file`, `author`, `source` page, `license`). `npm run check` fails
+on any uncredited file. Images belong to the demo only; the component itself
+takes images as props.
+
 ## 5. Add at least one feature
 
 Copia versions are better than the reference. Typical upgrades: a direction

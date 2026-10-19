@@ -26,6 +26,8 @@ shrink away after about a second, so the trail is always 6–10 items long.
 
 ## What Copia changed or added
 
-- Any `ReactNode` as an item (images, emoji, components); the demo uses
-  generated stickers, so no third-party images ship with the component.
+- Any `ReactNode` as an item (images, emoji, components).
+- The demo uses BeFreaky's own 12 sticker SVGs (credited to David Denni in
+  `meta.json` → `assets`, see `public/demo/cursor-trail/NOTICE.md`); the
+  component itself ships no images.
 - `spacing`, `lifetime`, `max`, `size` props; disabled for reduced motion.
