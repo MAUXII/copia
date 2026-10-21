@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils"
 const CELL_W = 14 // px per column
 const CELL_H = 18 // px per row
 const FONT = '12px "Geist Mono", ui-monospace, monospace'
-const RAMP = ["·", "∙", "•", "+", "×", "✳", "✶"] // calm → intense
+// Code glyphs from faint to dense, like the Claude desktop "Landing Texture".
+const RAMP = ["·", ".", ":", "-", "=", "+", "*", "/", "<", ">", "{", "}", "#"]
 const BASE_ALPHA = 0.14
 const WAVE_SPEED = 560 // px per second
 const WAVE_WIDTH = 110 // px, thickness of the ring
@@ -14,14 +15,38 @@ const WAVE_LIFE = 2.6 // seconds
 const HOVER_RADIUS = 150
 const TWINKLE = 0.0025 // chance per cell per frame to flicker while idle
 const ACCENT = [255, 122, 69] // Ember
+const WIND_SCALE = 0.0045 // noise frequency (lower = bigger gusts)
+const WIND_SPEED = 0.06 // how fast the wind drifts
+const WIND_STRENGTH = 0.38
+const CALM_RADIUS = 0.34 // fraction of width around the content kept quiet
+
+/** Smooth value noise in [0, 1]. */
+function hash(x: number, y: number) {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453
+  return n - Math.floor(n)
+}
+function noise(x: number, y: number) {
+  const xi = Math.floor(x)
+  const yi = Math.floor(y)
+  const xf = x - xi
+  const yf = y - yi
+  const u = xf * xf * (3 - 2 * xf)
+  const v = yf * yf * (3 - 2 * yf)
+  const a = hash(xi, yi)
+  const b = hash(xi + 1, yi)
+  const c = hash(xi, yi + 1)
+  const d = hash(xi + 1, yi + 1)
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
+}
 
 type Wave = { x: number; y: number; start: number }
 
 /**
- * A grid of monospace glyphs, like the Claude desktop background. Clicking
- * sends a wave that swaps glyphs for denser ones and tints them in the brand
- * color; glyphs near the cursor scramble; a few twinkle while idle. Listens on
- * the parent so content above stays clickable.
+ * A field of code glyphs, after the Claude desktop "Landing Texture": a slow
+ * noise "wind" drifts bright patches across the grid, clicks send circular
+ * waves that densify and tint glyphs in the brand color, glyphs near the
+ * cursor scramble, and a calm zone keeps the center readable. Listens on the
+ * parent so content above stays clickable.
  */
 export function GlyphRipple({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -84,14 +109,34 @@ export function GlyphRipple({ className }: { className?: string }) {
           if (!reduceMotion && Math.random() < TWINKLE + near * 0.08) twinkle[index] = 0.35 + Math.random() * 0.4 * (1 + near)
           twinkle[index] = Math.max(0, twinkle[index] - dt * 0.9)
 
-          const energy = Math.max(wave, twinkle[index] * 0.6, near * 0.25)
+          // Drifting wind: two octaves of noise sliding diagonally.
+          const wind =
+            noise(x * WIND_SCALE + t * WIND_SPEED, y * WIND_SCALE - t * WIND_SPEED * 0.6) * 0.65 +
+            noise(x * WIND_SCALE * 2.3 - t * WIND_SPEED * 1.4, y * WIND_SCALE * 2.3 + t * WIND_SPEED) * 0.35
+          const gust = Math.max(0, wind - 0.45) / 0.55
+          // Calm zone: an ellipse around the content where the texture fades.
+          const cx = (x - width / 2) / (width * CALM_RADIUS)
+          const cy = (y - height / 2) / (height * CALM_RADIUS * 1.25)
+          const calm = Math.min(1, Math.max(0.15, Math.hypot(cx, cy) - 0.35))
+
+          // Waves soften inside the calm zone so the headline stays readable.
+          wave *= 0.3 + 0.7 * calm
+          const energy = Math.max(wave, (gust * WIND_STRENGTH + twinkle[index] * 0.5) * calm, near * 0.3)
           const glyph = RAMP[Math.min(RAMP.length - 1, Math.floor(energy * RAMP.length))]
-          const alpha = BASE_ALPHA + energy * (1 - BASE_ALPHA) * 0.9
+          const alpha = (BASE_ALPHA * (0.45 + 0.55 * calm) + energy * (1 - BASE_ALPHA) * 0.9)
           const r = 255 + (ACCENT[0] - 255) * wave
           const g = 255 + (ACCENT[1] - 255) * wave
           const b = 255 + (ACCENT[2] - 255) * wave
           ctx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${alpha})`
-          ctx.fillText(glyph, x, y)
+          // Wave crests glow, like the original's luminous symbols.
+          if (wave > 0.55) {
+            ctx.shadowColor = `rgba(${ACCENT[0]}, ${ACCENT[1]}, ${ACCENT[2]}, ${wave * 0.9})`
+            ctx.shadowBlur = 8 * wave
+            ctx.fillText(glyph, x, y)
+            ctx.shadowBlur = 0
+          } else {
+            ctx.fillText(glyph, x, y)
+          }
         }
       }
     }
