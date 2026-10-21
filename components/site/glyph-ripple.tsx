@@ -16,17 +16,17 @@ const WIND_SCALE = 0.004 // noise frequency (lower = bigger gusts)
 const WIND_SPEED = 0.018 // drift, noise units per second: slow
 const SWAP_RATE = 0.04 // idle glyph swaps per cell per second (~ one every 25 s)
 
-// Bursts, after the Claude desktop energy grid: a ragged wavefront races out in
-// Manhattan distance, quantized to whole cells, flashes each recruited cell on
+// Bursts, after the Claude desktop energy grid: a round wavefront ripples out from
+// the click, quantized to whole cells, flashes each recruited cell on
 // arrival and leaves an afterglow that cools through a discrete ramp.
 const SPEED = 30 // cells per second
 const RANGE = 48 // cells the front travels before it dies out
-const DENSITY = 0.6 // fraction of cells a burst recruits, keeps dark gaps
-const JITTER = 0.12 // per-cell arrival scatter, seconds
+const DENSITY = 0.75 // fraction of cells a burst recruits, keeps dark gaps
+const JITTER = 0.05 // per-cell arrival scatter, seconds
 const HEAD_GAIN = 1.25 // arrival flash strength
-const HEAD_DECAY = 5 // arrival flash fade, 1/s
-const BODY_GAIN = 0.5 // afterglow strength
-const BODY_DECAY = 1.1 // afterglow fade, 1/s
+const HEAD_DECAY = 9 // arrival flash fade, 1/s: fast, so the lit band stays thin
+const BODY_GAIN = 0.06 // faint afterglow behind the ring
+const BODY_DECAY = 2.6 // afterglow fade, 1/s: short, so the front reads as a ring
 const MAX_AGE = 4 // seconds, past this a burst is dead
 const STEPS = 5 // intensity is quantized, never a continuous gradient
 const INK_FLOOR = 0.08 // alpha of the lowest ramp step
@@ -63,7 +63,7 @@ type Burst = { col: number; row: number; start: number; seed: number }
 /**
  * A near-invisible field of code glyphs, after the Claude desktop "Landing
  * Texture". At rest it is a dark, slow texture you barely notice; a click sends
- * a ragged wavefront that recruits cells, flashes them toward the brand color
+ * a round ripple ring that recruits cells, flashes them toward the brand color
  * and lets them cool back down. Listens on the parent so content stays clickable.
  */
 export function GlyphRipple({ className }: { className?: string }) {
@@ -126,7 +126,8 @@ export function GlyphRipple({ className }: { className?: string }) {
           let energy = 0
           for (const b of bursts) {
             if (hash(col + b.seed, row - b.seed) > DENSITY) continue
-            const dist = Math.abs(col - b.col) + Math.abs(row - b.row)
+            // Euclidean in pixel space (rows are taller than columns), so the front is a round ring.
+            const dist = Math.hypot(col - b.col, ((row - b.row) * CELL_H) / CELL_W)
             if (dist > RANGE) continue
             const arrive = b.start + dist / SPEED + hash(col * 1.7 + b.seed, row * 2.3) * JITTER
             const since = t - arrive
@@ -135,7 +136,7 @@ export function GlyphRipple({ className }: { className?: string }) {
               flash[index] = arrive
               glyphs[index] = (Math.random() * GLYPHS.length) | 0 // the front rewrites what it touches
             }
-            const reach = 1 - dist / RANGE
+            const reach = 1 - (dist / RANGE) ** 2 // holds its strength, then dies at the edge
             const e = (HEAD_GAIN * Math.exp(-since * HEAD_DECAY) + BODY_GAIN * Math.exp(-since * BODY_DECAY)) * reach
             energy = Math.max(energy, e * (0.55 + 0.45 * hash(col - b.seed, row + b.seed)))
           }
@@ -150,7 +151,7 @@ export function GlyphRipple({ className }: { className?: string }) {
 
           let alpha: number
           let mix = 0
-          if (energy > 0.04) {
+          if (energy > 0.12) {
             const step = Math.min(STEPS, Math.ceil(Math.min(1, energy) * STEPS)) / STEPS
             alpha = INK_FLOOR + (INK_CEIL - INK_FLOOR) * Math.pow(step, RAMP_POW)
             mix = Math.pow(step, 1.6)
