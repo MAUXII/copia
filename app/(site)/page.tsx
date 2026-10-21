@@ -1,7 +1,7 @@
 import { CommandLine } from "@/components/site/copy-button"
 import { ComponentGrid } from "@/components/site/component-grid"
 import { KeysHero } from "@/components/site/keys-hero"
-import { DotRipple } from "@/components/site/dot-ripple"
+import { GlyphRipple } from "@/components/site/glyph-ripple"
 import { getComponents } from "@/lib/registry"
 import { NAMESPACE } from "@/lib/site"
 
@@ -12,8 +12,8 @@ export default function Home() {
     <>
       {/* The hero is always dark: the dot grid is part of the brand, not the theme. */}
       <section className="dark relative isolate flex min-h-[640px] items-center justify-center overflow-hidden bg-[#0a0a0b] px-4 pt-24 pb-20 text-neutral-50 sm:min-h-[760px]">
-        {/* Click anywhere: the dot grid answers with a wave. */}
-        <DotRipple className="absolute inset-0 -z-10 size-full" />
+        {/* Click anywhere: the glyph grid answers with a wave (like the Claude desktop background). */}
+        <GlyphRipple className="absolute inset-0 -z-10 size-full" />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_35%,#0a0a0b_85%)]" />
         <div className="flex w-full flex-col items-center gap-8 text-center">
           <KeysHero />
