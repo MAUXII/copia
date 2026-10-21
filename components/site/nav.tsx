@@ -30,7 +30,7 @@ export async function Nav() {
             href={REPO_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-[30px] items-center gap-1.5 rounded-[15px] bg-white/[0.08] px-2.5 text-sm font-medium text-white/65 transition-colors hover:bg-white/[0.14] hover:text-white"
+            className="inline-flex h-[30px] items-center gap-1.5 rounded-[15px] bg-foreground/[0.06] px-2.5 text-sm font-medium text-foreground/65 transition-colors hover:bg-foreground/[0.12] hover:text-foreground"
           >
             <GitHubIcon />
             {stars !== null ? <span className="tabular-nums">{stars.toLocaleString("en")}</span> : <span>GitHub</span>}

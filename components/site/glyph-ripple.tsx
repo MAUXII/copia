@@ -36,6 +36,7 @@ const HOVER_RADIUS = 5 // cells, the cursor wakes a few faint cells
 const CALM = 0.45 // how much bursts soften over the headline
 
 const COOL = [235, 228, 220] // low energy: warm white
+const COOL_LIGHT = [40, 34, 30] // low energy on the light hero: warm ink
 const HOT = [255, 122, 69] // top energy: Ember
 
 /** Deterministic hash in [0, 1). */
@@ -87,6 +88,13 @@ export function GlyphRipple({ className }: { className?: string }) {
     let frame = 0
     let visible = true
     let last = performance.now()
+    // Dark glyphs add light; light glyphs are ink on paper and blend normally.
+    let dark = document.documentElement.classList.contains("dark")
+    const themeObserver = new MutationObserver(() => {
+      dark = document.documentElement.classList.contains("dark")
+      if (reduceMotion) draw(performance.now())
+    })
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio, 2)
@@ -110,7 +118,8 @@ export function GlyphRipple({ className }: { className?: string }) {
       ctx.font = FONT
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
-      ctx.globalCompositeOperation = "lighter"
+      ctx.globalCompositeOperation = dark ? "lighter" : "source-over"
+      const cool = dark ? COOL : COOL_LIGHT
       for (let i = bursts.length - 1; i >= 0; i--) if (t - bursts[i].start > MAX_AGE) bursts.splice(i, 1)
 
       const offsetX = (width - cols * CELL_W) / 2 + CELL_W / 2
@@ -160,9 +169,9 @@ export function GlyphRipple({ className }: { className?: string }) {
             const wind = noise(x * WIND_SCALE + t * WIND_SPEED, y * WIND_SCALE - t * WIND_SPEED * 0.7)
             alpha = REST_ALPHA + WIND_ALPHA * Math.max(0, wind - 0.5) * 2
           }
-          const r = COOL[0] + (HOT[0] - COOL[0]) * mix
-          const g = COOL[1] + (HOT[1] - COOL[1]) * mix
-          const bl = COOL[2] + (HOT[2] - COOL[2]) * mix
+          const r = cool[0] + (HOT[0] - cool[0]) * mix
+          const g = cool[1] + (HOT[1] - cool[1]) * mix
+          const bl = cool[2] + (HOT[2] - cool[2]) * mix
           ctx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${bl | 0}, ${alpha})`
           ctx.fillText(GLYPHS[glyphs[index]], x, y)
         }
@@ -224,6 +233,7 @@ export function GlyphRipple({ className }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(frame)
+      themeObserver.disconnect()
       ro.disconnect()
       io.disconnect()
       host.removeEventListener("pointerdown", onDown)

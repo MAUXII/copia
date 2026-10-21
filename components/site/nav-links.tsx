@@ -26,7 +26,7 @@ export function NavLinks() {
             href={href}
             {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
             aria-current={active ? "page" : undefined}
-            className={cn("flex items-center gap-1.5 text-sm font-medium transition-colors", active ? "text-white" : "text-white/50 hover:text-white")}
+            className={cn("flex items-center gap-1.5 text-sm font-medium transition-colors", active ? "text-foreground" : "text-foreground/50 hover:text-foreground")}
           >
             <Icon className="size-4" aria-hidden />
             {label}
@@ -48,7 +48,7 @@ export function LocalTime() {
     return () => clearInterval(id)
   }, [])
   return (
-    <time className="hidden text-sm font-medium text-white/50 tabular-nums md:block" suppressHydrationWarning>
+    <time className="hidden text-sm font-medium text-foreground/50 tabular-nums md:block" suppressHydrationWarning>
       {time}
     </time>
   )

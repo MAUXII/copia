@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 
 /** Ember ramp: background, deep red, orange, amber highlight. */
 const RAMP = ["#0a0302", "#7a0f00", "#ff4d1c", "#ffd29a"]
+/** Light ramp: paper, peach, orange, deep ember. */
+const RAMP_LIGHT = ["#fafaf9", "#ffd9bf", "#ff8a4c", "#ff4d1c"]
 const RENDER_SCALE = 0.45 // the smoke is blurred anyway; low resolution keeps it cheap
 
 const VERTEX = "attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }"
@@ -63,9 +65,12 @@ export function Smoke({ className }: { className?: string }) {
     gl.enableVertexAttribArray(position)
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0)
     const uniform = (name: string) => gl.getUniformLocation(program, name)
-    RAMP.forEach((hex, i) => gl.uniform3fv(uniform(`k${i}`), hexToRgb(hex)))
-
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const applyTheme = () => {
+      const ramp = document.documentElement.classList.contains("dark") ? RAMP : RAMP_LIGHT
+      ramp.forEach((hex, i) => gl.uniform3fv(uniform(`k${i}`), hexToRgb(hex)))
+      if (reduceMotion) draw(performance.now())
+    }
     let frame = 0
     let visible = true
 
@@ -86,6 +91,10 @@ export function Smoke({ className }: { className?: string }) {
       if (visible && !reduceMotion) frame = requestAnimationFrame(loop)
     }
 
+    const themeObserver = new MutationObserver(applyTheme)
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    applyTheme()
+
     // Pause when the hero scrolls out of view.
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting
@@ -96,6 +105,7 @@ export function Smoke({ className }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(frame)
+      themeObserver.disconnect()
       observer.disconnect()
     }
   }, [])

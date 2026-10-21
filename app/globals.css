@@ -160,11 +160,24 @@
     transform: translateY(7px);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.32), inset 0 -6px 14px rgb(0 0 0 / 0.35), 0 2px 0 rgb(4 4 4 / 0.92), 0 0 60px rgb(255 90 30 / 0.5);
   }
+  /* Light keycaps: white plastic on a warm off-white hero. */
+  :root:not(.dark) .keycap {
+    color: #1c1c1c;
+    background: linear-gradient(160deg, #fff, #f4f4f3 45%, #e7e6e4);
+    border-color: rgb(0 0 0 / 0.08);
+    box-shadow: inset 0 1px 0 #fff, inset 0 -10px 20px rgb(0 0 0 / 0.04), 0 9px 0 #d6d5d2, 0 24px 50px rgb(0 0 0 / 0.12);
+  }
+  :root:not(.dark) .keycap-down {
+    box-shadow: inset 0 1px 0 #fff, inset 0 -6px 14px rgb(0 0 0 / 0.04), 0 2px 0 #d6d5d2, 0 0 60px rgb(255 90 30 / 0.35);
+  }
   .ember-text {
     background: linear-gradient(180deg, #fff, #ffc48a 45%, #ff4d1c);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  :root:not(.dark) .ember-text {
+    background-image: linear-gradient(180deg, #ffa36b, #ff6a2b 55%, #e8400f);
   }
   .grain {
     pointer-events: none;
