@@ -2,6 +2,7 @@ import { CommandLine } from "@/components/site/copy-button"
 import { ComponentGrid } from "@/components/site/component-grid"
 import { KeysHero } from "@/components/site/keys-hero"
 import { GlyphRipple } from "@/components/site/glyph-ripple"
+import { Smoke } from "@/components/site/smoke"
 import { getComponents } from "@/lib/registry"
 import { NAMESPACE } from "@/lib/site"
 
@@ -12,6 +13,8 @@ export default function Home() {
     <>
       {/* The hero is always dark: the dot grid is part of the brand, not the theme. */}
       <section className="dark relative isolate flex min-h-[640px] items-center justify-center overflow-hidden bg-[#0a0a0b] px-4 pt-24 pb-20 text-neutral-50 sm:min-h-[760px]">
+        {/* A faint Ember smoke rising from the bottom edge, under the glyphs. */}
+        <Smoke className="absolute inset-0 -z-10 size-full opacity-[0.12] [mask-image:linear-gradient(to_top,black,transparent_75%)]" />
         {/* Click anywhere: the glyph grid answers with a wave (like the Claude desktop background). */}
         <GlyphRipple className="absolute inset-0 -z-10 size-full" />
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_35%,#0a0a0b_85%)]" />
