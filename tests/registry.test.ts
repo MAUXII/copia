@@ -23,6 +23,23 @@ describe("MetaSchema", () => {
   })
 })
 
+describe("MetaSchema controls", () => {
+  it("accepts number, boolean and select controls", () => {
+    const controls = [
+      { prop: "layers", type: "number", min: 2, max: 16, step: 1, default: 8 },
+      { prop: "tint", type: "boolean", default: false },
+      { prop: "curve", type: "select", options: ["linear", "exponential"], default: "exponential" },
+    ]
+    expect(MetaSchema.safeParse({ ...okMeta, controls }).success).toBe(true)
+  })
+  it("rejects a number control without a range", () => {
+    expect(MetaSchema.safeParse({ ...okMeta, controls: [{ prop: "x", type: "number", default: 1 }] }).success).toBe(false)
+  })
+  it("rejects a select default that is not one of the options", () => {
+    expect(MetaSchema.safeParse({ ...okMeta, controls: [{ prop: "c", type: "select", options: ["a", "b"], default: "z" }] }).success).toBe(false)
+  })
+})
+
 describe("registry reader", () => {
   it("lists components", () => {
     const items = getComponents(ROOT)

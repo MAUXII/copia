@@ -3,19 +3,121 @@
   "name": "Glow Border Button",
   "description": "A button whose border carries a travelling beam of light (border beam); Copia adds a blurred halo that bleeds outside the edge and a beam that smoothly speeds up on hover or keyboard focus without restarting its lap.",
   "category": "buttons",
-  "tags": ["border beam", "glow", "button", "offset-path", "magic ui"],
-  "author": { "name": "Copia", "github": "MAUXII" },
-  "inspiration": { "author": "Magic UI (Border Beam)", "url": "https://magicui.design/docs/components/border-beam" },
-  "dependencies": ["motion", "lucide-react"],
-  "props": [
-    { "name": "size", "type": "number", "default": "60", "description": "Length of the beam in px." },
-    { "name": "duration", "type": "number", "default": "4", "description": "Seconds for one lap at rest." },
-    { "name": "hoverSpeed", "type": "number", "default": "3", "description": "Lap speed multiplier while hovered or focused; eases in and out." },
-    { "name": "colorFrom", "type": "string", "default": "\"#ffaa40\"", "description": "Leading color of the beam." },
-    { "name": "colorTo", "type": "string", "default": "\"#9c40ff\"", "description": "Trailing color of the beam." },
-    { "name": "borderWidth", "type": "number", "default": "1.5", "description": "Border thickness in px." },
-    { "name": "glow", "type": "number", "default": "14", "description": "Blur radius of the outer halo in px; 0 turns it off." },
-    { "name": "reverse", "type": "boolean", "default": "false", "description": "Run the beam counter-clockwise." }
+  "tags": [
+    "border beam",
+    "glow",
+    "button",
+    "offset-path",
+    "magic ui"
   ],
-  "createdAt": "2026-10-18"
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Magic UI (Border Beam)",
+    "url": "https://magicui.design/docs/components/border-beam"
+  },
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
+  "props": [
+    {
+      "name": "size",
+      "type": "number",
+      "default": "60",
+      "description": "Length of the beam in px."
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "default": "4",
+      "description": "Seconds for one lap at rest."
+    },
+    {
+      "name": "hoverSpeed",
+      "type": "number",
+      "default": "3",
+      "description": "Lap speed multiplier while hovered or focused; eases in and out."
+    },
+    {
+      "name": "colorFrom",
+      "type": "string",
+      "default": "\"#ffaa40\"",
+      "description": "Leading color of the beam."
+    },
+    {
+      "name": "colorTo",
+      "type": "string",
+      "default": "\"#9c40ff\"",
+      "description": "Trailing color of the beam."
+    },
+    {
+      "name": "borderWidth",
+      "type": "number",
+      "default": "1.5",
+      "description": "Border thickness in px."
+    },
+    {
+      "name": "glow",
+      "type": "number",
+      "default": "14",
+      "description": "Blur radius of the outer halo in px; 0 turns it off."
+    },
+    {
+      "name": "reverse",
+      "type": "boolean",
+      "default": "false",
+      "description": "Run the beam counter-clockwise."
+    }
+  ],
+  "createdAt": "2026-10-18",
+  "controls": [
+    {
+      "prop": "size",
+      "type": "number",
+      "min": 20,
+      "max": 140,
+      "step": 2,
+      "default": 70
+    },
+    {
+      "prop": "duration",
+      "type": "number",
+      "min": 1,
+      "max": 12,
+      "step": 0.5,
+      "default": 4
+    },
+    {
+      "prop": "hoverSpeed",
+      "type": "number",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "default": 3
+    },
+    {
+      "prop": "borderWidth",
+      "type": "number",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.5,
+      "default": 1.5
+    },
+    {
+      "prop": "glow",
+      "type": "number",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "prop": "reverse",
+      "type": "boolean",
+      "default": false
+    }
+  ]
 }

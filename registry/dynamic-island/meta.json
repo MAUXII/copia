@@ -66,5 +66,15 @@
       "description": "Custom content with its own size."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "controls": [
+    {
+      "prop": "timerSeconds",
+      "type": "number",
+      "min": 10,
+      "max": 300,
+      "step": 5,
+      "default": 60
+    }
+  ]
 }

@@ -93,6 +93,12 @@ Put files in `public/demo/<slug>/` and credit every one in `meta.json` →
 on any uncredited file. Images belong to the demo only; the component itself
 takes images as props.
 
+### Customizer controls
+
+Add `controls` to `meta.json` for the props worth tweaking live and make the
+demo accept them as props (see the contract). The viewer then shows a Props
+Customizer with sliders, switches and generated JSX.
+
 ## 5. Add at least one feature
 
 Copia versions are better than the reference. Typical upgrades: a direction

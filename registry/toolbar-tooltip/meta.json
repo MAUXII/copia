@@ -42,5 +42,24 @@
       "description": "Where the tooltip appears."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "controls": [
+    {
+      "prop": "delay",
+      "type": "number",
+      "min": 0,
+      "max": 1000,
+      "step": 50,
+      "default": 150
+    },
+    {
+      "prop": "side",
+      "type": "select",
+      "options": [
+        "top",
+        "bottom"
+      ],
+      "default": "top"
+    }
+  ]
 }

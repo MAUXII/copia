@@ -6,6 +6,16 @@ export type Category = (typeof CATEGORIES)[number]
 /** kebab-case starting with a letter, so it maps to a valid component name. */
 export const SLUG_RE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 
+/** Props the viewer's customizer can change live. */
+const ControlSchema = z.discriminatedUnion("type", [
+  z.object({ prop: z.string().min(1), type: z.literal("number"), min: z.number(), max: z.number(), step: z.number().positive(), default: z.number() }),
+  z.object({ prop: z.string().min(1), type: z.literal("boolean"), default: z.boolean() }),
+  z
+    .object({ prop: z.string().min(1), type: z.literal("select"), options: z.array(z.string()).min(2), default: z.string() })
+    .refine((c) => c.options.includes(c.default), { message: "select default must be one of its options" }),
+])
+export type Control = z.infer<typeof ControlSchema>
+
 export const MetaSchema = z.object({
   slug: z.string().regex(SLUG_RE, "slug must be kebab-case (a-z, 0-9, hyphens)"),
   name: z.string().min(1),
@@ -32,6 +42,7 @@ export const MetaSchema = z.object({
       description: z.string(),
     }),
   ),
+  controls: z.array(ControlSchema).optional(),
   createdAt: z.iso.date(),
 })
 

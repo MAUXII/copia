@@ -36,7 +36,23 @@ public/demo/<slug>/*               demo images, each credited in meta.json → a
   "assets": [{ "file": "photo.webp", "author": "creator", "source": "https://www.lummi.ai/photo/…", "license": "Lummi License" }],
   "dependencies": [],
   "props": [{ "name": "layers", "type": "number", "default": "8", "description": "…" }],
+  "controls": [
+    { "prop": "layers", "type": "number", "min": 2, "max": 16, "step": 1, "default": 8 },
+    { "prop": "tint", "type": "boolean", "default": false },
+    { "prop": "curve", "type": "select", "options": ["linear", "exponential"], "default": "exponential" }
+  ],
   "createdAt": "2026-10-18"
+}
+```
+
+`controls` power the viewer's Props Customizer (sliders, switches, options,
+generated JSX). List the props worth tweaking live; `default` must match what
+the demo shows. The demo's default export receives them as props and spreads
+them onto the component:
+
+```tsx
+export default function Demo(props: Pick<ProgressiveBlurProps, "layers" | "tint" | "curve">) {
+  return <ProgressiveBlur {...props} direction="bottom" />
 }
 ```
 

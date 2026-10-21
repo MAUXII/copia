@@ -1,8 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { Code2, Expand, Home, Info, Moon, RotateCcw, Shrink, Sun } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { Code2, Expand, Home, Info, Moon, RotateCcw, Shrink, SlidersHorizontal, Sun } from "lucide-react"
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react"
+import { demos } from "@/lib/demos"
+import { defaultValues, type ControlValues } from "@/lib/jsx"
+import type { Control } from "@/lib/schema"
+import { Customizer } from "./customizer"
 import { AnimatePresence, motion } from "motion/react"
 import { cn } from "@/lib/utils"
 import { CurvedScrollbar } from "./curved-scrollbar"
@@ -11,8 +15,11 @@ import { InstallCommand } from "./install-command"
 type Props = {
   name: string
   installTarget: string
-  /** The live demo. */
-  preview: React.ReactNode
+  slug: string
+  /** Name used in the generated JSX. */
+  componentName: string
+  /** Props the customizer can change live. */
+  controls: Control[]
   /** The specification panel content. */
   info: React.ReactNode
 }
@@ -48,7 +55,11 @@ function DockButton({ label, onClick, active, children }: { label: string; onCli
 }
 
 /** Full-screen component page: the demo fills the viewport, specs slide in from the left. */
-export function ComponentViewer({ name, installTarget, preview, info }: Props) {
+export function ComponentViewer({ name, installTarget, slug, componentName, controls, info }: Props) {
+  // The demo renders on the client so customizer values can flow into it as props.
+  const Demo = useMemo(() => lazy(demos[slug]), [slug])
+  const [values, setValues] = useState<ControlValues>(() => defaultValues(controls))
+  const [customize, setCustomize] = useState(false)
   // Docs column open by default on desktop, like Componentry; closed on small screens.
   const [panel, setPanel] = useState(true)
   const root = useRef<HTMLDivElement>(null)
@@ -75,6 +86,14 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [])
+
+  const dismissHint = () => {
+    if (!hint) return
+    setHint(false)
+    try {
+      localStorage.setItem("copia:hint-seen", "1")
+    } catch {}
+  }
 
   const openPanel = (next: boolean) => {
     setPanel(next)
@@ -142,9 +161,24 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
             className={cn("h-full overflow-x-hidden overflow-y-auto transition-colors", light ? "bg-[#f2f2f0] text-neutral-900" : "bg-[#0b0b0c]")}
           >
             <div key={run} className={cn("flex min-h-full w-full flex-col", !light && "dark")}>
-              {preview}
+              <Suspense fallback={<div className="flex-1" />}>
+                <Demo {...values} />
+              </Suspense>
             </div>
           </div>
+
+          {/* Customizer replaces the preview while open, like Great UI. */}
+          {customize && (
+            <div className="absolute inset-0 z-30 overflow-y-auto bg-[#0b0b0c]">
+              <Customizer
+                name={componentName}
+                controls={controls}
+                values={values}
+                onChange={(prop, value) => setValues((v) => ({ ...v, [prop]: value }))}
+                onReset={() => setValues(defaultValues(controls))}
+              />
+            </div>
+          )}
 
           {/* Dock */}
           <div className={cn("absolute top-3 right-3 z-40 flex items-center gap-1 rounded-full bg-neutral-800/85 p-1 transition-opacity", focus && "opacity-40 hover:opacity-100")}>
@@ -160,6 +194,18 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
             <DockButton label="Code and details" onClick={() => openPanel(!panel)} active={panel}>
               {panel ? <Code2 /> : <Info />}
             </DockButton>
+            {controls.length > 0 && (
+              <DockButton
+                label={customize ? "Back to preview" : "Customize the preview"}
+                onClick={() => {
+                  setCustomize((c) => !c)
+                  dismissHint()
+                }}
+                active={customize}
+              >
+                <SlidersHorizontal />
+              </DockButton>
+            )}
             <DockButton label={light ? "Dark preview" : "Light preview"} onClick={() => setLight((l) => !l)} active={light}>
               {light ? <Moon /> : <Sun />}
             </DockButton>
@@ -167,7 +213,7 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
 
           {/* Handwritten hint */}
           <AnimatePresence>
-            {hint && !panel && !focus && (
+            {hint && !focus && !customize && (
               <motion.div
                 initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0, transition: { delay: 0.6 } }}
@@ -175,9 +221,9 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
                 className={cn("pointer-events-none absolute top-14 right-20 z-30 hidden items-start gap-1 font-hand text-xl leading-tight md:flex", light ? "text-neutral-500" : "text-neutral-400")}
               >
                 <span className="mt-4 rotate-[-4deg] text-right">
-                  Click here to see the code,
+                  {controls.length > 0 ? "Click here to customize the preview" : "Click here to see the code,"}
                   <br />
-                  props and credits!
+                  {controls.length > 0 ? "or see the code and credits!" : "props and credits!"}
                 </span>
                 <svg width="54" height="46" viewBox="0 0 54 46" fill="none" className="-mt-1" aria-hidden>
                   <path d="M4 42 C 20 40, 38 30, 44 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -189,7 +235,7 @@ export function ComponentViewer({ name, installTarget, preview, info }: Props) {
 
           {/* Install pill */}
           <AnimatePresence>
-            {!focus && !panel && (
+            {!focus && !panel && !customize && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

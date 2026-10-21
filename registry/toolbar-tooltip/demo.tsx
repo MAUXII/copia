@@ -1,5 +1,5 @@
 import { Eye, Inbox, Menu, MessageCircle, Share, ToggleRight } from "lucide-react"
-import { ToolbarTooltip } from "./toolbar-tooltip"
+import { ToolbarTooltip, type ToolbarTooltipProps } from "./toolbar-tooltip"
 
 const items = [
   { label: "Comment", icon: <MessageCircle />, shortcut: ["C"] },
@@ -10,10 +10,10 @@ const items = [
   { label: "Menu", icon: <Menu />, shortcut: ["⌘", "K"] },
 ]
 
-export default function Demo() {
+export default function Demo(props: Pick<ToolbarTooltipProps, "delay" | "side">) {
   return (
     <div className="grid flex-1 place-items-center p-6">
-      <ToolbarTooltip items={items} delay={150} className="scale-[1.6]" />
+      <ToolbarTooltip delay={150} {...props} items={items} className="scale-[1.6]" />
     </div>
   )
 }

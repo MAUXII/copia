@@ -69,5 +69,37 @@
       "description": "Size the blur area, e.g. h-32 or w-24."
     }
   ],
-  "createdAt": "2026-10-18"
+  "createdAt": "2026-10-18",
+  "controls": [
+    {
+      "prop": "layers",
+      "type": "number",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "prop": "maxBlur",
+      "type": "number",
+      "min": 2,
+      "max": 64,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "prop": "curve",
+      "type": "select",
+      "options": [
+        "linear",
+        "exponential"
+      ],
+      "default": "exponential"
+    },
+    {
+      "prop": "tint",
+      "type": "boolean",
+      "default": false
+    }
+  ]
 }

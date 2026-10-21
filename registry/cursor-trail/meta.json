@@ -128,5 +128,39 @@
       "source": "https://www.befreaky.co/",
       "license": "© David Denni — demo use with credit, not MIT"
     }
+  ],
+  "controls": [
+    {
+      "prop": "spacing",
+      "type": "number",
+      "min": 10,
+      "max": 150,
+      "step": 5,
+      "default": 45
+    },
+    {
+      "prop": "lifetime",
+      "type": "number",
+      "min": 200,
+      "max": 3000,
+      "step": 100,
+      "default": 900
+    },
+    {
+      "prop": "max",
+      "type": "number",
+      "min": 3,
+      "max": 30,
+      "step": 1,
+      "default": 14
+    },
+    {
+      "prop": "size",
+      "type": "number",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "default": 110
+    }
   ]
 }

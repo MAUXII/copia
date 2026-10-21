@@ -1,4 +1,4 @@
-import { CardStackScroll } from "./card-stack-scroll"
+import { CardStackScroll, type CardStackScrollProps } from "./card-stack-scroll"
 
 /** Free photos from Lummi (lummi.ai); authors in meta.json → assets. */
 const CARDS = [
@@ -21,7 +21,7 @@ const items = CARDS.map((card, i) => (
   </div>
 ))
 
-export default function Demo() {
+export default function Demo(props: Pick<CardStackScrollProps, "top" | "peek" | "scaleStep" | "autoScroll">) {
   return (
     <div className="flex-1 px-4">
       <div className="flex h-[45vh] flex-col items-center justify-end gap-3 pb-10">
@@ -32,7 +32,7 @@ export default function Demo() {
         </span>
         <span className="h-12 w-px bg-muted-foreground/50" />
       </div>
-      <CardStackScroll items={items} autoScroll={160} className="mx-auto w-full max-w-2xl" />
+      <CardStackScroll autoScroll={160} {...props} items={items} className="mx-auto w-full max-w-2xl" />
     </div>
   )
 }

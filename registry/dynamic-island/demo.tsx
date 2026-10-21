@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { DynamicIsland, type IslandView } from "./dynamic-island"
+import { DynamicIsland, type DynamicIslandProps, type IslandView } from "./dynamic-island"
 
 const VIEWS: IslandView[] = ["idle", "ring", "silent", "timer", "recording", "call", "music", "notification"]
 
-export default function Demo() {
+export default function Demo(props: Pick<DynamicIslandProps, "timerSeconds">) {
   const [index, setIndex] = useState(1)
   const [auto, setAuto] = useState(true)
 
@@ -17,7 +17,7 @@ export default function Demo() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-16 p-6">
-      <DynamicIsland view={VIEWS[index]} />
+      <DynamicIsland {...props} view={VIEWS[index]} />
       <div className="flex flex-wrap justify-center gap-1.5">
         {VIEWS.map((view, i) => (
           <button

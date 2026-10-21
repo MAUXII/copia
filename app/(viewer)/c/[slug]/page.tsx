@@ -10,6 +10,7 @@ import { InstallTabs } from "@/components/site/viewer/install-command"
 import { demos } from "@/lib/demos"
 import { buildPrompt } from "@/lib/prompt"
 import { highlightCode } from "@/lib/highlight"
+import { componentName } from "@/lib/jsx"
 import { getComponent, getComponents, readSource } from "@/lib/registry"
 import { NAMESPACE, REPO_URL, SITE_URL } from "@/lib/site"
 
@@ -55,7 +56,6 @@ export default async function ComponentPage({ params }: Params) {
   const meta = getComponent(slug)
   const load = demos[slug]
   if (!meta || !load) notFound()
-  const { default: Demo } = await load()
 
   const all = getComponents()
   const index = all.findIndex((m) => m.slug === slug)
@@ -113,6 +113,13 @@ export default async function ComponentPage({ params }: Params) {
       <Section title="How to use">
         <CodeBlock code={usage} html={usageHtml} label="demo.tsx" />
       </Section>
+
+      {meta.controls && meta.controls.length > 0 && (
+        <Section title="Customization">
+          Use the <span className="text-white">sliders button</span> at the top right of the preview to tweak {meta.controls.map((c) => c.prop).join(", ")} live and copy the
+          generated JSX.
+        </Section>
+      )}
 
       {meta.props.length > 0 && (
         <Section title="Props">
@@ -203,5 +210,14 @@ export default async function ComponentPage({ params }: Params) {
     </div>
   )
 
-  return <ComponentViewer name={meta.name} installTarget={`${NAMESPACE}/${slug}`} preview={<Demo />} info={info} />
+  return (
+    <ComponentViewer
+      name={meta.name}
+      installTarget={`${NAMESPACE}/${slug}`}
+      slug={slug}
+      componentName={componentName(slug)}
+      controls={meta.controls ?? []}
+      info={info}
+    />
+  )
 }
