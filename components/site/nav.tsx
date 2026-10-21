@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { getStars } from "@/lib/github"
 import { REPO_URL } from "@/lib/site"
-import { Logo } from "./logo"
+import { LogoMark } from "./logo"
 import { LocalTime, NavLinks } from "./nav-links"
 import { ThemeToggle } from "./theme-toggle"
 
@@ -19,8 +19,8 @@ export async function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-[16px]">
       <nav className="flex h-[53px] items-center gap-7 px-4 sm:px-5">
-        <Link href="/" className="text-white">
-          <Logo />
+        <Link href="/" aria-label="Copia home" className="grid size-8 place-items-center">
+          <LogoMark className="size-6" />
         </Link>
         <NavLinks />
         <div className="ml-auto flex items-center gap-4">

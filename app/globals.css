@@ -166,14 +166,6 @@
     background-clip: text;
     color: transparent;
   }
-  .logo-sphere {
-    position: absolute;
-    width: 72%;
-    height: 72%;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 30% 25%, #fff 0, #ffc48a 18%, #ff4d1c 55%, #2a0700 100%);
-    box-shadow: inset -2px -2px 5px rgb(0 0 0 / 0.45), inset 0 0 0 0.5px rgb(255 255 255 / 0.25);
-  }
   .grain {
     pointer-events: none;
     opacity: 0.12;
