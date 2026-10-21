@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 /** "Slices" mark: a half disc with two copies peeling off to the right. */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 64 64" aria-hidden className={cn("size-[22px] shrink-0", className)}>
+    <svg viewBox="0 0 68 56" aria-hidden className={cn("h-[22px] w-[27px] shrink-0", className)}>
       <defs>
         <linearGradient id="copia-mark-gradient" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#FFC48A" />
@@ -11,18 +11,18 @@ export function LogoMark({ className }: { className?: string }) {
         </linearGradient>
         {/* Each slice is a shifted disc minus the previous piece's outline plus a gap. */}
         <mask id="copia-mark-slice-1">
-          <rect width="64" height="64" fill="#fff" />
-          <circle cx="6" cy="32" r="27.5" fill="#000" />
+          <rect width="68" height="56" fill="#fff" />
+          <circle cx="4" cy="28" r="29.2" fill="#000" />
         </mask>
         <mask id="copia-mark-slice-2">
-          <rect width="64" height="64" fill="#fff" />
-          <circle cx="18" cy="32" r="27.5" fill="#000" />
+          <rect width="68" height="56" fill="#fff" />
+          <circle cx="21" cy="28" r="29.2" fill="#000" />
         </mask>
       </defs>
       <g fill="url(#copia-mark-gradient)">
-        <path d="M6 8 A24 24 0 0 1 6 56 Z" />
-        <circle cx="18" cy="32" r="24" mask="url(#copia-mark-slice-1)" />
-        <circle cx="30" cy="32" r="24" mask="url(#copia-mark-slice-2)" />
+        <path d="M4 2 A26 26 0 0 1 4 54 Z" />
+        <circle cx="21" cy="28" r="26" mask="url(#copia-mark-slice-1)" />
+        <circle cx="38" cy="28" r="26" mask="url(#copia-mark-slice-2)" />
       </g>
     </svg>
   )

@@ -19,8 +19,8 @@ export async function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-[16px]">
       <nav className="flex h-[53px] items-center gap-7 px-4 sm:px-5">
-        <Link href="/" aria-label="Copia home" className="grid size-8 place-items-center">
-          <LogoMark className="size-6" />
+        <Link href="/" aria-label="Copia home" className="grid h-8 place-items-center">
+          <LogoMark className="h-6 w-[29px]" />
         </Link>
         <NavLinks />
         <div className="ml-auto flex items-center gap-4">
