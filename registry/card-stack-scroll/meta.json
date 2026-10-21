@@ -1,7 +1,7 @@
 {
   "slug": "card-stack-scroll",
   "name": "Card Stack Scroll",
-  "description": "Cards pin to the top and pile into a stack as you scroll, each buried card shrinking and dimming; peek, scale step and an optional auto-scroll.",
+  "description": "Cards pin to the top and pile into a stack as the page scrolls, each buried card shrinking and dimming; uses the existing scroller, never its own box.",
   "category": "cards",
   "tags": [
     "scroll",
@@ -28,21 +28,21 @@
       "description": "Card contents."
     },
     {
-      "name": "height",
-      "type": "number",
-      "default": "360",
-      "description": "Height of the scroll area (px)."
+      "name": "cardHeight",
+      "type": "number | string",
+      "default": "\"min(60vh, 420px)\"",
+      "description": "Card height: pixels or any CSS length."
     },
     {
-      "name": "cardHeight",
+      "name": "top",
       "type": "number",
-      "default": "200",
-      "description": "Card height (px)."
+      "default": "24",
+      "description": "Distance from the top of the scroll area where cards pin (px)."
     },
     {
       "name": "peek",
       "type": "number",
-      "default": "14",
+      "default": "16",
       "description": "Offset between stacked cards (px)."
     },
     {
@@ -55,7 +55,7 @@
       "name": "autoScroll",
       "type": "number",
       "default": "-",
-      "description": "Auto-scroll speed (px/s) until the user interacts."
+      "description": "Scroll the page on its own (px/s) until the user interacts."
     }
   ],
   "createdAt": "2026-10-18",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils"
 
@@ -24,6 +24,12 @@ export function CursorTrail({ items, spacing = 60, lifetime = 900, max = 14, siz
   const [drops, setDrops] = useState<Drop[]>([])
   const last = useRef<{ x: number; y: number } | null>(null)
   const next = useRef(0)
+  const timers = useRef(new Set<ReturnType<typeof setTimeout>>())
+
+  useEffect(() => {
+    const pending = timers.current
+    return () => pending.forEach(clearTimeout)
+  }, [])
   const reduceMotion = useReducedMotion()
 
   return (
@@ -39,7 +45,11 @@ export function CursorTrail({ items, spacing = 60, lifetime = 900, max = 14, siz
         const id = next.current++
         const drop = { id, ...point, rotate: Math.random() * 30 - 15, item: id % items.length }
         setDrops((current) => [...current.slice(-(max - 1)), drop])
-        setTimeout(() => setDrops((current) => current.filter((d) => d.id !== id)), lifetime)
+        const timer = setTimeout(() => {
+          timers.current.delete(timer)
+          setDrops((current) => current.filter((d) => d.id !== id))
+        }, lifetime)
+        timers.current.add(timer)
       }}
       onPointerLeave={() => (last.current = null)}
       {...props}

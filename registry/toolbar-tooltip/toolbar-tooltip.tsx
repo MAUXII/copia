@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils"
 
@@ -30,7 +30,22 @@ export function ToolbarTooltip({ items, delay = 350, side = "top", className }: 
   const [center, setCenter] = useState(0)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const warm = useRef(false)
+  const buttons = useRef<(HTMLButtonElement | null)[]>([])
+  // Roving tabindex: the toolbar is one tab stop; arrow keys move between buttons.
+  const [focusIndex, setFocusIndex] = useState(0)
   const reduceMotion = useReducedMotion()
+
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Escape") return hide()
+    const moves: Record<string, number> = { ArrowRight: focusIndex + 1, ArrowLeft: focusIndex - 1, Home: 0, End: items.length - 1 }
+    if (!(event.key in moves)) return
+    event.preventDefault()
+    const next = (moves[event.key] + items.length) % items.length
+    setFocusIndex(next)
+    buttons.current[next]?.focus()
+  }
 
   const show = (index: number, el: HTMLElement) => {
     clearTimeout(timer.current)
@@ -52,16 +67,23 @@ export function ToolbarTooltip({ items, delay = 350, side = "top", className }: 
   const item = active === null ? null : items[active]
 
   return (
-    <div role="toolbar" onPointerLeave={hide} onBlur={hide} onKeyDown={(e) => e.key === "Escape" && hide()} className={cn("relative inline-flex items-center gap-0.5 rounded-full bg-neutral-950 p-1 text-neutral-400 shadow-lg ring-1 ring-white/10", className)}>
+    <div role="toolbar" aria-orientation="horizontal" onPointerLeave={hide} onBlur={hide} onKeyDown={onKeyDown} className={cn("relative inline-flex items-center gap-0.5 rounded-full bg-neutral-950 p-1 text-neutral-400 shadow-lg ring-1 ring-white/10", className)}>
       {items.map((it, i) => (
         <button
           key={it.label}
+          ref={(el) => {
+            buttons.current[i] = el
+          }}
           type="button"
+          tabIndex={i === focusIndex ? 0 : -1}
           aria-label={it.label}
           aria-keyshortcuts={it.shortcut?.join("+")}
           onClick={it.onClick}
           onPointerEnter={(e) => show(i, e.currentTarget)}
-          onFocus={(e) => show(i, e.currentTarget)}
+          onFocus={(e) => {
+            setFocusIndex(i)
+            show(i, e.currentTarget)
+          }}
           className={cn(
             "grid size-8 place-items-center rounded-full transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 [&_svg]:size-4",
             active === i && "bg-white/10 text-white",

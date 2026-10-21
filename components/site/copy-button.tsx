@@ -1,11 +1,13 @@
 "use client"
 
 import { Check, Copy } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 export function CopyButton({ value, label = "Copy", className, children }: { value: string; label?: string; className?: string; children?: React.ReactNode }) {
   const [copied, setCopied] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => () => clearTimeout(timer.current), [])
   return (
     <button
       type="button"
@@ -13,7 +15,8 @@ export function CopyButton({ value, label = "Copy", className, children }: { val
       onClick={async () => {
         await navigator.clipboard.writeText(value)
         setCopied(true)
-        setTimeout(() => setCopied(false), 1500)
+        clearTimeout(timer.current)
+        timer.current = setTimeout(() => setCopied(false), 1500)
       }}
       className={cn(
         "inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-highlight",

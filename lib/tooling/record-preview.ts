@@ -79,21 +79,28 @@ export async function recordPreview(slug: string, { baseUrl, outDir, seconds = 5
       const shot = await page.screenshot({ type: "jpeg", quality: 92 })
       frames.push({ data: shot.toString("base64"), timestamp: startTimestamp })
     }
+  } catch (error) {
+    rmSync(work, { recursive: true, force: true })
+    throw error
   } finally {
     await browser.close()
   }
-  const list = writeFrames(frames, work, endTimestamp)
-  mkdirSync(outDir, { recursive: true })
   const mp4 = path.join(outDir, `${slug}.mp4`)
   const webp = path.join(outDir, `${slug}.webp`)
-  const ff = (args: string[]) => execFileSync("ffmpeg", ["-y", "-loglevel", "error", ...args])
-  ff([
-    "-f", "concat", "-safe", "0", "-i", list,
-    "-ss", String(LEAD_IN), "-t", String(seconds),
-    "-vf", `fps=${FPS},scale=${WIDTH}:${HEIGHT}:flags=lanczos,format=yuv420p`,
-    "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-movflags", "+faststart", mp4,
-  ])
-  ff(["-ss", String(seconds / 2), "-i", mp4, "-frames:v", "1", "-quality", "82", webp])
-  rmSync(work, { recursive: true, force: true })
+  try {
+    const list = writeFrames(frames, work, endTimestamp)
+    mkdirSync(outDir, { recursive: true })
+    const ff = (args: string[]) => execFileSync("ffmpeg", ["-y", "-loglevel", "error", ...args])
+    ff([
+      "-f", "concat", "-safe", "0", "-i", list,
+      "-ss", String(LEAD_IN), "-t", String(seconds),
+      "-vf", `fps=${FPS},scale=${WIDTH}:${HEIGHT}:flags=lanczos,format=yuv420p`,
+      "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-movflags", "+faststart", mp4,
+    ])
+    ff(["-ss", String(seconds / 2), "-i", mp4, "-frames:v", "1", "-quality", "82", webp])
+  } finally {
+    // Never leave the frame folder behind, even when ffmpeg fails.
+    rmSync(work, { recursive: true, force: true })
+  }
   return { webp, mp4 }
 }
