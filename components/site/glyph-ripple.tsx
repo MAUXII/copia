@@ -5,26 +5,45 @@ import { cn } from "@/lib/utils"
 
 const CELL_W = 14 // px per column
 const CELL_H = 18 // px per row
-const FONT = '12px "Geist Mono", ui-monospace, monospace'
-// Code glyphs from faint to dense, like the Claude desktop "Landing Texture".
-const RAMP = ["·", ".", ":", "-", "=", "+", "*", "/", "<", ">", "{", "}", "#"]
-const BASE_ALPHA = 0.14
-const WAVE_SPEED = 560 // px per second
-const WAVE_WIDTH = 110 // px, thickness of the ring
-const WAVE_LIFE = 2.6 // seconds
-const HOVER_RADIUS = 150
-const TWINKLE = 0.0025 // chance per cell per frame to flicker while idle
-const ACCENT = [255, 122, 69] // Ember
-const WIND_SCALE = 0.0045 // noise frequency (lower = bigger gusts)
-const WIND_SPEED = 0.06 // how fast the wind drifts
-const WIND_STRENGTH = 0.38
-const CALM_RADIUS = 0.34 // fraction of width around the content kept quiet
+const FONT = '11px "Geist Mono", ui-monospace, monospace'
+// Code glyphs. Each cell owns one and swaps it rarely, so the field reads as text, not noise.
+const GLYPHS = "abcdefghijklmnopqrstuvwxyz0123456789{}[]()<>/\\=+-*_;:.,'\"|&%$#@!?~^".split("")
 
-/** Smooth value noise in [0, 1]. */
+// At rest: barely there. Alpha IS brightness on a near-black ground.
+const REST_ALPHA = 0.035
+const WIND_ALPHA = 0.035 // extra alpha a slow noise gust adds at its peak
+const WIND_SCALE = 0.004 // noise frequency (lower = bigger gusts)
+const WIND_SPEED = 0.018 // drift, noise units per second: slow
+const SWAP_RATE = 0.04 // idle glyph swaps per cell per second (~ one every 25 s)
+
+// Bursts, after the Claude desktop energy grid: a ragged wavefront races out in
+// Manhattan distance, quantized to whole cells, flashes each recruited cell on
+// arrival and leaves an afterglow that cools through a discrete ramp.
+const SPEED = 30 // cells per second
+const RANGE = 48 // cells the front travels before it dies out
+const DENSITY = 0.6 // fraction of cells a burst recruits, keeps dark gaps
+const JITTER = 0.12 // per-cell arrival scatter, seconds
+const HEAD_GAIN = 1.25 // arrival flash strength
+const HEAD_DECAY = 5 // arrival flash fade, 1/s
+const BODY_GAIN = 0.5 // afterglow strength
+const BODY_DECAY = 1.1 // afterglow fade, 1/s
+const MAX_AGE = 4 // seconds, past this a burst is dead
+const STEPS = 5 // intensity is quantized, never a continuous gradient
+const INK_FLOOR = 0.08 // alpha of the lowest ramp step
+const INK_CEIL = 0.8 // alpha of the top ramp step
+const RAMP_POW = 1.4 // keeps the cool end of the ramp longer
+const HOVER_RADIUS = 5 // cells, the cursor wakes a few faint cells
+const CALM = 0.45 // how much bursts soften over the headline
+
+const COOL = [235, 228, 220] // low energy: warm white
+const HOT = [255, 122, 69] // top energy: Ember
+
+/** Deterministic hash in [0, 1). */
 function hash(x: number, y: number) {
   const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453
   return n - Math.floor(n)
 }
+/** Smooth value noise in [0, 1]. */
 function noise(x: number, y: number) {
   const xi = Math.floor(x)
   const yi = Math.floor(y)
@@ -39,14 +58,13 @@ function noise(x: number, y: number) {
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
 }
 
-type Wave = { x: number; y: number; start: number }
+type Burst = { col: number; row: number; start: number; seed: number }
 
 /**
- * A field of code glyphs, after the Claude desktop "Landing Texture": a slow
- * noise "wind" drifts bright patches across the grid, clicks send circular
- * waves that densify and tint glyphs in the brand color, glyphs near the
- * cursor scramble, and a calm zone keeps the center readable. Listens on the
- * parent so content above stays clickable.
+ * A near-invisible field of code glyphs, after the Claude desktop "Landing
+ * Texture". At rest it is a dark, slow texture you barely notice; a click sends
+ * a ragged wavefront that recruits cells, flashes them toward the brand color
+ * and lets them cool back down. Listens on the parent so content stays clickable.
  */
 export function GlyphRipple({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -58,13 +76,14 @@ export function GlyphRipple({ className }: { className?: string }) {
     if (!canvas || !ctx || !host) return
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const waves: Wave[] = []
-    const pointer = { x: -9999, y: -9999 }
+    const bursts: Burst[] = []
+    const pointer = { col: -999, row: -999 }
     let width = 0
     let height = 0
     let cols = 0
     let rows = 0
-    let twinkle = new Float32Array(0) // per-cell flicker energy, decays over time
+    let glyphs = new Uint8Array(0) // glyph index per cell
+    let flash = new Float32Array(0) // last arrival time per cell, swaps its glyph once
     let frame = 0
     let visible = true
     let last = performance.now()
@@ -78,7 +97,9 @@ export function GlyphRipple({ className }: { className?: string }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       cols = Math.ceil(width / CELL_W)
       rows = Math.ceil(height / CELL_H)
-      twinkle = new Float32Array(cols * rows)
+      glyphs = new Uint8Array(cols * rows)
+      for (let i = 0; i < glyphs.length; i++) glyphs[i] = (Math.random() * GLYPHS.length) | 0
+      flash = new Float32Array(cols * rows).fill(-1)
     }
 
     const draw = (now: number) => {
@@ -89,7 +110,8 @@ export function GlyphRipple({ className }: { className?: string }) {
       ctx.font = FONT
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
-      for (let i = waves.length - 1; i >= 0; i--) if (t - waves[i].start > WAVE_LIFE) waves.splice(i, 1)
+      ctx.globalCompositeOperation = "lighter"
+      for (let i = bursts.length - 1; i >= 0; i--) if (t - bursts[i].start > MAX_AGE) bursts.splice(i, 1)
 
       const offsetX = (width - cols * CELL_W) / 2 + CELL_W / 2
       const offsetY = (height - rows * CELL_H) / 2 + CELL_H / 2
@@ -98,47 +120,53 @@ export function GlyphRipple({ className }: { className?: string }) {
           const x = offsetX + col * CELL_W
           const y = offsetY + row * CELL_H
           const index = row * cols + col
+          if (!reduceMotion && Math.random() < SWAP_RATE * dt) glyphs[index] = (Math.random() * GLYPHS.length) | 0
 
-          let wave = 0
-          for (const w of waves) {
-            const age = t - w.start
-            const band = 1 - Math.abs(Math.hypot(x - w.x, y - w.y) - age * WAVE_SPEED) / WAVE_WIDTH
-            if (band > 0) wave = Math.max(wave, band * (1 - age / WAVE_LIFE))
+          // Burst energy: strongest contribution of any live burst.
+          let energy = 0
+          for (const b of bursts) {
+            if (hash(col + b.seed, row - b.seed) > DENSITY) continue
+            const dist = Math.abs(col - b.col) + Math.abs(row - b.row)
+            if (dist > RANGE) continue
+            const arrive = b.start + dist / SPEED + hash(col * 1.7 + b.seed, row * 2.3) * JITTER
+            const since = t - arrive
+            if (since < 0) continue
+            if (flash[index] < arrive) {
+              flash[index] = arrive
+              glyphs[index] = (Math.random() * GLYPHS.length) | 0 // the front rewrites what it touches
+            }
+            const reach = 1 - dist / RANGE
+            const e = (HEAD_GAIN * Math.exp(-since * HEAD_DECAY) + BODY_GAIN * Math.exp(-since * BODY_DECAY)) * reach
+            energy = Math.max(energy, e * (0.55 + 0.45 * hash(col - b.seed, row + b.seed)))
           }
-          const near = Math.max(0, 1 - Math.hypot(x - pointer.x, y - pointer.y) / HOVER_RADIUS)
-          if (!reduceMotion && Math.random() < TWINKLE + near * 0.08) twinkle[index] = 0.35 + Math.random() * 0.4 * (1 + near)
-          twinkle[index] = Math.max(0, twinkle[index] - dt * 0.9)
+          // The cursor wakes a sparse handful of faint cells, nothing more.
+          const near = Math.abs(col - pointer.col) + Math.abs(row - pointer.row)
+          if (near < HOVER_RADIUS && hash(col * 3.1, row * 5.7) < 0.35) energy = Math.max(energy, 0.22 * (1 - near / HOVER_RADIUS))
 
-          // Drifting wind: two octaves of noise sliding diagonally.
-          const wind =
-            noise(x * WIND_SCALE + t * WIND_SPEED, y * WIND_SCALE - t * WIND_SPEED * 0.6) * 0.65 +
-            noise(x * WIND_SCALE * 2.3 - t * WIND_SPEED * 1.4, y * WIND_SCALE * 2.3 + t * WIND_SPEED) * 0.35
-          const gust = Math.max(0, wind - 0.45) / 0.55
-          // Calm zone: an ellipse around the content where the texture fades.
-          const cx = (x - width / 2) / (width * CALM_RADIUS)
-          const cy = (y - height / 2) / (height * CALM_RADIUS * 1.25)
-          const calm = Math.min(1, Math.max(0.15, Math.hypot(cx, cy) - 0.35))
+          // Bursts soften over the headline so it stays readable.
+          const cx = (x - width / 2) / (width * 0.3)
+          const cy = (y - height / 2) / (height * 0.36)
+          energy *= 1 - CALM * Math.max(0, 1 - Math.hypot(cx, cy))
 
-          // Waves soften inside the calm zone so the headline stays readable.
-          wave *= 0.3 + 0.7 * calm
-          const energy = Math.max(wave, (gust * WIND_STRENGTH + twinkle[index] * 0.5) * calm, near * 0.3)
-          const glyph = RAMP[Math.min(RAMP.length - 1, Math.floor(energy * RAMP.length))]
-          const alpha = (BASE_ALPHA * (0.45 + 0.55 * calm) + energy * (1 - BASE_ALPHA) * 0.9)
-          const r = 255 + (ACCENT[0] - 255) * wave
-          const g = 255 + (ACCENT[1] - 255) * wave
-          const b = 255 + (ACCENT[2] - 255) * wave
-          ctx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${alpha})`
-          // Wave crests glow, like the original's luminous symbols.
-          if (wave > 0.55) {
-            ctx.shadowColor = `rgba(${ACCENT[0]}, ${ACCENT[1]}, ${ACCENT[2]}, ${wave * 0.9})`
-            ctx.shadowBlur = 8 * wave
-            ctx.fillText(glyph, x, y)
-            ctx.shadowBlur = 0
+          let alpha: number
+          let mix = 0
+          if (energy > 0.04) {
+            const step = Math.min(STEPS, Math.ceil(Math.min(1, energy) * STEPS)) / STEPS
+            alpha = INK_FLOOR + (INK_CEIL - INK_FLOOR) * Math.pow(step, RAMP_POW)
+            mix = Math.pow(step, 1.6)
           } else {
-            ctx.fillText(glyph, x, y)
+            // Rest: a slow gust of noise drifting across an almost black field.
+            const wind = noise(x * WIND_SCALE + t * WIND_SPEED, y * WIND_SCALE - t * WIND_SPEED * 0.7)
+            alpha = REST_ALPHA + WIND_ALPHA * Math.max(0, wind - 0.5) * 2
           }
+          const r = COOL[0] + (HOT[0] - COOL[0]) * mix
+          const g = COOL[1] + (HOT[1] - COOL[1]) * mix
+          const bl = COOL[2] + (HOT[2] - COOL[2]) * mix
+          ctx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${bl | 0}, ${alpha})`
+          ctx.fillText(GLYPHS[glyphs[index]], x, y)
         }
       }
+      ctx.globalCompositeOperation = "source-over"
     }
 
     const loop = (now: number) => {
@@ -151,16 +179,25 @@ export function GlyphRipple({ className }: { className?: string }) {
       if (visible && !reduceMotion) frame = requestAnimationFrame(loop)
     }
 
-    const local = (event: PointerEvent) => {
+    const cell = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect()
-      return { x: event.clientX - rect.left, y: event.clientY - rect.top }
+      const offsetX = (width - cols * CELL_W) / 2
+      const offsetY = (height - rows * CELL_H) / 2
+      return {
+        col: Math.floor((event.clientX - rect.left - offsetX) / CELL_W),
+        row: Math.floor((event.clientY - rect.top - offsetY) / CELL_H),
+      }
+    }
+    const fire = (col: number, row: number, start: number) => {
+      bursts.push({ col, row, start, seed: Math.random() * 1000 })
+      if (bursts.length > 8) bursts.shift()
     }
     const onDown = (event: PointerEvent) => {
-      waves.push({ ...local(event), start: performance.now() / 1000 })
-      if (waves.length > 6) waves.shift()
+      const { col, row } = cell(event)
+      fire(col, row, performance.now() / 1000)
     }
-    const onMove = (event: PointerEvent) => Object.assign(pointer, local(event))
-    const onLeave = () => Object.assign(pointer, { x: -9999, y: -9999 })
+    const onMove = (event: PointerEvent) => Object.assign(pointer, cell(event))
+    const onLeave = () => Object.assign(pointer, { col: -999, row: -999 })
 
     resize()
     const ro = new ResizeObserver(() => {
@@ -177,8 +214,8 @@ export function GlyphRipple({ className }: { className?: string }) {
     host.addEventListener("pointermove", onMove)
     host.addEventListener("pointerleave", onLeave)
 
-    // One wave from the center on load, so people see it is interactive.
-    if (!reduceMotion) waves.push({ x: width / 2, y: height / 2, start: performance.now() / 1000 + 0.4 })
+    // One burst from the center on load, so people see it is interactive.
+    if (!reduceMotion) fire(cols >> 1, rows >> 1, performance.now() / 1000 + 0.5)
     // Redraw once the mono font is ready so glyph metrics are right.
     document.fonts?.ready.then(() => draw(performance.now()))
     draw(performance.now())
