@@ -1,4 +1,3 @@
-import { BadgeCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // Fine film grain, tiled over the generated avatars.
@@ -39,7 +38,14 @@ export function Avatar({ src, name, seed, verified = false, className }: { src: 
       )}
       {verified && (
         <span title="Verified: claimed by its owner" className="absolute -right-[3%] -bottom-[3%] grid size-[38%] place-items-center rounded-full bg-background">
-          <BadgeCheck aria-label="Verified" className="size-[84%] fill-[#ff5a24] text-white" strokeWidth={2.4} />
+          {/* One border only (the ring in the page colour): the seal itself is filled, not outlined. */}
+          <svg viewBox="0 0 24 24" role="img" aria-label="Verified" className="size-[84%]">
+            <path
+              fill="#ff5a24"
+              d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+            />
+            <path d="m8.6 12.2 2.3 2.3 4.5-4.6" fill="none" stroke="#fff" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </span>
       )}
     </span>
