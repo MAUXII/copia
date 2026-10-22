@@ -54,10 +54,10 @@ export default async function AuthorPage({ params }: Params) {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-14 px-4 pt-32">
       <header className="flex flex-col gap-5">
-        <div className="flex items-center gap-5">
-          <Avatar src={avatarUrl(person)} name={person.name} className="size-16 text-xl" />
+        <div className="flex items-center gap-6">
+          <Avatar src={avatarUrl(person)} name={person.name} seed={person.handle} verified={person.claimed} className="size-32" />
           <div className="flex min-w-0 flex-col gap-1">
-            <h1 className="truncate text-3xl font-medium tracking-tight">{person.name}</h1>
+            <h1 className="truncate text-4xl font-medium tracking-tight">{person.name}</h1>
             <p className="text-sm text-muted-foreground">
               @{person.handle}
               {person.since && ` · since ${person.since}`}

@@ -22,11 +22,11 @@ export default function AuthorsPage() {
       <ul className="-mx-3 mt-3 grid gap-1 sm:grid-cols-2">
         {people.map((person) => (
           <li key={person.handle}>
-            <Link href={`/@${person.handle}`} className="flex items-center gap-3 rounded-2xl p-3 transition-colors hover:bg-muted">
-              <Avatar src={avatarUrl(person)} name={person.name} className="size-11 rounded-xl text-sm" />
+            <Link href={`/@${person.handle}`} className="flex items-center gap-4 rounded-3xl p-3 transition-colors hover:bg-muted">
+              <Avatar src={avatarUrl(person)} name={person.name} seed={person.handle} verified={person.claimed} className="size-20" />
               <span className="flex min-w-0 flex-col">
-                <span className="truncate font-medium">{person.name}</span>
-                <span className="truncate text-xs text-muted-foreground">
+                <span className="truncate text-lg font-medium">{person.name}</span>
+                <span className="truncate text-sm text-muted-foreground">
                   @{person.handle} · {count(person)} {count(person) === 1 ? "component" : "components"}
                 </span>
               </span>
