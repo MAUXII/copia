@@ -43,7 +43,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         columns={COLUMNS}
         github={REPO_URL}
         copyright={`© ${new Date().getFullYear()} Copia · MIT · Most components are credited recreations.`}
-        credit={{ label: "Kedhareswer Naidu", href: "https://21st.dev/@kedhareswer/components/ridgeline-dither-footer" }}
       />
     </>
   )
