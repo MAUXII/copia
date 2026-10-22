@@ -1,0 +1,194 @@
+{
+  "slug": "liquid-glass-carousel",
+  "name": "Liquid Glass Carousel",
+  "description": "An endless photo row seen through a WebGL liquid-glass lens: a rotated ellipse that swirls the image at its rim, splits it into colour and glows with a ring; drag, flick, scroll or use the arrows, click the middle photo to focus it. Copia rebuilds it without three.js or GSAP and adds autoplay, a lens colour, rounded panels and a background that follows the theme.",
+  "category": "cards",
+  "tags": [
+    "carousel",
+    "webgl",
+    "shader",
+    "glass",
+    "lens",
+    "drag",
+    "scroll",
+    "keyboard"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Yousuf Soomro",
+    "url": "https://github.com/Yousuf-developer/liquid-glass-carousel",
+    "handle": "yousuf-developer"
+  },
+  "credits": [
+    {
+      "author": "Componentry (Harsh Jadhav)",
+      "url": "https://componentry.dev/docs/components/liquid-glass-carousel",
+      "handle": "harshjdhv"
+    }
+  ],
+  "assets": [
+    {
+      "file": "crimson-contemplation.webp",
+      "author": "pablostanley",
+      "source": "https://www.lummi.ai/photo/crimson-contemplation-5sozs",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "artistic-orchid.webp",
+      "author": "ms.designs.0711",
+      "source": "https://www.lummi.ai/photo/artistic-orchid-close-up-pv618",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "elegant-red-portrait.webp",
+      "author": "axelnascimentto",
+      "source": "https://www.lummi.ai/photo/elegant-red-portrait-lx5ig",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "white-flowers-on-black.webp",
+      "author": "clemara_studio",
+      "source": "https://www.lummi.ai/photo/white-flowers-on-black-1byya",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "red-light-portrait.webp",
+      "author": "harshworks",
+      "source": "https://www.lummi.ai/photo/red-light-portrait-lstku",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "fiery-profile.webp",
+      "author": "ibis_design",
+      "source": "https://www.lummi.ai/photo/fiery-profile-portrait-fatsu",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "intense-eye.webp",
+      "author": "westkast",
+      "source": "https://www.lummi.ai/photo/intense-eye-close-up-gbx9c",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "metallic-droplets.webp",
+      "author": "nikadominguez_",
+      "source": "https://www.lummi.ai/photo/floating-metallic-droplets-cdwx",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "close-up-eye.webp",
+      "author": "rena",
+      "source": "https://www.lummi.ai/photo/close-up-eye-portrait-axhc4",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "items",
+      "type": "{ src, title, aspect? }[]",
+      "default": "-",
+      "description": "Photos in order. Aspect is read from the image when omitted."
+    },
+    {
+      "name": "panelHeight",
+      "type": "number",
+      "default": "450",
+      "description": "Target panel height in px; capped at 52% of the container."
+    },
+    {
+      "name": "gap",
+      "type": "number",
+      "default": "12",
+      "description": "Space between panels."
+    },
+    {
+      "name": "radius",
+      "type": "number",
+      "default": "6",
+      "description": "Panel corner radius in px."
+    },
+    {
+      "name": "lensSize",
+      "type": "number",
+      "default": "1",
+      "description": "Lens size as a multiple of the reference lens."
+    },
+    {
+      "name": "lensColor",
+      "type": "string",
+      "default": "\"#ff7a45\"",
+      "description": "Colour of the glowing ring at the lens rim."
+    },
+    {
+      "name": "dispersion",
+      "type": "number",
+      "default": "11",
+      "description": "Chromatic split at the rim; 0 turns it off."
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "default": "0",
+      "description": "Seconds between automatic steps; input pauses it for 4 s."
+    },
+    {
+      "name": "entry",
+      "type": "boolean",
+      "default": "true",
+      "description": "Panels rise in and the lens blooms on mount."
+    },
+    {
+      "name": "onActiveChange",
+      "type": "(index) => void",
+      "default": "-",
+      "description": "Called when the centred photo changes."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "lensSize",
+      "type": "number",
+      "min": 0.5,
+      "max": 1.5,
+      "step": 0.05,
+      "default": 1
+    },
+    {
+      "prop": "dispersion",
+      "type": "number",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 11
+    },
+    {
+      "prop": "radius",
+      "type": "number",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "prop": "gap",
+      "type": "number",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "prop": "autoplay",
+      "type": "number",
+      "min": 0,
+      "max": 5,
+      "step": 0.1,
+      "default": 1.8
+    }
+  ],
+  "createdAt": "2026-10-22"
+}
