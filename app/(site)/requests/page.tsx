@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowUpRight, ThumbsUp } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { CopyButton } from "@/components/site/copy-button"
+import { Emoji } from "@/components/site/emoji"
 import { RequestForm } from "@/components/site/request-form"
 import { buildRequestPrompt } from "@/lib/prompt"
 import { getComponents } from "@/lib/registry"
@@ -31,7 +32,7 @@ function Row({ request, slug }: { request: Request; slug?: string }) {
         title="Vote with 👍 on GitHub"
         className="flex h-12 w-11 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl bg-muted text-xs tabular-nums transition-colors hover:bg-[#ff4d1c]/15 hover:text-[#ff7a45]"
       >
-        <ThumbsUp className="size-3.5" aria-hidden />
+        <Emoji char="👍" label="" className="size-4" />
         {request.votes}
       </a>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -86,7 +87,7 @@ export default async function RequestsPage() {
         Wanted<span className="font-serif font-light italic">.</span>
       </h1>
       <p className="mt-4 text-muted-foreground">
-        Components people want copied. Vote with 👍 on the ones you want too, or pick one and press <span className="text-foreground">Build it</span>: it copies a prompt that has your
+        Components people want copied. Vote with <Emoji char="👍" label="thumbs up" /> on the ones you want too, or pick one and press <span className="text-foreground">Build it</span>: it copies a prompt that has your
         agent recreate it with Copia&apos;s skill and open the pull request.
       </p>
 
