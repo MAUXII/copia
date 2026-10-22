@@ -40,7 +40,7 @@ To only install the skills (the "brain") into your agent:
 npx skills add MAUXII/copia
 ```
 
-Prefer to suggest instead? Use the [suggest page](https://copia-ui.vercel.app/suggest)
+Prefer to request instead? Use the [requests page](https://copia-ui.vercel.app/requests)
 or [open an issue](https://github.com/MAUXII/copia/issues/new/choose).
 
 ## Develop

@@ -2,14 +2,15 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BookOpen, LayoutGrid, Lightbulb } from "lucide-react"
+import { BookOpen, LayoutGrid, Lightbulb, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import { REPO_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const LINKS = [
   { href: "/", label: "Components", icon: LayoutGrid },
-  { href: "/suggest", label: "Suggest", icon: Lightbulb },
+  { href: "/requests", label: "Requests", icon: Lightbulb },
+  { href: "/publish", label: "Publish", icon: Upload },
   { href: `${REPO_URL}/tree/main/docs`, label: "Docs", icon: BookOpen, external: true },
 ]
 

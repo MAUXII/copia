@@ -1,5 +1,5 @@
-name: Suggest a component
-description: A component you'd like Copia to recreate
+name: Request a component
+description: A component you'd like Copia to recreate (shows up on /requests, ranked by 👍)
 labels: ["suggestion"]
 body:
   - type: input

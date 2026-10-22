@@ -101,6 +101,7 @@ export default async function AuthorPage({ params }: Params) {
 
       <Grid title={`Recreated by ${person.name}`} items={person.made} />
       <Grid title={`Credited to ${person.name}`} items={person.inspired} />
+      <Grid title={`Requested by ${person.name}`} items={person.requested} />
 
       <Link href="/authors" className="text-sm text-muted-foreground hover:text-foreground">
         All authors →

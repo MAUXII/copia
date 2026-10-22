@@ -37,8 +37,8 @@ export function ComponentGrid({ items }: { items: Meta[] }) {
       ) : (
         <p className="py-16 text-center text-sm text-muted-foreground">
           Nothing here yet.{" "}
-          <Link href="/suggest" className="text-highlight underline-offset-4 hover:underline">
-            Suggest it
+          <Link href="/requests" className="text-highlight underline-offset-4 hover:underline">
+            Request it
           </Link>
           .
         </p>

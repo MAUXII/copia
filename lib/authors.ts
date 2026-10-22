@@ -11,6 +11,8 @@ export type Person = Author & {
   made: Meta[]
   /** Components that credit this person as the inspiration or a secondary credit. */
   inspired: Meta[]
+  /** Components built because this person requested them. */
+  requested: Meta[]
   /** First year they appear on Copia. */
   since: number | null
 }
@@ -37,12 +39,12 @@ export function getPeople(registryRoot?: string, authorsRoot = DEFAULT_ROOT): Pe
     if (!entry) {
       // No file yet: an auto-indexed page built from the credit itself.
       const base: Author = files.get(handle) ?? { handle, name: fallbackName, claimed: false, ...(site ? { site } : {}) }
-      entry = { ...base, made: [], inspired: [], since: null }
+      entry = { ...base, made: [], inspired: [], requested: [], since: null }
       people.set(handle, entry)
     }
     return entry
   }
-  const note = (entry: Person, meta: Meta, list: "made" | "inspired") => {
+  const note = (entry: Person, meta: Meta, list: "made" | "inspired" | "requested") => {
     if (!entry[list].includes(meta)) entry[list].push(meta)
     const year = Number(meta.createdAt.slice(0, 4))
     entry.since = entry.since === null ? year : Math.min(entry.since, year)
@@ -53,10 +55,17 @@ export function getPeople(registryRoot?: string, authorsRoot = DEFAULT_ROOT): Pe
     const { inspiration } = meta
     if (inspiration.handle) note(person(inspiration.handle, inspiration.author, inspiration.url), meta, "inspired")
     for (const credit of meta.credits ?? []) if (credit.handle) note(person(credit.handle, credit.author, credit.url), meta, "inspired")
+    if (meta.request) {
+      const requester = person(meta.request.by, meta.request.by)
+      // Requests come from GitHub issues, so the handle is a GitHub login.
+      if (!files.has(requester.handle)) requester.github ??= requester.handle
+      note(requester, meta, "requested")
+    }
   }
-  for (const [handle, author] of files) if (!people.has(handle)) people.set(handle, { ...author, made: [], inspired: [], since: null })
+  for (const [handle, author] of files) if (!people.has(handle)) people.set(handle, { ...author, made: [], inspired: [], requested: [], since: null })
 
-  return [...people.values()].sort((a, b) => b.made.length + b.inspired.length - (a.made.length + a.inspired.length) || a.name.localeCompare(b.name))
+  const weight = (p: Person) => p.made.length + p.inspired.length + p.requested.length
+  return [...people.values()].sort((a, b) => weight(b) - weight(a) || a.name.localeCompare(b.name))
 }
 
 export function getPerson(handle: string, registryRoot?: string, authorsRoot?: string): Person | null {

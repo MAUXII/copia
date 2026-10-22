@@ -29,7 +29,7 @@ describe("people", () => {
   it("every real author file is valid and matches its credits", () => {
     const people = getPeople()
     expect(people.find((p) => p.handle === "mauxii")?.claimed).toBe(true)
-    expect(people.every((p) => p.made.length + p.inspired.length > 0)).toBe(true)
+    expect(people.every((p) => p.made.length + p.inspired.length + p.requested.length > 0)).toBe(true)
   })
   it("prefers the GitHub avatar and builds a claim link that opens a pull request", () => {
     expect(avatarUrl({ handle: "jane", name: "Jane", github: "jane", claimed: false })).toBe("https://github.com/jane.png?size=160")

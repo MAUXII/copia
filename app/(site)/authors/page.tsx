@@ -1,12 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Avatar } from "@/components/site/avatar"
-import { avatarUrl, getPeople } from "@/lib/authors"
+import { avatarUrl, getPeople, type Person } from "@/lib/authors"
 
 export const metadata: Metadata = {
   title: "Authors",
   description: "Everyone Copia credits or who recreated a component, each with their own page.",
 }
+
+const count = (person: Person) => new Set([...person.made, ...person.inspired, ...person.requested]).size
 
 export default function AuthorsPage() {
   const people = getPeople()
@@ -24,7 +26,7 @@ export default function AuthorsPage() {
               <span className="flex min-w-0 flex-col">
                 <span className="truncate font-medium">{person.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  @{person.handle} · {person.made.length + person.inspired.length} {person.made.length + person.inspired.length === 1 ? "component" : "components"}
+                  @{person.handle} · {count(person)} {count(person) === 1 ? "component" : "components"}
                 </span>
               </span>
             </Link>

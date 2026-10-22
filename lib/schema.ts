@@ -39,6 +39,8 @@ export const MetaSchema = z.object({
   assets: z
     .array(z.object({ file: z.string().min(1), author: z.string().min(1), source: z.url(), license: z.string().min(1) }))
     .optional(),
+  /** The request this component fulfils: GitHub issue number and who asked for it. */
+  request: z.object({ issue: z.number().int().positive(), by: Handle }).optional(),
   dependencies: z.array(z.string()),
   props: z.array(
     z.object({

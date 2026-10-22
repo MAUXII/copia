@@ -15,8 +15,11 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           <Link href="/authors" className="hover:text-foreground">
             Authors
           </Link>
-          <Link href="/suggest" className="hover:text-foreground">
-            Suggest
+          <Link href="/requests" className="hover:text-foreground">
+            Requests
+          </Link>
+          <Link href="/publish" className="hover:text-foreground">
+            Publish
           </Link>
           <a href={REPO_URL} className="hover:text-foreground">
             GitHub
