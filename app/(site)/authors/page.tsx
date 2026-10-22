@@ -13,12 +13,13 @@ const count = (person: Person) => new Set([...person.made, ...person.inspired, .
 export default function AuthorsPage() {
   const people = getPeople()
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-32">
+    <div className="mx-auto max-w-2xl px-4 pt-32">
       <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
         The <span className="font-serif font-light italic">people</span> behind it.
       </h1>
-      <p className="mt-4 max-w-xl text-muted-foreground">Who made the originals and who recreated them. Every credit gets a page; if one is yours, claim it.</p>
-      <ul className="mt-12 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <p className="mt-4 text-muted-foreground">Who made the originals and who recreated them. Every credit gets a page; if one is yours, claim it.</p>
+      <h2 className="mt-12 font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Everyone · {people.length}</h2>
+      <ul className="-mx-3 mt-3 grid gap-1 sm:grid-cols-2">
         {people.map((person) => (
           <li key={person.handle}>
             <Link href={`/@${person.handle}`} className="flex items-center gap-3 rounded-2xl p-3 transition-colors hover:bg-muted">
