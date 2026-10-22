@@ -40,8 +40,8 @@ export function RequestForm() {
           {error}
         </p>
       )}
-      <div className="flex flex-col gap-2">
-        <button type="submit" className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-medium whitespace-nowrap text-background">
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 text-sm font-medium whitespace-nowrap text-background">
           Request on GitHub
           <ArrowUpRight className="size-4" aria-hidden />
         </button>

@@ -81,18 +81,19 @@ export default async function RequestsPage() {
   const built = new Map(getComponents().flatMap((meta) => (meta.request ? [[meta.request.issue, meta.slug] as const] : [])))
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-12 px-4 pt-32 lg:grid-cols-[1fr_320px]">
-      <div className="min-w-0">
-        <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
-          Wanted<span className="font-serif font-light italic">.</span>
-        </h1>
-        <p className="mt-4 max-w-xl text-muted-foreground">
-          Components people want copied. Vote with 👍 on the ones you want too, or pick one and press <span className="text-foreground">Build it</span>: it copies a prompt that
-          has your agent recreate it with Copia&apos;s skill and open the pull request.
-        </p>
+    <div className="mx-auto max-w-2xl px-4 pt-32">
+      <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
+        Wanted<span className="font-serif font-light italic">.</span>
+      </h1>
+      <p className="mt-4 text-muted-foreground">
+        Components people want copied. Vote with 👍 on the ones you want too, or pick one and press <span className="text-foreground">Build it</span>: it copies a prompt that has your
+        agent recreate it with Copia&apos;s skill and open the pull request.
+      </p>
 
+      <section className="mt-12">
+        <h2 className="font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">Open requests</h2>
         {requests === null ? (
-          <p className="mt-10 text-sm text-muted-foreground">
+          <p className="mt-5 text-sm text-muted-foreground">
             Could not reach GitHub right now. See the requests on{" "}
             <a href={`${REPO_URL}/issues?q=label%3Asuggestion`} className="text-highlight underline-offset-4 hover:underline">
               GitHub
@@ -100,27 +101,28 @@ export default async function RequestsPage() {
             .
           </p>
         ) : requests.length === 0 ? (
-          <p className="mt-10 text-sm text-muted-foreground">No requests yet. Be the first.</p>
+          <p className="mt-5 text-sm text-muted-foreground">No requests yet. Be the first.</p>
         ) : (
-          <ul className="mt-8 divide-y">
+          <ul className="mt-2 divide-y">
             {requests.map((request) => (
               <Row key={request.number} request={request} slug={built.get(request.number)} />
             ))}
           </ul>
         )}
-      </div>
+      </section>
 
-      <aside className="lg:sticky lg:top-24 lg:self-start">
-        <h2 className="mb-4 font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">New request</h2>
+      <section className="mt-16">
+        <h2 className="mb-5 font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">New request</h2>
         <RequestForm />
-        <p className="mt-6 text-sm text-muted-foreground">
-          Built it already?{" "}
-          <Link href="/publish" className="text-foreground underline-offset-4 hover:underline">
-            Publish it
-          </Link>
-          .
-        </p>
-      </aside>
+      </section>
+
+      <p className="mt-16 text-sm text-muted-foreground">
+        Built it already?{" "}
+        <Link href="/publish" className="text-foreground underline-offset-4 hover:underline">
+          Publish it
+        </Link>
+        .
+      </p>
     </div>
   )
 }
