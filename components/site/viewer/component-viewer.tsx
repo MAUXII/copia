@@ -69,9 +69,15 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
   const [light, setLight] = useState(false)
   const [run, setRun] = useState(0)
   const [hint, setHint] = useState(false)
+  // On phones the props become a bottom sheet under the preview instead of a side column.
+  const [mobile, setMobile] = useState(false)
 
   useEffect(() => {
-    if (window.matchMedia("(max-width: 767px)").matches) setPanel(false)
+    const phone = window.matchMedia("(max-width: 767px)")
+    if (phone.matches) setPanel(false)
+    setMobile(phone.matches)
+    const onPhone = (e: MediaQueryListEvent) => setMobile(e.matches)
+    phone.addEventListener("change", onPhone)
     try {
       setHint(localStorage.getItem("copia:hint-seen") !== "1")
     } catch {
@@ -85,7 +91,10 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
       }
     }
     window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      phone.removeEventListener("change", onPhone)
+    }
   }, [])
 
   const dismissHint = () => {
@@ -111,7 +120,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
   }
 
   return (
-    <div ref={root} className="dark relative flex h-dvh overflow-hidden bg-[#070707] text-neutral-100">
+    <div ref={root} className="dark relative flex h-dvh overflow-hidden max-md:flex-col bg-[#070707] text-neutral-100">
       <AnimatePresence initial={false}>
         {panel && !focus && (
           <motion.aside
@@ -157,7 +166,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
           ref={card}
           layout
           transition={{ duration: 0.5, ease: PANEL_EASE }}
-          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "m-3 rounded-2xl", !focus && panel && "ml-0 max-md:hidden", !focus && customize && "mr-0")}
+          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "m-3 rounded-2xl", !focus && panel && "ml-0 max-md:hidden", !focus && customize && "mr-0 max-md:mr-3 max-md:mb-0")}
         >
           {/* The demo owns the whole area; if it is taller, this area scrolls (never a box inside). */}
           <div
@@ -248,13 +257,13 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
           <motion.aside
             key="props"
             aria-label={`${name} props`}
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 300, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
+            initial={mobile ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
+            animate={mobile ? { height: "46dvh", opacity: 1 } : { width: 300, opacity: 1 }}
+            exit={mobile ? { height: 0, opacity: 0 } : { width: 0, opacity: 0 }}
             transition={{ duration: 0.5, ease: PANEL_EASE }}
-            className="h-full shrink-0 overflow-hidden max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-50 max-md:bg-[#070707]"
+            className="h-full shrink-0 overflow-hidden max-md:h-auto max-md:w-full"
           >
-            <div className="h-full w-[300px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="h-full w-[300px] overflow-y-auto max-md:w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <Customizer
                 name={componentName}
                 controls={controls}
