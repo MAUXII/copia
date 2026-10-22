@@ -200,14 +200,14 @@ const RDF_CSS = `
 .rdf-root {
   position: relative; display: grid; width: 100%; overflow: hidden; isolation: isolate;
   background: var(--rdf-paper); color: var(--rdf-ink); font-family: var(--font-geist-sans), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased; --rdf-pad: clamp(20px, 3.2vw, 30px);
+  -webkit-font-smoothing: antialiased; --rdf-pad: 20px;
   --rdf-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 .rdf-frame {
   position: relative; display: grid; grid-template-rows: auto auto minmax(var(--rdf-scene-min), 1fr);
   width: 100%;
 }
-/* Copia: the range runs edge to edge; only the text keeps the max width, so the hairlines go. */
+/* Copia: full width like the nav, so the frame's hairlines go. */
 .rdf-frame::before, .rdf-frame::after { display: none; }
 .rdf-frame::before, .rdf-frame::after {
   content: ""; position: absolute; top: 0; bottom: 0; width: 1px; z-index: 3; pointer-events: none;
@@ -304,6 +304,10 @@ const RDF_CSS = `
 }
 .rdf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
+@media (max-width: 640px) {
+  /* Copia: the same side gutter as the nav. */
+  .rdf-root { --rdf-pad: 16px; }
+}
 @media (max-width: 760px) {
   .rdf-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 36px; }
   .rdf-brand { grid-column: 1 / -1; }

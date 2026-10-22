@@ -38,6 +38,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main>{children}</main>
       <RidgelineFooter
         className="mt-24"
+        maxWidth="none"
         logo={<LogoMark className="h-[21px] w-[26px]" />}
         tagline="Free, open-source recreations of the best interfaces on the web. Credited, one file each."
         columns={COLUMNS}
