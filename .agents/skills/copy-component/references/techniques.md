@@ -145,6 +145,14 @@ stagger children in after ~150 ms; reverse order on exit.
 **Seen in.** Magic UI Border Beam; Copia `glow-border-button`.
 **Pitfalls.** To change speed without a jump, drive `offset-distance` from `useAnimationFrame` instead of changing a Motion `duration` (that restarts the loop). An inset `box-shadow` on an `isolate` parent paints under its negative-z children, so put the resting ring on the face layer.
 
+## Arc dial (curved wheel picker)
+
+**Idea.** A list laid on a circle: drag, flick or scroll and the options slide along the arc, the one in the middle is the value.
+**Mechanism.** One float `position` MotionValue (index units). Each option: `angle = clamp((i - position) * spacing / radius, ±1.5)`, `along = r·sin(angle)`, `bend = r·(1 - cos(angle))`; for `side="right"` translate `(-bend, along)` and `rotate(angle)`, origin left center. Opacity falls off past `visibleCount / 2`. Crossing a detent while the gesture is live publishes that value in order (never skip). Drag velocity is smoothed (`v = 0.35·v + 0.65·new`) and on release the target is `nearest(position + v · 0.18 s)`, then a spring settles it. Wheel deltas set `position` directly (trackpads already carry momentum) and a 120 ms idle timer snaps. A concentric inner arc (`radius - inset`, shifted by `inset` along the normal) carries the tick dial.
+**Numbers.** Settle spring 360 / 32 / mass 0.6; bracket spread spring 700 / 50 / 0.5; brackets 4 px gap + 6 px spread while active, `scaleY(0.92)`; edges masked `transparent → black 12% … 88% → transparent`. Copia depth: scale `1 - 0.22·depth·t`, blur up to `2.4·depth` px.
+**Seen in.** Be UI Arc Picker (Saurabh); Copia `arc-picker`.
+**Pitfalls.** Render the options after mount: server-serialized motion transforms differ from the client's first frame and React reports a hydration mismatch. Re-measure label widths after they mount. A drag that ends on an option must swallow its click (`onClickCapture`). Release the wheel at either end so the page can scroll.
+
 ## Recording tip
 
 The preview recorder uses Chrome's screencast, which only sends frames when

@@ -140,5 +140,6 @@ This is how the machine gets smarter with every copy.
 
 ## 9. Ship
 
-Open a pull request with the template. Optionally tell the maintainers via
-the "I opened a PR" form on the site.
+Open a pull request with the template. If it fulfils a request from
+`/requests`, add `"request": { "issue": <number>, "by": "<their-github>" }` to
+`meta.json` and write "Closes #<number>" in the pull request.
