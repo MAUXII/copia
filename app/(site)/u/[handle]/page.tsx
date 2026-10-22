@@ -37,7 +37,7 @@ function Grid({ title, items }: { title: string; items: Meta[] }) {
       <h2 className="font-mono text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
         {title} · {items.length}
       </h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         {items.map((meta) => (
           <ComponentCard key={meta.slug} meta={meta} />
         ))}
@@ -52,7 +52,7 @@ export default async function AuthorPage({ params }: Params) {
   if (!person) notFound()
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-14 px-4 pt-32">
+    <div className="mx-auto flex max-w-2xl flex-col gap-14 px-4 pt-32">
       <header className="flex flex-col gap-5">
         <div className="flex items-center gap-6">
           <Avatar src={avatarUrl(person)} name={person.name} seed={person.handle} verified={person.claimed} className="size-32" />
@@ -65,7 +65,7 @@ export default async function AuthorPage({ params }: Params) {
           </div>
         </div>
 
-        {person.bio && <p className="max-w-xl text-[15px] leading-relaxed">{person.bio}</p>}
+        {person.bio && <p className="text-[15px] leading-relaxed">{person.bio}</p>}
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
           {person.made.length > 0 && (
@@ -84,7 +84,7 @@ export default async function AuthorPage({ params }: Params) {
         </div>
 
         {!person.claimed && (
-          <div className="flex max-w-xl flex-col gap-1.5 text-sm text-muted-foreground">
+          <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
             <p>
               Auto-indexed ·{" "}
               <a href={claimUrl(person, hasAuthorFile(person.handle))} target="_blank" rel="noreferrer" className="text-highlight underline-offset-4 hover:underline">
