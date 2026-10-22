@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 /** Ember ramp: background, deep red, orange, amber highlight. */
 const RAMP = ["#0a0302", "#7a0f00", "#ff4d1c", "#ffd29a"]
 /** Light ramp: paper, peach, orange, deep ember. */
-const RAMP_LIGHT = ["#fafaf9", "#ffd9bf", "#ff8a4c", "#ff4d1c"]
+const RAMP_LIGHT = ["#ffffff", "#ffd9bf", "#ff8a4c", "#ff4d1c"]
 const RENDER_SCALE = 0.45 // the smoke is blurred anyway; low resolution keeps it cheap
 
 const VERTEX = "attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }"
