@@ -12,6 +12,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         <Logo className="text-foreground" />
         <span>Free and open source (MIT). Most components are credited recreations.</span>
         <span className="flex gap-4">
+          <Link href="/authors" className="hover:text-foreground">
+            Authors
+          </Link>
           <Link href="/suggest" className="hover:text-foreground">
             Suggest
           </Link>

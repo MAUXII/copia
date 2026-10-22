@@ -16,7 +16,8 @@
   },
   "inspiration": {
     "author": "Magic UI (Border Beam)",
-    "url": "https://magicui.design/docs/components/border-beam"
+    "url": "https://magicui.design/docs/components/border-beam",
+    "handle": "magicuidesign"
   },
   "dependencies": [
     "motion",

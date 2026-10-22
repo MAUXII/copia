@@ -16,7 +16,8 @@
   },
   "inspiration": {
     "author": "BeFreaky (David Denni)",
-    "url": "https://www.befreaky.co/"
+    "url": "https://www.befreaky.co/",
+    "handle": "befreaky"
   },
   "dependencies": [
     "motion",

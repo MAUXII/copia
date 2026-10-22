@@ -26,6 +26,15 @@ To only look for options without building, use
 - [`.agents/skills/copy-component/references/sources.md`](.agents/skills/copy-component/references/sources.md):
   where and how to search.
 
+## People
+
+Everyone Copia credits or who recreates a component gets a page at
+`/@<handle>`, built from `meta.json` (`author.github`, `inspiration.handle`,
+`credits[].handle`) and `authors/<handle>.json`. A page without
+`"claimed": true` shows "Is this yours? Claim it", which opens a pull request
+from the person's own GitHub account. See
+[crediting](.agents/skills/copy-component/references/crediting.md).
+
 ## Commands
 
 ```bash

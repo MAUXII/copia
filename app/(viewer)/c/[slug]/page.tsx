@@ -51,6 +51,21 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
   )
 }
 
+/** A credit: the name opens the person's Copia page when they have one, the arrow opens their site. */
+function Credit({ author, url, handle }: { author: string; url: string; handle?: string }) {
+  if (!handle) return <ExternalLink href={url}>{author}</ExternalLink>
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      <Link href={`/@${handle}`} className="text-white underline-offset-4 hover:underline">
+        {author}
+      </Link>
+      <a href={url} target="_blank" rel="noreferrer" aria-label={`${author} website`} className="text-neutral-400 hover:text-white">
+        <ArrowUpRight className="size-3.5" aria-hidden />
+      </a>
+    </span>
+  )
+}
+
 export default async function ComponentPage({ params }: Params) {
   const { slug } = await params
   const meta = getComponent(slug)
@@ -131,7 +146,7 @@ export default async function ComponentPage({ params }: Params) {
         <p>
           {meta.inspiration.url ? (
             <>
-              Inspired by <ExternalLink href={meta.inspiration.url}>{meta.inspiration.author}</ExternalLink>
+              Inspired by <Credit author={meta.inspiration.author} url={meta.inspiration.url} handle={meta.inspiration.handle} />
             </>
           ) : (
             "Original component"
@@ -139,13 +154,13 @@ export default async function ComponentPage({ params }: Params) {
           {meta.credits?.map((credit) => (
             <span key={credit.url}>
               {", "}
-              <ExternalLink href={credit.url}>{credit.author}</ExternalLink>
+              <Credit {...credit} />
             </span>
           ))}
           . Recreated by{" "}
-          <a href={`https://github.com/${meta.author.github}`} className="text-white underline-offset-4 hover:underline">
+          <Link href={`/@${meta.author.github.toLowerCase()}`} className="text-white underline-offset-4 hover:underline">
             {meta.author.name}
-          </a>
+          </Link>
           .
         </p>
         {meta.assets && meta.assets.length > 0 && (

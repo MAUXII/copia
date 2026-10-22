@@ -16,12 +16,14 @@
   },
   "inspiration": {
     "author": "Family",
-    "url": "https://family.co"
+    "url": "https://family.co",
+    "handle": "family"
   },
   "credits": [
     {
       "author": "Jakub Krehel (micro-interactions)",
-      "url": "https://jakub.kr"
+      "url": "https://jakub.kr",
+      "handle": "jakubkrehel"
     }
   ],
   "dependencies": [

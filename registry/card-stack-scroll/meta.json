@@ -15,7 +15,8 @@
   },
   "inspiration": {
     "author": "Skiper UI",
-    "url": "https://skiper-ui.com/v1/skiper16"
+    "url": "https://skiper-ui.com/v1/skiper16",
+    "handle": "skiper-ui"
   },
   "dependencies": [
     "motion"

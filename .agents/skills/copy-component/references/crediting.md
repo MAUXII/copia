@@ -16,7 +16,15 @@ optional.
    (for example Skiper UI, Motion Primitives, Aceternity).
 3. The component page shows "Inspired by <original>" and links the case study
    through "View source on GitHub".
-4. If an author asks for a credit fix or removal, handle it through the
+4. **Give every credit a page.** Add `handle` to `inspiration` (and to any
+   `credits` entry) so the name links to `/@<handle>`. Use the person's
+   GitHub login in lowercase when they have one. If `authors/<handle>.json`
+   does not exist, create it with `"claimed": false` and only facts you can
+   link (name, `github`, `site`, a one-line `bio`). The page then shows
+   "Is this yours? Claim it": the person opens a pull request from their own
+   GitHub account that sets `"claimed": true`. Merge it only when the pull
+   request author matches `github` (or the site they list proves it).
+5. If an author asks for a credit fix or removal, handle it through the
    `removal-request` issue template within a week.
 
 When the original is unknown, credit the earliest version you can find and

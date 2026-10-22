@@ -16,7 +16,8 @@
   },
   "inspiration": {
     "author": "Vercel",
-    "url": "https://vercel.com/"
+    "url": "https://vercel.com/",
+    "handle": "vercel"
   },
   "dependencies": [
     "motion",

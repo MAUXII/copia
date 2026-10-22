@@ -16,12 +16,14 @@
   },
   "inspiration": {
     "author": "Apple (Human Interface Guidelines: Live Activities)",
-    "url": "https://developer.apple.com/design/human-interface-guidelines/live-activities"
+    "url": "https://developer.apple.com/design/human-interface-guidelines/live-activities",
+    "handle": "apple"
   },
   "credits": [
     {
       "author": "animations.dev (Emil Kowalski)",
-      "url": "https://animations.dev/learn"
+      "url": "https://animations.dev/learn",
+      "handle": "emilkowalski"
     }
   ],
   "dependencies": [
