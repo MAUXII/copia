@@ -81,6 +81,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
       if (e.key === "Escape") {
         setPanel(false)
         setFocus(false)
+        setCustomize(false)
       }
     }
     window.addEventListener("keydown", onKey)
@@ -97,7 +98,10 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
 
   const openPanel = (next: boolean) => {
     setPanel(next)
-    if (next) setFocus(false)
+    if (next) {
+      setFocus(false)
+      setCustomize(false)
+    }
     if (hint) {
       setHint(false)
       try {
@@ -153,7 +157,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
           ref={card}
           layout
           transition={{ duration: 0.5, ease: PANEL_EASE }}
-          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "m-3 rounded-2xl", !focus && panel && "ml-0 max-md:hidden")}
+          className={cn("relative min-w-0 flex-1 overflow-hidden", !focus && "m-3 rounded-2xl", !focus && panel && "ml-0 max-md:hidden", !focus && customize && "mr-0")}
         >
           {/* The demo owns the whole area; if it is taller, this area scrolls (never a box inside). */}
           <div
@@ -167,19 +171,6 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
             </div>
           </div>
 
-          {/* Customizer replaces the preview while open, like Great UI. */}
-          {customize && (
-            <div className="absolute inset-0 z-30 overflow-y-auto bg-[#0b0b0c]">
-              <Customizer
-                name={componentName}
-                controls={controls}
-                values={values}
-                onChange={(prop, value) => setValues((v) => ({ ...v, [prop]: value }))}
-                onReset={() => setValues(defaultValues(controls))}
-              />
-            </div>
-          )}
-
           {/* Dock */}
           <div className={cn("absolute top-3 right-3 z-40 flex items-center gap-1 rounded-full bg-neutral-800/85 p-1 transition-opacity", focus && "opacity-40 hover:opacity-100")}>
             <Link href="/" aria-label="Home" title="Home" className="grid size-8 place-items-center rounded-full bg-white/[0.06] text-neutral-300 hover:bg-white/15 hover:text-white">
@@ -188,7 +179,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
             <DockButton label="Replay" onClick={() => setRun((n) => n + 1)}>
               <RotateCcw />
             </DockButton>
-            <DockButton label={focus ? "Exit full screen" : "Full screen preview"} onClick={() => { setFocus((f) => !f); setPanel(false) }} active={focus}>
+            <DockButton label={focus ? "Exit full screen" : "Full screen preview"} onClick={() => { setFocus((f) => !f); setPanel(false); setCustomize(false) }} active={focus}>
               {focus ? <Shrink /> : <Expand />}
             </DockButton>
             <DockButton label="Code and details" onClick={() => openPanel(!panel)} active={panel}>
@@ -198,7 +189,10 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
               <DockButton
                 label={customize ? "Back to preview" : "Customize the preview"}
                 onClick={() => {
+                  // Props sidebar and docs column take turns, so the preview keeps most of the screen.
                   setCustomize((c) => !c)
+                  setPanel(false)
+                  setFocus(false)
                   dismissHint()
                 }}
                 active={customize}
@@ -247,6 +241,32 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
             )}
           </AnimatePresence>
         </motion.main>
+
+      {/* Props sidebar on the right; the preview keeps the rest of the screen. */}
+      <AnimatePresence initial={false}>
+        {customize && !focus && (
+          <motion.aside
+            key="props"
+            aria-label={`${name} props`}
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 300, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: PANEL_EASE }}
+            className="h-full shrink-0 overflow-hidden max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-50 max-md:bg-[#070707]"
+          >
+            <div className="h-full w-[300px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <Customizer
+                name={componentName}
+                controls={controls}
+                values={values}
+                onChange={(prop, value) => setValues((v) => ({ ...v, [prop]: value }))}
+                onReset={() => setValues(defaultValues(controls))}
+                onClose={() => setCustomize(false)}
+              />
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       {panel && !focus && <CurvedScrollbar scroller={docs} card={card} container={root} radius={16} />}
     </div>

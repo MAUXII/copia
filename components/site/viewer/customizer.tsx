@@ -1,5 +1,6 @@
 "use client"
 
+import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { generateJsx, type ControlValues } from "@/lib/jsx"
 import type { Control } from "@/lib/schema"
@@ -83,19 +84,23 @@ function ColoredJsx({ code }: { code: string }) {
   )
 }
 
-export function Customizer({ name, controls, values, onChange, onReset }: { name: string; controls: Control[]; values: ControlValues; onChange: (prop: string, value: ControlValues[string]) => void; onReset: () => void }) {
+/** Narrow props sidebar: the preview keeps the screen, the props sit on the right. */
+export function Customizer({ name, controls, values, onChange, onReset, onClose }: { name: string; controls: Control[]; values: ControlValues; onChange: (prop: string, value: ControlValues[string]) => void; onReset: () => void; onClose: () => void }) {
   const jsx = generateJsx(name, controls, values)
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-7 px-6 pt-24 pb-28">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="font-mono text-xs tracking-[0.14em] text-neutral-500">PROPS CUSTOMIZER</h2>
+    <div className="flex w-full flex-col gap-6 px-4 pb-12">
+      {/* Same blurred header as the docs column. */}
+      <header className="sticky top-0 z-10 -mx-4 flex h-14 items-center justify-between gap-2 bg-[#070707]/70 px-4 backdrop-blur-md">
+        <h2 className="text-[15px] font-medium text-white/60">Props</h2>
+        <div className="flex items-center gap-1">
           <button type="button" onClick={onReset} className="rounded-lg bg-white/[0.06] px-2.5 py-1 font-mono text-xs text-neutral-300 hover:bg-white/10 hover:text-white">
             Reset
           </button>
+          <button type="button" aria-label="Close props" onClick={onClose} className="grid size-8 place-items-center rounded text-white/50 transition-colors hover:text-white">
+            <X className="size-4" />
+          </button>
         </div>
-        <p className="text-lg text-neutral-300">Adjust configurable properties for the live preview.</p>
-      </div>
+      </header>
 
       {controls.map((control) => (
         <div key={control.prop} className={cn("flex gap-3", control.type === "boolean" ? "items-center justify-between" : "flex-col")}>
