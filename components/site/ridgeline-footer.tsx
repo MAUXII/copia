@@ -205,8 +205,10 @@ const RDF_CSS = `
 }
 .rdf-frame {
   position: relative; display: grid; grid-template-rows: auto auto minmax(var(--rdf-scene-min), 1fr);
-  width: 100%; max-width: var(--rdf-max); margin: 0 auto;
+  width: 100%;
 }
+/* Copia: the range runs edge to edge; only the text keeps the max width, so the hairlines go. */
+.rdf-frame::before, .rdf-frame::after { display: none; }
 .rdf-frame::before, .rdf-frame::after {
   content: ""; position: absolute; top: 0; bottom: 0; width: 1px; z-index: 3; pointer-events: none;
   background: var(--rdf-line); transform: scaleY(0); transform-origin: 50% 0;
@@ -227,6 +229,7 @@ const RDF_CSS = `
   position: relative; z-index: 2; display: grid;
   grid-template-columns: minmax(0, 1.9fr) repeat(var(--rdf-n), minmax(0, 1fr));
   gap: 28px; padding: clamp(44px, 6.4vw, 80px) var(--rdf-pad) clamp(30px, 4vw, 52px);
+  width: 100%; max-width: var(--rdf-max); margin: 0 auto;
 }
 .rdf-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
 .rdf-logo {
@@ -268,6 +271,7 @@ const RDF_CSS = `
 .rdf-bar {
   position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 16px;
   padding: 0 var(--rdf-pad); font-size: 12px; color: var(--rdf-muted);
+  width: 100%; max-width: var(--rdf-max); margin: 0 auto;
 }
 .rdf-bar p { margin: 0; }
 .rdf-credit {
