@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { useEffect, useRef } from "react"
 import type { Meta } from "@/lib/schema"
+import { PREVIEW_THEMES } from "@/lib/previews"
+import { cn } from "@/lib/utils"
 
 /** "Apple (iPhone Dynamic Island), studied via …" -> "after Apple". */
 function shortCredit(meta: Meta) {
@@ -11,13 +13,22 @@ function shortCredit(meta: Meta) {
 }
 
 export function ComponentCard({ meta }: { meta: Meta }) {
-  const video = useRef<HTMLVideoElement>(null)
+  // One take per theme; CSS shows the one that matches the page and only that one plays.
+  const videos = useRef<(HTMLVideoElement | null)[]>([])
+  const shown = () => videos.current.find((v) => v && v.offsetParent !== null) ?? null
 
   // Touch screens have no hover: play while the card is on screen instead.
   useEffect(() => {
-    const el = video.current
+    const el = videos.current[0]?.parentElement
     if (!el || !window.matchMedia?.("(hover: none)").matches || !("IntersectionObserver" in window)) return
-    const observer = new IntersectionObserver(([entry]) => (entry.isIntersecting ? el.play().catch(() => {}) : el.pause()), { threshold: 0.6 })
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const video = shown()
+        if (entry.isIntersecting) video?.play().catch(() => {})
+        else videos.current.forEach((v) => v?.pause())
+      },
+      { threshold: 0.6 },
+    )
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
@@ -26,25 +37,32 @@ export function ComponentCard({ meta }: { meta: Meta }) {
     <Link
       href={`/c/${meta.slug}`}
       className="group block rounded-2xl border bg-card p-2 transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-highlight"
-      onMouseEnter={() => video.current?.play().catch(() => {})}
+      onMouseEnter={() => shown()?.play().catch(() => {})}
       onMouseLeave={() => {
-        if (!video.current) return
-        video.current.pause()
-        video.current.currentTime = 0
+        videos.current.forEach((v) => {
+          if (!v) return
+          v.pause()
+          v.currentTime = 0
+        })
       }}
     >
       <div className="aspect-[16/10] overflow-hidden rounded-xl bg-background">
-        <video
-          ref={video}
-          src={`/previews/${meta.slug}.mp4`}
-          poster={`/previews/${meta.slug}.webp`}
-          muted
-          playsInline
-          loop
-          preload="none"
-          className="size-full object-cover"
-          aria-hidden
-        />
+        {PREVIEW_THEMES.map(({ suffix }, i) => (
+          <video
+            key={suffix}
+            ref={(el) => {
+              videos.current[i] = el
+            }}
+            src={`/previews/${meta.slug}${suffix}.mp4`}
+            poster={`/previews/${meta.slug}${suffix}.webp`}
+            muted
+            playsInline
+            loop
+            preload="none"
+            className={cn("size-full object-cover", suffix ? "dark:hidden" : "hidden dark:block")}
+            aria-hidden
+          />
+        ))}
       </div>
       <div className="flex flex-col gap-0.5 px-2 pt-3 pb-1">
         <span className="text-sm font-medium">{meta.name}</span>

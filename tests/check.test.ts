@@ -13,9 +13,12 @@ function ffmpeg(args: string[]) {
   execFileSync("ffmpeg", ["-y", "-loglevel", "error", ...args])
 }
 
+/** A dark and a light take, as every component needs. */
 function makePreviews(dir: string, slug: string, size = "1280x800", seconds = 5) {
-  ffmpeg(["-f", "lavfi", "-i", `testsrc=size=${size}:rate=30:duration=${seconds}`, "-pix_fmt", "yuv420p", path.join(dir, `${slug}.mp4`)])
-  ffmpeg(["-f", "lavfi", "-i", `testsrc=size=${size}:rate=1:duration=1`, "-frames:v", "1", path.join(dir, `${slug}.webp`)])
+  for (const name of [slug, `${slug}-light`]) {
+    ffmpeg(["-f", "lavfi", "-i", `testsrc=size=${size}:rate=30:duration=${seconds}`, "-pix_fmt", "yuv420p", path.join(dir, `${name}.mp4`)])
+    ffmpeg(["-f", "lavfi", "-i", `testsrc=size=${size}:rate=1:duration=1`, "-frames:v", "1", path.join(dir, `${name}.webp`)])
+  }
 }
 
 /** Copies the ok-button fixture into a fresh registry root and lets the test mutate it. */
@@ -138,6 +141,15 @@ describe("checkComponent", () => {
     unlinkSync(path.join(own, "ok-button.webp"))
     const { dir } = setup("nowebp")
     expect(rules(checkComponent(dir, own))).toMatch(/ok-button\.webp is missing/)
+  })
+
+  it("rejects a missing light preview", () => {
+    const own = path.join(work, "prev-nolight")
+    mkdirSync(own)
+    makePreviews(own, "ok-button")
+    unlinkSync(path.join(own, "ok-button-light.mp4"))
+    const { dir } = setup("nolight")
+    expect(rules(checkComponent(dir, own))).toMatch(/ok-button-light\.mp4 is missing/)
   })
 
   it("rejects a wrong-size mp4", () => {

@@ -41,7 +41,7 @@ from the person's own GitHub account. See
 npm install
 npm run new <slug> [category]   # scaffold registry/<slug>/ (buttons, text, cards, navigation, effects)
 npm run dev              # site at http://localhost:3000 (/c/<slug>, /preview/<slug>)
-npm run preview <slug>   # record public/previews/<slug>.webp + .mp4 (no registry step needed;
+npm run preview <slug>   # record public/previews/<slug>.webp/.mp4 (dark) and <slug>-light.webp/.mp4 (no registry step needed;
                          # set PREVIEW_BASE_URL to reuse a dev server that already has the component)
 npm run check            # validate every component (must pass before a PR)
 npm run lint             # eslint (must pass before a PR)
@@ -71,7 +71,10 @@ background, text, borders, pills and every surface light or dark (use
 `bg-background`, `text-foreground`, `border-border`, `bg-muted`… or the
 `dark:` variant, never a fixed page colour like `bg-[#f5f4f3]` or
 `text-black`; a WebGL or canvas piece that needs a hex reads the theme's
-computed colour and updates when the theme class changes); previews exist at
-1280x800, the mp4 lasts 3–8 s without audio. `npm run lint` and
+computed colour and updates when the theme class changes); every component has
+two previews, a dark one (`<slug>.webp/.mp4`) and a light one
+(`<slug>-light.webp/.mp4`), both recorded by `npm run preview`, at 1280x800,
+the mp4s 3–8 s without audio; the site shows the one that matches the reader's
+theme. `npm run lint` and
 `npx tsc --noEmit` pass (CI runs both). Also expected: a case study and at
 least one feature beyond the reference.

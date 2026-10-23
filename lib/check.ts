@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process"
 import { existsSync, readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
+import { PREVIEW_THEMES } from "./previews"
 import { MetaSchema, SLUG_RE } from "./schema"
 
 export type Problem = { file: string; rule: string; fix: string }
@@ -62,11 +63,12 @@ function probe(file: string): Probe | null {
 function checkPreviews(slug: string, previewsDir: string): Problem[] {
   const problems: Problem[] = []
   const regen = `Run: npm run preview ${slug}`
+  for (const { suffix } of PREVIEW_THEMES)
   for (const ext of ["webp", "mp4"] as const) {
-    const file = path.join(previewsDir, `${slug}.${ext}`)
-    const shown = `public/previews/${slug}.${ext}`
+    const file = path.join(previewsDir, `${slug}${suffix}.${ext}`)
+    const shown = `public/previews/${slug}${suffix}.${ext}`
     if (!existsSync(file)) {
-      problems.push({ file: shown, rule: `${slug}.${ext} is missing`, fix: regen })
+      problems.push({ file: shown, rule: `${slug}${suffix}.${ext} is missing (every component has a dark and a light preview)`, fix: regen })
       continue
     }
     if (!hasFfprobe()) {

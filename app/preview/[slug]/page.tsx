@@ -10,13 +10,15 @@ export function generateStaticParams() {
   return getComponents().map((meta) => ({ slug: meta.slug }))
 }
 
-export default async function PreviewPage({ params }: { params: Promise<{ slug: string }> }) {
+/** `?theme=light` renders the demo in the light theme, for the light preview recording. */
+export default async function PreviewPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ theme?: string }> }) {
   const { slug } = await params
+  const theme = (await searchParams).theme === "light" ? "light" : "dark"
   const load = demos[slug]
   if (!load) notFound()
   const { default: Demo } = await load()
   return (
-    <main className="dark flex min-h-screen w-full flex-col bg-background text-foreground">
+    <main className={`${theme} flex min-h-screen w-full flex-col bg-background text-foreground`}>
       <Demo />
     </main>
   )

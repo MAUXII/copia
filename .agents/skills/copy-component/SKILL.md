@@ -137,8 +137,9 @@ npm run preview <slug>
 npm run check
 ```
 
-Look at `public/previews/<slug>.webp`. If the effect does not show, fix the
-demo, not the recorder. `check` must print `✓ N components OK`; its messages
+`preview` records two takes: dark (`<slug>.*`) and light (`<slug>-light.*`).
+Look at both posters in `public/previews/`. If the effect does not show, or
+the light one still has a dark page, fix the demo, not the recorder. `check` must print `✓ N components OK`; its messages
 say the file, the rule and the fix.
 
 When REA is connected, compare your preview page with the reference using

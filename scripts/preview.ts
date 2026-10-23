@@ -2,7 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process"
 import { writeFileSync } from "node:fs"
 import { createServer } from "node:net"
 import { buildDemosModule } from "../lib/tooling/build-registry"
-import { recordPreview } from "../lib/tooling/record-preview"
+import { PREVIEW_THEMES, recordPreview } from "../lib/tooling/record-preview"
 
 const slug = process.argv[2]
 if (!slug) {
@@ -53,8 +53,11 @@ async function main() {
         await new Promise((r) => setTimeout(r, 1000))
       }
     }
-    const { webp, mp4 } = await recordPreview(slug, { baseUrl, outDir: "public/previews" })
-    console.log(`✓ ${mp4}\n✓ ${webp}`)
+    // One take per theme, so the site's cards match the reader's theme.
+    for (const { theme } of PREVIEW_THEMES) {
+      const { webp, mp4 } = await recordPreview(slug, { baseUrl, outDir: "public/previews", theme })
+      console.log(`✓ ${mp4}\n✓ ${webp}`)
+    }
   } finally {
     stop(server)
   }

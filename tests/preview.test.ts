@@ -36,11 +36,13 @@ describe("recordPreview", () => {
     rmSync(out, { recursive: true, force: true })
   })
 
-  it("writes webp and mp4 that pass the preview checks", async () => {
-    const result = await recordPreview("ok-button", { baseUrl, outDir: out })
-    expect(existsSync(result.webp)).toBe(true)
-    expect(existsSync(result.mp4)).toBe(true)
+  it("writes a dark and a light webp and mp4 that pass the preview checks", async () => {
+    const dark = await recordPreview("ok-button", { baseUrl, outDir: out })
+    const light = await recordPreview("ok-button", { baseUrl, outDir: out, theme: "light" })
+    expect(existsSync(dark.webp) && existsSync(dark.mp4)).toBe(true)
+    expect(light.mp4).toMatch(/ok-button-light\.mp4$/)
+    expect(existsSync(light.webp) && existsSync(light.mp4)).toBe(true)
     const previewProblems = checkComponent("tests/fixtures/registry/ok-button", out)
     expect(previewProblems).toEqual([])
-  }, 90000)
+  }, 180000)
 })

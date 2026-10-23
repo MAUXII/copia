@@ -3,6 +3,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { chromium, type Page } from "playwright"
+import { PREVIEW_THEMES, type PreviewTheme } from "../previews"
+
+export { PREVIEW_THEMES }
 
 const WIDTH = 1280 // output size
 const HEIGHT = 800
@@ -14,7 +17,7 @@ const VIEW_H = HEIGHT / SCALE
 const FPS = 30
 const LEAD_IN = 0.8 // seconds captured before the clip starts, so the cursor is already moving
 
-type Options = { baseUrl: string; outDir: string; seconds?: number }
+type Options = { baseUrl: string; outDir: string; seconds?: number; theme?: PreviewTheme }
 type Frame = { data: string; timestamp: number }
 
 /** Moves the cursor in from the left, over the center and around it, so hover effects show. */
@@ -53,14 +56,14 @@ function writeFrames(frames: Frame[], dir: string, endTimestamp: number) {
   return list
 }
 
-export async function recordPreview(slug: string, { baseUrl, outDir, seconds = 5 }: Options) {
+export async function recordPreview(slug: string, { baseUrl, outDir, seconds = 5, theme = "dark" }: Options) {
   const work = mkdtempSync(path.join(tmpdir(), "copia-frames-"))
   const frames: Frame[] = []
   let endTimestamp = 0
   const browser = await chromium.launch()
   try {
-    const page = await browser.newPage({ viewport: { width: VIEW_W, height: VIEW_H }, deviceScaleFactor: SCALE, colorScheme: "dark" })
-    await page.goto(`${baseUrl}/preview/${slug}`, { waitUntil: "networkidle" })
+    const page = await browser.newPage({ viewport: { width: VIEW_W, height: VIEW_H }, deviceScaleFactor: SCALE, colorScheme: theme })
+    await page.goto(`${baseUrl}/preview/${slug}?theme=${theme}`, { waitUntil: "networkidle" })
     await page.waitForTimeout(500)
 
     // Chrome's screencast delivers frames at device resolution (1280x800), unlike recordVideo.
@@ -85,8 +88,9 @@ export async function recordPreview(slug: string, { baseUrl, outDir, seconds = 5
   } finally {
     await browser.close()
   }
-  const mp4 = path.join(outDir, `${slug}.mp4`)
-  const webp = path.join(outDir, `${slug}.webp`)
+  const name = `${slug}${PREVIEW_THEMES.find((t) => t.theme === theme)!.suffix}`
+  const mp4 = path.join(outDir, `${name}.mp4`)
+  const webp = path.join(outDir, `${name}.webp`)
   try {
     const list = writeFrames(frames, work, endTimestamp)
     mkdirSync(outDir, { recursive: true })

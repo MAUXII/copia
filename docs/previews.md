@@ -1,18 +1,20 @@
 # Previews
 
-Every component ships a poster and a short loop, shown on the grid:
+Every component ships a poster and a short loop in each theme, shown on the
+grid (the card shows the take that matches the reader's theme):
 
-- `public/previews/<slug>.webp` — poster, 1280×800
-- `public/previews/<slug>.mp4` — 3–8 s loop, 1280×800, no audio
+- `public/previews/<slug>.webp` and `<slug>.mp4` — dark theme
+- `public/previews/<slug>-light.webp` and `<slug>-light.mp4` — light theme
+- posters 1280×800; loops 3–8 s, 1280×800, no audio
 
-Generate both with:
+Generate all four with:
 
 ```bash
 npm run preview <slug>
 ```
 
-The recorder opens `/preview/<slug>` (your `demo.tsx` alone, centered, dark
-theme) in Chromium at 2.5× pixel density, moves the cursor in from the left
+The recorder opens `/preview/<slug>` and then `/preview/<slug>?theme=light`
+(your `demo.tsx` alone, centered) in Chromium at 2.5× pixel density, moves the cursor in from the left
 and circles the center for about five seconds, and encodes the result with
 ffmpeg (required on your PATH).
 
