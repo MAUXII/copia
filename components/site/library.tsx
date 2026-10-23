@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Copy, LayoutGrid, Sparkles } from "lucide-react"
 import { ComponentGrid } from "@/components/site/component-grid"
+import { CollectionSwitch } from "@/components/site/collection-switch"
 import { PublishNudge } from "@/components/site/publish-nudge"
 import { getComponents } from "@/lib/registry"
 import { CATEGORIES, type Meta } from "@/lib/schema"
@@ -52,33 +53,6 @@ function SectionLabel({ children, count }: { children: React.ReactNode; count: n
       {children}
       <span className="rounded-md bg-muted px-1.5 font-mono text-[10px] font-medium tabular-nums">{count}</span>
     </p>
-  )
-}
-
-/** Collection switch: icons in a pill group, the active one opens to show its label. */
-function CollectionSwitch({ active, counts }: { active: Collection; counts: Record<Collection, number> }) {
-  return (
-    <div className="inline-flex min-h-9 items-center gap-1 rounded-full bg-muted p-0.5">
-      {(Object.keys(COLLECTIONS) as Collection[]).map((c) => {
-        const { label, href, icon: Icon } = COLLECTIONS[c]
-        const on = c === active
-        return (
-          <Link
-            key={c}
-            href={href}
-            aria-current={on ? "page" : undefined}
-            title={`${label} (${counts[c]})`}
-            className={cn(
-              "inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-colors",
-              on ? "bg-background text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.1)]" : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Icon className="size-3.5" aria-hidden />
-            {on && label}
-          </Link>
-        )
-      })}
-    </div>
   )
 }
 
