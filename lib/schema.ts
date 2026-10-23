@@ -28,7 +28,7 @@ export const MetaSchema = z.object({
   description: z.string().min(1),
   category: z.enum(CATEGORIES),
   /** "copies": credited recreations (the default). "craft": Copia's own originals. */
-  collection: z.enum(["copies", "craft"]).default("copies"),
+  collection: z.enum(["copies", "craft", "agents"]).default("copies"),
   /** The original's own agent skill, if it has one (e.g. isokit), shown with the credits. */
   skill: z.object({ name: z.string().min(1), install: z.string().min(1), url: z.url() }).optional(),
   tags: z.array(z.string()),

@@ -21,8 +21,8 @@ Copia also makes its own pieces, the **Components** collection (the site's
 one from scratch rather than copy, follow
 **[`.agents/skills/craft-component/SKILL.md`](.agents/skills/craft-component/SKILL.md)**
 (`"collection": "craft"` in `meta.json`). That skill is also Copia's style:
-every Craft piece follows it, and people can install it to make their own
-in the same look. Copies are
+every Craft piece follows it. AI-interface pieces (prompts, streaming,
+agent status) use the same skill with `"collection": "agents"`. Copies are
 `"collection": "copies"`, the default.
 
 To only look for options without building, use

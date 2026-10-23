@@ -1,12 +1,9 @@
 import Link from "next/link"
-import { Copy, LayoutGrid, Sparkles } from "lucide-react"
+import { Bot, Copy, LayoutGrid, Sparkles } from "lucide-react"
 import { ComponentGrid } from "@/components/site/component-grid"
-import { CommandLine } from "@/components/site/copy-button"
-import { MakeYourOwn } from "@/components/site/make-your-own"
-import { REPO } from "@/lib/site"
 import { getComponents } from "@/lib/registry"
 
-export type Collection = "all" | "craft" | "copies"
+export type Collection = "all" | "craft" | "copies" | "agents"
 
 export const COLLECTIONS: Record<Collection, { label: string; href: string; title: string; intro: string; icon: typeof LayoutGrid }> = {
   all: {
@@ -24,6 +21,13 @@ export const COLLECTIONS: Record<Collection, { label: string; href: string; titl
     intro: "The best interfaces on the web, recreated as one file each, often with a feature more, and always credited to whoever made them first.",
     icon: Copy,
   },
+  agents: {
+    label: "Agents",
+    href: "/components/agents",
+    title: "Agents",
+    intro: "Interfaces for AI agents: prompts, streaming answers, thinking and tool states, approvals. Calm, clear motion for software that talks back.",
+    icon: Bot,
+  },
 }
 
 /** The main column of /components, /components/craft and /components/copies; the sidebar lives in their layout. */
@@ -36,20 +40,6 @@ export function Library({ collection }: { collection: Collection }) {
         <p className="text-sm font-medium">{collection === "all" ? "Library" : "Components"}</p>
         <h1 className="mt-2 text-4xl font-medium tracking-tight">{meta.title}</h1>
         <p className="mt-3 mb-8 max-w-2xl text-muted-foreground">{meta.intro}</p>
-        {/* Craft is Copia's style; its skill lets anyone make their own in the same look. */}
-        {collection === "craft" && (
-          <section className="mb-10 grid gap-4 rounded-2xl bg-muted/50 p-5 lg:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-sm font-medium">Make your own in Copia&apos;s style</h2>
-              <p className="text-sm text-muted-foreground">Install the craft skill in your coding agent, then describe what you want.</p>
-              <CommandLine command={`npx skills add ${REPO} --skill craft-component`} className="mt-1 w-full" />
-            </div>
-            <div className="flex flex-col justify-end gap-2">
-              <MakeYourOwn />
-              <p className="text-xs text-muted-foreground">Copies a prompt for Claude Code, Codex or Cursor.</p>
-            </div>
-          </section>
-        )}
         {/* Collections as tabs on small screens, where the sidebar is hidden. */}
         <div className="mb-8 flex gap-5 text-sm md:hidden">
           {(Object.keys(COLLECTIONS) as Collection[]).map((c) => (

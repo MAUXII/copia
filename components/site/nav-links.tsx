@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BookOpen, ChevronDown, LayoutGrid, Lightbulb, Upload, Users } from "lucide-react"
+import { BookOpen, Bot, ChevronDown, LayoutGrid, Lightbulb, Upload, Users } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 const LINKS = [
-  { href: "/components", label: "Components", icon: LayoutGrid, active: (p: string) => p.startsWith("/components") || p.startsWith("/c/") },
+  { href: "/components", label: "Components", icon: LayoutGrid, active: (p: string) => (p.startsWith("/components") && !p.endsWith("/agents")) || p.startsWith("/c/") },
+  { href: "/components/agents", label: "Agents", icon: Bot, active: (p: string) => p.endsWith("/components/agents") },
   { href: "/guides", label: "Guides", icon: BookOpen, active: (p: string) => p.startsWith("/guides") },
 ]
 

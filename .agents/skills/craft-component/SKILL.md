@@ -1,6 +1,6 @@
 ---
 name: craft-component
-description: Copia's own style and the workflow for its Craft components, as opposed to copies. Install it in any project to make components in Copia's style ("make a kitchen timer in Copia's style"). Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button, a gooey menu that blobs open…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
+description: Copia's own style and the workflow for its Craft components, as opposed to copies. Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button, a gooey menu that blobs open…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
 metadata:
   version: "1"
 ---

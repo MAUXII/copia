@@ -10,6 +10,7 @@ const COLUMNS = [
       { label: "Components", href: "/components" },
       { label: "Craft", href: "/components/craft", badge: "New" },
       { label: "Copies", href: "/components/copies" },
+      { label: "Agents", href: "/components/agents" },
     ],
   },
   {
