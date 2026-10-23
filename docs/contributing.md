@@ -10,7 +10,7 @@ the short version for humans.
    mechanism and numbers ([REA for UI](using-rea.md)).
 3. **Scaffold.** `npm run new <slug>`.
 4. **Build.** One file, allowed imports only (`react`, `motion`,
-   `lucide-react`, `@/lib/utils`), theme variables, keyboard support,
+   `lucide-react`, `@/lib/utils`, `three`/`gsap` for WebGL), theme variables, keyboard support,
    reduced motion. Add at least one feature beyond the reference.
 5. **Demo.** `demo.tsx` should show the effect within ~5 seconds of cursor
    movement (see [previews](previews.md)).

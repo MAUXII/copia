@@ -1,7 +1,7 @@
 {
   "slug": "liquid-glass-carousel",
   "name": "Liquid Glass Carousel",
-  "description": "An endless photo row seen through a WebGL liquid-glass lens: a rotated ellipse that swirls the image at its rim, splits it into colour and glows with a ring; drag, flick, scroll or use the arrows, click the middle photo to focus it. Copia rebuilds it without three.js or GSAP and adds autoplay, a lens colour, rounded panels and a background that follows the theme.",
+  "description": "Componentry's liquid-glass carousel, original code: an endless photo row seen through a WebGL lens (three.js + GSAP) that swirls the image at its rim, splits it into colour and glows with a ring; drag, flick, scroll or use the arrows, click the middle photo to focus it. Copia adds `lens` overrides, `lensColor` and `autoplay`.",
   "category": "cards",
   "tags": [
     "carousel",
@@ -24,7 +24,7 @@
   },
   "credits": [
     {
-      "author": "Componentry (Harsh Jadhav)",
+      "author": "Componentry (Harsh Jadhav), the code",
       "url": "https://componentry.dev/docs/components/liquid-glass-carousel",
       "handle": "harshjdhv"
     }
@@ -85,12 +85,15 @@
       "license": "Lummi License (free, credit appreciated)"
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    "three",
+    "gsap"
+  ],
   "props": [
     {
       "name": "items",
       "type": "{ src, title, aspect? }[]",
-      "default": "-",
+      "default": "8 Unsplash photos",
       "description": "Photos in order. Aspect is read from the image when omitted."
     },
     {
@@ -106,57 +109,43 @@
       "description": "Space between panels."
     },
     {
-      "name": "radius",
-      "type": "number",
-      "default": "6",
-      "description": "Panel corner radius in px."
-    },
-    {
-      "name": "lensSize",
-      "type": "number",
-      "default": "1",
-      "description": "Lens size as a multiple of the reference lens."
-    },
-    {
-      "name": "lensColor",
+      "name": "background",
       "type": "string",
-      "default": "\"#ff7a45\"",
-      "description": "Colour of the glowing ring at the lens rim."
-    },
-    {
-      "name": "dispersion",
-      "type": "number",
-      "default": "11",
-      "description": "Chromatic split at the rim; 0 turns it off."
-    },
-    {
-      "name": "autoplay",
-      "type": "number",
-      "default": "0",
-      "description": "Seconds between automatic steps; input pauses it for 4 s."
+      "default": "\"#ffffff\"",
+      "description": "Page colour behind the row (hex). The glass looks right on light pages."
     },
     {
       "name": "entry",
       "type": "boolean",
       "default": "true",
-      "description": "Panels rise in and the lens blooms on mount."
+      "description": "Rise-and-grow intro."
     },
     {
-      "name": "onActiveChange",
-      "type": "(index) => void",
+      "name": "lens",
+      "type": "Partial<LiquidGlassLens>",
       "default": "-",
-      "description": "Called when the centred photo changes."
+      "description": "Copia: override any lens setting: sizeX, sizeY, rotation, dispersion, blueRing, rimTangential, shimmer, glow…"
+    },
+    {
+      "name": "lensColor",
+      "type": "string",
+      "default": "\"#009dff\"",
+      "description": "Copia: colour of the glowing ring."
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "default": "0",
+      "description": "Copia: seconds between automatic steps; input pauses it for 4 s."
+    },
+    {
+      "name": "onActiveChange / onFocusChange",
+      "type": "(index) => void / (focused) => void",
+      "default": "-",
+      "description": "Called when the centred photo or the focus changes."
     }
   ],
   "controls": [
-    {
-      "prop": "lensSize",
-      "type": "number",
-      "min": 0.5,
-      "max": 1.5,
-      "step": 0.05,
-      "default": 1
-    },
     {
       "prop": "dispersion",
       "type": "number",
@@ -166,12 +155,20 @@
       "default": 11
     },
     {
-      "prop": "radius",
+      "prop": "ring",
       "type": "number",
       "min": 0,
-      "max": 32,
-      "step": 1,
+      "max": 12,
+      "step": 0.5,
       "default": 6
+    },
+    {
+      "prop": "rotation",
+      "type": "number",
+      "min": 0,
+      "max": 180,
+      "step": 5,
+      "default": 65
     },
     {
       "prop": "gap",

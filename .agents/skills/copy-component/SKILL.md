@@ -62,7 +62,9 @@ npm run new <slug>
 
 - One file: `registry/<slug>/<slug>.tsx`. Write it from your mechanism note.
 - Allowed imports: `react`, `motion` / `motion/react`, `lucide-react`,
-  `@/lib/utils`. Anything else gets reimplemented inside the file.
+  `@/lib/utils`, and `three` / `gsap` for WebGL pieces. Anything else gets
+  reimplemented inside the file. When a reference is MIT and already one file,
+  keep its code and add props instead of rewriting it.
 - Theme colors through CSS variables, `className` passthrough, typed props
   with defaults, keyboard support when interactive, `prefers-reduced-motion`.
 - `demo.tsx` shows the component at its best in ~5 seconds of cursor motion

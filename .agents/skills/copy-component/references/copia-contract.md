@@ -17,7 +17,8 @@ public/demo/<slug>/*               demo images, each credited in meta.json → a
 ```
 
 - `slug`: kebab-case, unique, same as the folder name.
-- Imports: `react`, `motion`, `motion/react`, `lucide-react`, `@/lib/utils`;
+- Imports: `react`, `motion`, `motion/react`, `lucide-react`, `@/lib/utils`,
+  and `three` / `gsap` for WebGL pieces;
   `demo.tsx` may also import `./<slug>`. Every npm package used must be listed
   in `meta.json` → `dependencies` (`react` excluded).
 

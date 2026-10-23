@@ -1,8 +1,8 @@
 "use client"
 
-import { LiquidGlassCarousel, type LiquidGlassCarouselProps, type LiquidGlassItem } from "./liquid-glass-carousel"
+import { LiquidGlassCarousel, type LiquidGlassCarouselItem } from "./liquid-glass-carousel"
 
-const photo = (file: string, title: string): LiquidGlassItem => ({ src: `/demo/liquid-glass-carousel/${file}`, title })
+const photo = (file: string, title: string): LiquidGlassCarouselItem => ({ src: `/demo/liquid-glass-carousel/${file}`, title })
 
 const ITEMS = [
   photo("crimson-contemplation.webp", "Crimson Contemplation"),
@@ -16,11 +16,13 @@ const ITEMS = [
   photo("fiery-profile.webp", "Fiery Profile"),
 ]
 
-/** Customizer values (lensSize, dispersion, radius, gap, autoplay) flow into the carousel. */
-export default function Demo({ autoplay = 1.8, ...props }: Pick<LiquidGlassCarouselProps, "lensSize" | "dispersion" | "radius" | "gap" | "autoplay">) {
+type DemoProps = { dispersion?: number; ring?: number; rotation?: number; gap?: number; autoplay?: number }
+
+/** Customizer values flow into the lens (dispersion, ring, rotation), the row (gap) and autoplay. */
+export default function Demo({ dispersion = 11, ring = 6, rotation = 65, gap = 12, autoplay = 1.8 }: DemoProps) {
   return (
     <div className="relative min-h-[560px] flex-1">
-      <LiquidGlassCarousel items={ITEMS} autoplay={autoplay} className="absolute inset-0" {...props} />
+      <LiquidGlassCarousel items={ITEMS} gap={gap} autoplay={autoplay} lens={{ dispersion, blueRing: ring, rotation }} className="absolute inset-0" />
     </div>
   )
 }

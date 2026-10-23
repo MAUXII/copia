@@ -1,850 +1,1646 @@
-"use client"
+"use client";
 
-import { useEffect, useId, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
+// Liquid Glass Carousel by Harsh Jadhav for Componentry (MIT), after Yousuf Soomro's
+// liquid-glass-carousel (MIT). The original code is kept as is; Copia only inlines the WebGL
+// error boundary (one file per component) and adds the `lens`, `lensColor` and `autoplay` props,
+// marked "Copia:" below.
 
-export type LiquidGlassItem = {
-  src: string
-  title: string
-  /** Width / height. Read from the image when omitted. */
-  aspect?: number
+import { gsap } from "gsap";
+import {
+  Component,
+  type CSSProperties,
+  type ErrorInfo,
+  type ReactNode,
+  type KeyboardEvent as ReactKeyboardEvent,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import * as THREE from "three";
+import { cn } from "@/lib/utils";
+
+// Copia: inlined from Componentry's components/ui/webgl-error-boundary.tsx.
+interface WebGLErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export type LiquidGlassCarouselProps = {
-  items: LiquidGlassItem[]
-  /** Target panel height in px; scaled down when the container is shorter. */
-  panelHeight?: number
-  gap?: number
-  /** Corner radius of each panel, in px. */
-  radius?: number
-  /** Lens size, as a multiple of the reference lens. */
-  lensSize?: number
-  /** Colour of the glowing ring around the lens rim. */
-  lensColor?: string
-  /** Chromatic split at the rim. 0 turns it off. */
-  dispersion?: number
-  /** Seconds between automatic steps; any input pauses it for a while. 0 turns it off. */
-  autoplay?: number
-  /** Panels rise in and the lens blooms on mount. */
-  entry?: boolean
-  className?: string
-  onActiveChange?: (index: number) => void
+interface WebGLErrorBoundaryState {
+  hasError: boolean;
 }
 
-type Engine = { step: (direction: number) => void; focusCenter: () => void; close: () => void; destroy: () => void }
+class WebGLErrorBoundary extends Component<
+  WebGLErrorBoundaryProps,
+  WebGLErrorBoundaryState
+> {
+  public state: WebGLErrorBoundaryState = { hasError: false };
 
-// The lens, measured from the reference (65° ellipse, rim swirl, ring, nova glow).
-const LENS = { sizeX: 0.565, sizeY: 1, rotation: (65 * Math.PI) / 180 }
-// Motion, per 60 fps frame like the reference; scaled by real frame time below.
-const EASE = 0.09
-const SNAP_EASE = 0.05
-const TOUCH_EASE = 0.22
-const WHEEL = 1.4
-const DRAG = 1.6
-const TOUCH_DRAG = 1
-const FRICTION = 0.865
-const SNAP_IDLE_MS = 120
-const SHRINK_MAX = 60 // px per frame that counts as full speed; panels shrink up to 25% while flying
-const CLICK_SLOP = 6
-const FLICK_IDLE_MS = 90
-const IDLE_BEFORE_AUTOPLAY_MS = 4000
+  static getDerivedStateFromError(): WebGLErrorBoundaryState {
+    return { hasError: true };
+  }
 
-const VERTEX = `
-attribute vec2 a;
-uniform vec4 uRect;
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.props.onError?.(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? <WebGLFallback />;
+    }
+    return this.props.children;
+  }
+}
+
+interface WebGLFallbackProps {
+  className?: string;
+  message?: string;
+}
+
+function WebGLFallback({
+  className,
+  message = "Interactive WebGL content is unavailable on this device/browser.",
+}: WebGLFallbackProps) {
+  return (
+    <div
+      className={cn(
+        "flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-950 via-slate-900 to-zinc-900 px-4 text-center text-sm text-white/75",
+        className,
+      )}
+      role="status"
+      aria-live="polite"
+    >
+      <p>{message}</p>
+    </div>
+  );
+}
+
+export interface LiquidGlassCarouselItem {
+  src: string;
+  title: string;
+  /** Width / height. Measured from the image when omitted. */
+  aspect?: number;
+}
+
+export interface LiquidGlassCarouselProps {
+  items?: LiquidGlassCarouselItem[];
+  /** Target panel height in CSS pixels. Scaled down when the container is shorter. */
+  panelHeight?: number;
+  gap?: number;
+  background?: string;
+  /** Play the rise-and-grow intro. Ignored when the user prefers reduced motion. */
+  entry?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  onActiveChange?: (index: number) => void;
+  onFocusChange?: (focused: boolean) => void;
+  /** Copia: override any lens setting (size, rotation, dispersion, ring, rim swirl, shimmer...). */
+  lens?: Partial<LiquidGlassLens>;
+  /** Copia: colour of the glowing ring, shorthand for `lens.blueColor`. */
+  lensColor?: string;
+  /** Copia: seconds between automatic steps; any input pauses it for 4 s. 0 turns it off. */
+  autoplay?: number;
+}
+
+const PORTRAIT_ASPECT = 3 / 4;
+
+const photo = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?w=900&h=1200&q=85&auto=format&fit=crop`;
+
+export const liquidGlassCarouselDefaultItems: LiquidGlassCarouselItem[] = [
+  { title: "Project One", src: photo("1600585154340-be6161a56a0c"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Two", src: photo("1514906689926-25ba6dcb584b"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Three", src: photo("1568557412756-7d219873dd11"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Four", src: photo("1581892805885-73bdd91beff0"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Five", src: photo("1482938289607-e9573fc25ebb"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Six", src: photo("1610846202780-b4d9837371ea"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Seven", src: photo("1527630941-4a229fd674ab"), aspect: PORTRAIT_ASPECT },
+  { title: "Project Eight", src: photo("1603786420263-ad59136a7409"), aspect: PORTRAIT_ASPECT },
+];
+
+const LENS = {
+  sizeX: 0.565,
+  sizeY: 1,
+  posX: 0.5,
+  posY: 0.5,
+  rotation: 65,
+  spin: 0,
+  zoom: 0,
+  dispersion: 11,
+  blur: 0,
+  glow: 4.2,
+  whiteGlow: 0.24,
+  novaSize: 12,
+  blueRing: 6,
+  ringRadius: 0.49,
+  ringWidth: 0.014,
+  shimmer: true,
+  shimmerFreq: 12,
+  shimmerSpeed: 3.5,
+  shimmerDepth: 0.12,
+  rimStart: 0.578,
+  rimTangential: 0.6,
+  rimInward: 0,
+  rimFreq1: 2,
+  rimFreq2: 1,
+  blueColor: "#009dff",
+  rimLine: 1.4,
+  rimLinePos: 0.488,
+  rimLineWidth: 0.003,
+  vignette: 0,
+  vignetteSize: 0.3,
+  samples: 16,
+};
+
+/** Copia: the lens settings, exposed so `lens` can override any of them. */
+export type LiquidGlassLens = typeof LENS;
+
+const FOCUS = {
+  cardDuration: 0.7,
+  focusDuration: 0.9,
+  cardEase: "power4.out",
+  focusEase: "power3.out",
+  stagger: 0.06,
+  dropDist: 1.4,
+  centerScale: 1.18,
+  lensFade: 0.85,
+};
+
+const ENTRY = {
+  delay: 0.5,
+  startH: 80,
+  riseDuration: 1.0,
+  stagger: 0.07,
+  riseEase: "power3.out",
+  fromBelow: 0.9,
+  growDelay: 0.25,
+  growDuration: 2.15,
+  growEase: "expo.inOut",
+  growStagger: 0.085,
+  lensBloom: 1.4,
+  lensBloomEase: "power2.inOut",
+};
+
+const LENS_VERTEX = /* glsl */ `
+varying vec2 vUv;
+void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+`;
+
+const LENS_FRAGMENT = /* glsl */ `
+#define PI 3.14159265
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D uTex;
 uniform vec2 uRes;
-varying vec2 vUv;
-void main() {
-  vUv = a;
-  vec2 px = uRect.xy + a * uRect.zw;
-  gl_Position = vec4(px / uRes * 2.0 - 1.0, 0.0, 1.0) * vec4(1.0, -1.0, 1.0, 1.0);
-}`
-
-// A photo, cover-fitted, with rounded corners; a flat tone while it loads.
-const PANEL = `
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D uTex;
-uniform float uReady;
-uniform vec2 uCover;
-uniform vec2 uSize;
-uniform float uRadius;
-uniform vec3 uTone;
-void main() {
-  vec2 q = abs(vUv - 0.5) * uSize - (uSize * 0.5 - uRadius);
-  float d = length(max(q, 0.0)) - uRadius;
-  float alpha = clamp(0.5 - d, 0.0, 1.0);
-  vec3 c = uReady > 0.5 ? texture2D(uTex, (vUv - 0.5) * uCover + 0.5).rgb : uTone;
-  gl_FragColor = vec4(c, alpha);
-}`
-
-const FULL = `
-attribute vec2 a;
-varying vec2 vUv;
-void main() { vUv = a; gl_Position = vec4(a * 2.0 - 1.0, 0.0, 1.0); }`
-
-// Ported from the reference shader, with its fixed settings folded into constants.
-const LENS_FRAGMENT = `
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D uTex;
+uniform vec2 uCenter;
+uniform float uSizeX;
+uniform float uSizeY;
 uniform float uAspect;
-uniform vec2 uSize;
-uniform float uRotation;
+uniform float uZoom;
 uniform float uDispersion;
-uniform float uRing;
-uniform float uRimLine;
-uniform float uRimSwirl;
+uniform float uBlur;
+uniform float uGlow;
+uniform float uWhiteGlow;
+uniform float uNovaSize;
+uniform float uBlueRing;
+uniform float uRingRadius;
+uniform float uRingWidth;
 uniform float uShimmer;
-uniform vec3 uBg;
+uniform float uShimmerFreq;
+uniform float uShimmerSpeed;
+uniform float uShimmerDepth;
 uniform float uTime;
-uniform vec3 uColor;
-const float GLOW = 4.2;
-const float WHITE_GLOW = 0.24;
-const float NOVA = 12.0;
-const float RING_RADIUS = 0.49;
-const float RING_WIDTH = 0.014;
-const float RIM_START = 0.578;
-const float RIM_LINE_POS = 0.488;
-const float RIM_LINE_WIDTH = 0.003;
-const int SAMPLES = 16;
+uniform float uRimStart;
+uniform float uRimTangential;
+uniform float uRimInward;
+uniform float uRimFreq1;
+uniform float uRimFreq2;
+uniform vec3 uBlueColor;
+uniform float uRimLine;
+uniform float uRimLinePos;
+uniform float uRimLineWidth;
+uniform float uVignette;
+uniform float uVignetteSize;
+uniform float uShape;
+uniform float uSquareRound;
+uniform float uRotation;
+uniform int uSamples;
 
-void main() {
-  vec3 base = texture2D(uTex, vUv).rgb;
-  vec2 offset = vUv - 0.5;
-  vec2 p = offset;
-  p.x *= uAspect;
+const int MAX_SAMPLES = 16;
+
+float sdRoundBox(vec2 p, vec2 b, float r){
+  vec2 q = abs(p) - b + r;
+  return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+}
+
+vec3 discLens(vec2 center, float aspectCorrect, out float outA) {
+  vec2 p = (vUv - center);
+  p.x *= aspectCorrect;
   float ca = cos(uRotation), sa = sin(uRotation);
   p = mat2(ca, -sa, sa, ca) * p;
-  float dist = length(p / uSize);
-  if (dist > 1.0) { gl_FragColor = vec4(base, 1.0); return; }
+  vec2 halfSize = vec2(uSizeX, uSizeY);
+  float dist = length(p / halfSize);
+  outA = 0.0;
 
+  float maskND;
+  if (uShape > 0.5) {
+    float corner = min(uSizeX, uSizeY) * clamp(uSquareRound, 0.0, 1.0);
+    float sd = sdRoundBox(p, halfSize, corner);
+    maskND = 1.0 + sd / min(uSizeX, uSizeY);
+  } else {
+    maskND = dist;
+  }
+  if (maskND > 1.0) return vec3(0.0);
+
+  float shapeND = clamp(maskND, 0.0, 1.0);
   float nd = clamp(dist, 0.0, 1.0);
-  vec2 radial = normalize(offset + 1e-6);
-  vec2 tangent = vec2(-radial.y, radial.x);
+  vec2 offset = vUv - center;
+  vec2 radialDir = normalize(offset + 1e-6);
+  vec2 tangentDir = vec2(-radialDir.y, radialDir.x);
   float angle = atan(p.y, p.x);
 
-  // The rim drags the image sideways in a slow two-lobe swirl.
-  float rim = smoothstep(RIM_START, 1.0, nd);
-  float wave = sin(angle * 2.0) * 0.55 + sin(angle) * 0.25;
-  float rScreen = (uSize.x + uSize.y) * 0.5;
-  vec2 uv = 0.5 + offset + tangent * wave * rim * rScreen * uRimSwirl;
+  float pull = uZoom * 0.30 * (nd * nd);
+  float rimStrength = smoothstep(uRimStart, 1.0, nd);
+  float fluidWave = sin(angle * uRimFreq1) * 0.55 + sin(angle * uRimFreq2) * 0.25;
+  float rScreen = (uSizeX + uSizeY) * 0.5;
+  vec2 rimOff = tangentDir * fluidWave * rimStrength * rScreen * uRimTangential;
+  vec2 rimPull = -radialDir * rimStrength * rScreen * uRimInward;
 
-  // Chromatic dispersion: 16 taps along the radius, weighted red to blue.
-  vec2 spread = offset * uDispersion * 0.004 * smoothstep(0.55, 1.0, nd);
+  vec2 baseUV = center + offset * (1.0 - pull) + rimOff + rimPull;
+
+  float rimMask = smoothstep(0.55, 1.0, nd);
+  vec2 dispDir = offset * uDispersion * 0.004 * rimMask;
+  int N = uSamples;
+  if (N < 2) N = 2;
+  if (N > MAX_SAMPLES) N = MAX_SAMPLES;
   vec3 col = vec3(0.0);
-  vec3 total = vec3(0.0);
-  for (int i = 0; i < SAMPLES; i++) {
-    float t = float(i) / float(SAMPLES - 1);
-    vec3 s = texture2D(uTex, uv + spread * (t - 0.5)).rgb;
-    vec3 w = vec3(exp(-pow(t / 0.38, 2.0)), exp(-pow((t - 0.5) / 0.38, 2.0)), exp(-pow((t - 1.0) / 0.38, 2.0)));
+  vec3 caW = vec3(0.0);
+  for (int i = 0; i < MAX_SAMPLES; i++) {
+    if (i >= N) break;
+    float t = float(i) / float(N - 1);
+    vec2 sUV = baseUV + dispDir * (t - 0.5);
+    vec3 s = texture2D(uTex, sUV).rgb;
+    vec3 w = vec3(
+      exp(-pow((t - 0.00) / 0.38, 2.0)),
+      exp(-pow((t - 0.50) / 0.38, 2.0)),
+      exp(-pow((t - 1.00) / 0.38, 2.0))
+    );
     col += s * w;
-    total += w;
+    caW += w;
   }
-  col /= max(total, vec3(0.001));
-  col *= mix(0.91, 1.0, smoothstep(0.0, 0.38, nd));
-  // Copia: the glass only glows where it bends an image. The reference adds its glow onto a white
-  // page, where it clips to white and vanishes; on any other page this keeps that look.
-  // Measured around the point, not only on it, so the glow spills a little past each image edge
-  // (the bright fringe the reference shows where the glass folds over a photo's edge).
-  float near = distance(col, uBg);
-  for (int k = 0; k < 8; k++) {
-    float a = float(k) * 0.785398;
-    near = max(near, distance(texture2D(uTex, uv + vec2(cos(a) / uAspect, sin(a)) * 0.022).rgb, uBg));
-  }
-  float content = smoothstep(0.03, 0.18, distance(col, uBg));
-  float fringe = smoothstep(0.03, 0.18, near);
+  col /= max(caW, vec3(0.001));
 
-  // Soft white nova in the middle, a coloured ring and a thin bright line at the rim.
-  float r2 = nd * nd * 0.25;
-  float gs = max(NOVA * GLOW * 0.003, 0.004);
-  col += vec3((exp(-r2 / gs) + exp(-r2 / (gs * 7.0)) * 0.18) * WHITE_GLOW * (GLOW / 17.0) * 1.15 * content);
-  float dC = nd * 0.5;
-  float ring = exp(-pow((dC - RING_RADIUS) / RING_WIDTH, 2.0)) * uRing * (GLOW / 17.0) * 1.8;
-  ring *= sin(angle * 12.0 + uTime * 3.5) * 0.12 * uShimmer + (1.0 - 0.12 * uShimmer);
-  float aura = exp(-pow((dC - RING_RADIUS) / (RING_WIDTH * 6.0), 2.0)) * 0.28 * uRing * (GLOW / 17.0);
-  col += uColor * (ring + aura) * fringe;
-  col += vec3(exp(-pow((dC - RIM_LINE_POS) / RIM_LINE_WIDTH, 2.0)) * uRimLine) * fringe;
-
-  gl_FragColor = vec4(mix(base, col, smoothstep(1.0, 0.93, dist)), 1.0);
-}`
-
-const easeOut = (power: number) => (t: number) => 1 - Math.pow(1 - t, power)
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
-
-function parseColor(value: string): [number, number, number] {
-  const hex = /^#([0-9a-f]{6})$/i.exec(value.trim())
-  if (hex) return [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16) / 255) as [number, number, number]
-  const rgb = value.match(/[\d.]+/g)
-  return rgb && rgb.length >= 3 ? [Number(rgb[0]) / 255, Number(rgb[1]) / 255, Number(rgb[2]) / 255] : [1, 1, 1]
-}
-
-function compile(gl: WebGLRenderingContext, vertex: string, fragment: string) {
-  const program = gl.createProgram()!
-  for (const [type, source] of [
-    [gl.VERTEX_SHADER, vertex],
-    [gl.FRAGMENT_SHADER, fragment],
-  ] as const) {
-    const shader = gl.createShader(type)!
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader) ?? "shader")
-    gl.attachShader(program, shader)
-  }
-  gl.linkProgram(program)
-  const uniforms = new Map<string, WebGLUniformLocation | null>()
-  return {
-    program,
-    u: (name: string) => {
-      if (!uniforms.has(name)) uniforms.set(name, gl.getUniformLocation(program, name))
-      return uniforms.get(name)!
-    },
-  }
-}
-
-type Options = Required<Pick<LiquidGlassCarouselProps, "panelHeight" | "gap" | "radius" | "lensSize" | "lensColor" | "dispersion" | "autoplay" | "entry">> & {
-  items: LiquidGlassItem[]
-  onActive: (index: number) => void
-  onFocus: (focused: boolean) => void
-  onReady: () => void
-}
-
-function createEngine(root: HTMLElement, canvas: HTMLCanvasElement, cursor: HTMLElement, o: Options): Engine | null {
-  const gl = canvas.getContext("webgl", { alpha: false, antialias: false, premultipliedAlpha: false })
-  if (!gl || o.items.length === 0) return null
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-  const panelProgram = compile(gl, VERTEX, PANEL)
-  const lensProgram = compile(gl, FULL, LENS_FRAGMENT)
-  const quad = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, quad)
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW)
-
-  // Panels render into this texture; the lens pass reads it back.
-  const target = gl.createTexture()
-  const fbo = gl.createFramebuffer()
-
-  const sources = o.items.map((item) => ({ aspect: item.aspect ?? 0.75, tex: null as WebGLTexture | null, w: 1, h: 1 }))
-  sources.forEach((s, i) => {
-    const image = new Image()
-    image.crossOrigin = "anonymous"
-    image.decoding = "async"
-    image.onload = () => {
-      const tex = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, tex)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      s.tex = tex
-      s.w = image.naturalWidth
-      s.h = image.naturalHeight
-      if (o.items[i].aspect === undefined) {
-        s.aspect = s.w / s.h
-        measure()
-        if (!touched) scroll = goal = centerFor(0)
+  float blurFade = 1.0 - smoothstep(0.72, 0.98, nd);
+  if (uBlur > 0.01 && blurFade > 0.01) {
+    vec2 blurRad = vec2(uBlur) / uRes * blurFade;
+    vec3 bcol = vec3(0.0);
+    float btw = 0.0;
+    for (float a = 0.0; a < PI * 2.0; a += PI * 2.0 / 6.0) {
+      for (float rr = 0.4; rr <= 1.001; rr += 0.3) {
+        vec2 o = vec2(cos(a), sin(a)) * blurRad * rr;
+        float w = 1.0 - rr * 0.38;
+        bcol += texture2D(uTex, baseUV + o).rgb * w;
+        btw += w;
       }
     }
-    image.src = o.items[i].src
-  })
+    col = mix(bcol / btw, col, rimMask);
+  }
 
-  let W = 1
-  let H = 1
-  let dpr = 1
-  let panelH = 1
-  let offsets: number[] = []
-  let total = 1
-  const slot = (i: number) => sources[i].aspect * panelH + o.gap
-  const slotCenter = (i: number) => offsets[i] + slot(i) / 2 - o.gap / 2
-  function measure() {
-    offsets = []
-    let acc = 0
-    sources.forEach((_, i) => {
-      offsets.push(acc)
-      acc += slot(i)
-    })
-    total = acc
+  col *= mix(0.91, 1.0, smoothstep(0.0, 0.38, shapeND));
+
+  float r2 = shapeND * shapeND * 0.25;
+  float gs = max(uNovaSize * uGlow * 0.003, 0.004);
+  float nova = exp(-r2 / gs) + exp(-r2 / (gs * 7.0)) * 0.18;
+  nova *= uWhiteGlow * (uGlow / 17.0) * 1.15;
+  col += vec3(nova);
+
+  float dC = shapeND * 0.5;
+  float tR = clamp(uRingRadius, 0.1, 0.49);
+  float rW = max(uRingWidth, 0.003);
+  float ring = exp(-pow((dC - tR) / rW, 2.0));
+  ring *= uBlueRing * (uGlow / 17.0) * 1.8;
+  if (uShimmer > 0.5) ring *= sin(angle * uShimmerFreq + uTime * uShimmerSpeed) * uShimmerDepth + (1.0 - uShimmerDepth);
+  float ringAura = exp(-pow((dC - tR) / (rW * 6.0), 2.0)) * 0.28 * uBlueRing * (uGlow / 17.0);
+  col += uBlueColor * (ring + ringAura);
+  col += vec3(exp(-pow((dC - uRimLinePos) / max(uRimLineWidth, 0.0001), 2.0)) * uRimLine);
+
+  outA = smoothstep(1.0, 0.93, maskND);
+  return col;
+}
+
+void main(){
+  vec3 base = texture2D(uTex, vUv).rgb;
+  vec3 outc = base;
+  float a = 0.0;
+  vec3 c = discLens(uCenter, uAspect, a);
+  outc = mix(outc, c, a);
+  if (uVignette > 0.001) {
+    vec2 vc = vUv - 0.5;
+    vc.x *= uAspect;
+    float d = length(vc) / max(uVignetteSize, 0.0001);
+    float vig = 1.0 - uVignette * smoothstep(0.5, 1.0, d);
+    outc *= clamp(vig, 0.0, 1.0);
   }
-  const centerFor = (index: number) => {
-    const n = sources.length
-    return slotCenter(((index % n) + n) % n) + Math.floor(index / n) * total
+  gl_FragColor = vec4(outc, 1.0);
+}
+`;
+
+const LENS_FX_KEYS = [
+  "uDispersion",
+  "uBlueRing",
+  "uRimLine",
+  "uVignette",
+  "uZoom",
+  "uRimTangential",
+  "uRimInward",
+] as const;
+
+const REPEATS = 4;
+const CLICK_SLOP = 6;
+const TOUCH_CLICK_SLOP = 12;
+const FLICK_IDLE_MS = 90;
+
+function at<T>(list: readonly T[], index: number): T {
+  const item = list[index];
+  if (item === undefined) {
+    throw new Error("Index out of range.");
   }
-  /** Nearest slot to `value`, as an unwrapped index (loops count). */
-  function nearest(value: number) {
-    let best = 0
-    let bestDist = Infinity
-    sources.forEach((_, i) => {
-      const k = Math.round((value - slotCenter(i)) / total)
-      const dist = Math.abs(slotCenter(i) + k * total - value)
+  return item;
+}
+
+type PanelRect = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  poolIdx: number;
+  srcIndex: number;
+  centerX: number;
+};
+
+type PoolItem = {
+  mesh: THREE.Mesh;
+  mat: THREE.MeshBasicMaterial;
+  srcIndex: number;
+  bound: boolean;
+};
+
+type Source = {
+  tex: THREE.Texture | null;
+  aspect: number;
+  locked: boolean;
+};
+
+export type LiquidGlassCarouselHandle = {
+  closeFocus: () => void;
+  next: () => void;
+  previous: () => void;
+  destroy: () => void;
+};
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function hexToNumber(background: string) {
+  const value = background.trim();
+  if (value.startsWith("#") && (value.length === 7 || value.length === 4)) {
+    const hex =
+      value.length === 4
+        ? `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`
+        : value;
+    const parsed = Number.parseInt(hex.slice(1), 16);
+    return Number.isFinite(parsed) ? parsed : 0xffffff;
+  }
+  return 0xffffff;
+}
+
+function createCarousel(
+  mount: HTMLElement,
+  cursorElement: HTMLElement | null,
+  options: {
+    items: LiquidGlassCarouselItem[];
+    panelHeight: number;
+    gap: number;
+    background: string;
+    entry: boolean;
+    onActiveChange: (index: number) => void;
+    onFocusChange: (open: boolean) => void;
+    onEntryDone: (done: boolean) => void;
+    lens: LiquidGlassLens;
+    autoplay: number;
+  },
+): LiquidGlassCarouselHandle | null {
+  // Copia: the engine reads the merged settings under the original name.
+  const LENS = options.lens;
+  let lastAuto = performance.now();
+  const reduced = prefersReducedMotion();
+  const entryOn = options.entry && !reduced;
+  const items = options.items;
+  if (items.length === 0) return null;
+
+  let W = Math.max(1, mount.clientWidth);
+  let H = Math.max(1, mount.clientHeight);
+  const panelHFor = () =>
+    Math.max(120, Math.min(options.panelHeight, Math.round(H * 0.52)));
+  let PANEL_H = panelHFor();
+  const GAP = options.gap;
+  const EASE = reduced ? 0.28 : 0.09;
+  const SNAP_EASE = reduced ? 0.22 : 0.05;
+  const WHEEL = 1.4;
+  const DRAG = 1.6;
+  const TOUCH_DRAG = 1;
+  const TOUCH_EASE = 0.22;
+  const FRICTION = 0.865;
+  const SNAP_IDLE_MS = 120;
+  const SHRINK_MAX = 60;
+  const SHRINK_ATTACK = 0.25;
+  const SHRINK_DECAY = 0.06;
+
+  let renderer: THREE.WebGLRenderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  } catch {
+    return null;
+  }
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(W, H);
+  renderer.setClearColor(hexToNumber(options.background), 1);
+  renderer.domElement.style.display = "block";
+  renderer.domElement.style.width = "100%";
+  renderer.domElement.style.height = "100%";
+  renderer.domElement.style.touchAction = "none";
+  renderer.domElement.style.userSelect = "none";
+  renderer.domElement.setAttribute("aria-hidden", "true");
+  mount.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(
+    -W / 2,
+    W / 2,
+    H / 2,
+    -H / 2,
+    -100,
+    100,
+  );
+  camera.position.z = 10;
+
+  const loader = new THREE.TextureLoader();
+  loader.setCrossOrigin("anonymous");
+  const sources: Source[] = items.map((img) => {
+    const s: Source = {
+      tex: null,
+      aspect: img.aspect || PORTRAIT_ASPECT,
+      locked: img.aspect != null,
+    };
+    loader.load(
+      img.src,
+      (tex) => {
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.generateMipmaps = true;
+        tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        tex.colorSpace = THREE.SRGBColorSpace;
+        if (!s.locked && tex.image) {
+          s.aspect = tex.image.width / tex.image.height;
+        }
+        s.tex = tex;
+        recomputeTotal();
+        if (!userInteracted) {
+          scroll = centerForIndex(0);
+          target = scroll;
+        }
+      },
+      undefined,
+      () => {
+        s.aspect = s.aspect || PORTRAIT_ASPECT;
+      },
+    );
+    return s;
+  });
+
+  function slotWidth(srcIndex: number) {
+    return at(sources, srcIndex).aspect * PANEL_H + GAP;
+  }
+
+  let offsets: number[] = [];
+  let totalWidth = 0;
+  function recomputeTotal() {
+    offsets = [];
+    let acc = 0;
+    for (let i = 0; i < sources.length; i++) {
+      offsets.push(acc);
+      acc += slotWidth(i);
+    }
+    totalWidth = acc;
+  }
+  recomputeTotal();
+
+  function centerForIndex(idx: number) {
+    const N = sources.length;
+    const loop = Math.floor(idx / N);
+    const s = ((idx % N) + N) % N;
+    return at(offsets, s) + slotWidth(s) / 2 - GAP / 2 + loop * totalWidth;
+  }
+
+  function nearestIndex(value: number) {
+    if (!totalWidth) return 0;
+    const N = sources.length;
+    let best = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < N; i++) {
+      const center = at(offsets, i) + slotWidth(i) / 2 - GAP / 2;
+      const k = Math.round((value - center) / totalWidth);
+      const dist = Math.abs(center + k * totalWidth - value);
       if (dist < bestDist) {
-        bestDist = dist
-        best = i + k * sources.length
+        bestDist = dist;
+        best = i + k * N;
       }
-    })
-    return best
-  }
-  const wrap = (index: number) => ((index % sources.length) + sources.length) % sources.length
-
-  function resize() {
-    W = Math.max(1, root.clientWidth)
-    H = Math.max(1, root.clientHeight)
-    dpr = Math.min(window.devicePixelRatio || 1, 2)
-    canvas.width = Math.round(W * dpr)
-    canvas.height = Math.round(H * dpr)
-    panelH = Math.max(120, Math.min(o.panelHeight, Math.round(H * 0.52)))
-    measure()
-    gl!.bindTexture(gl!.TEXTURE_2D, target)
-    gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, canvas.width, canvas.height, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, null)
-    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR)
-    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE)
-    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE)
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo)
-    gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, target, 0)
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, null)
-    if (!touched) scroll = goal = centerFor(0)
-  }
-
-  // The background follows the page theme: read the root's computed colour when the theme flips.
-  let background: [number, number, number] = [1, 1, 1]
-  let tone: [number, number, number] = [0.9, 0.9, 0.9]
-  const readTheme = () => {
-    background = parseColor(getComputedStyle(root).backgroundColor)
-    const light = background[0] + background[1] + background[2] > 1.5
-    tone = background.map((c) => c + (light ? -0.08 : 0.08)) as [number, number, number]
-  }
-  const ringColor = parseColor(o.lensColor)
-
-  // Scroll state.
-  let scroll = 0
-  let goal = 0
-  let velocity = 0
-  let previous = 0
-  let energy = 0
-  let touched = false
-  let snapped = false
-  let lastInput = performance.now()
-  let pendingFocus: number | null = null
-  let lastActive = -1
-
-  // Tweened state: lens effects, focus scale, per-panel drop and entry rise.
-  const fx = { value: o.entry && !reduced ? 0 : 1 }
-  const focus = { active: false, key: "", scale: 1 }
-  const drop = new Map<string, number>()
-  const rise = new Map<string, number>()
-  let entering = o.entry && !reduced
-  type Tween = { from: number; to: number; start: number; duration: number; ease: (t: number) => number; set: (v: number) => void; done?: () => void }
-  let tweens: Tween[] = []
-  const tween = (set: (v: number) => void, from: number, to: number, duration: number, ease: (t: number) => number, delay = 0, done?: () => void) => {
-    const t: Tween = { from, to, start: performance.now() + delay * 1000, duration: Math.max(1, duration * 1000), ease, set, done }
-    if (reduced) {
-      set(to)
-      done?.()
-      return
     }
-    tweens.push(t)
+    return best;
   }
 
-  // What is on screen this frame, for hit testing and focus.
-  type Rect = { key: string; index: number; x: number; left: number; right: number; top: number; bottom: number }
-  let rects: Rect[] = []
+  function centerIndex(value: number) {
+    if (!totalWidth) return 0;
+    let bestI = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < sources.length; i++) {
+      const center = at(offsets, i) + slotWidth(i) / 2 - GAP / 2;
+      const k = Math.round((value - center) / totalWidth);
+      const dist = Math.abs(center + k * totalWidth - value);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestI = i;
+      }
+    }
+    return bestI;
+  }
+
+  let lastCenter = -1;
+  const pool: PoolItem[] = [];
+  for (let r = 0; r < REPEATS; r++) {
+    for (let i = 0; i < sources.length; i++) {
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xdddddd,
+        transparent: true,
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1), mat);
+      mesh.visible = false;
+      scene.add(mesh);
+      pool.push({ mesh, mat, srcIndex: i, bound: false });
+    }
+  }
+
+  let scroll = centerForIndex(0);
+  let target = scroll;
+  let userInteracted = false;
+  let velocity = 0;
+  let prevScroll = 0;
+  let scrollEnergy = 0;
+  let pendingFocus: { srcIndex: number } | null = null;
+  let lastInput = performance.now();
+  let snapped = false;
+
+  const rt = new THREE.WebGLRenderTarget(W * dpr, H * dpr);
+  const lensScene = new THREE.Scene();
+  const lensCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const lensUniforms = {
+    uTex: { value: rt.texture },
+    uRes: { value: new THREE.Vector2(W * dpr, H * dpr) },
+    uCenter: { value: new THREE.Vector2(0.5, 0.5) },
+    uSizeX: { value: LENS.sizeX },
+    uSizeY: { value: LENS.sizeY },
+    uShape: { value: 0 },
+    uSquareRound: { value: 0 },
+    uRotation: { value: 0 },
+    uAspect: { value: W / H },
+    uZoom: { value: LENS.zoom },
+    uDispersion: { value: LENS.dispersion },
+    uBlur: { value: LENS.blur },
+    uGlow: { value: LENS.glow },
+    uWhiteGlow: { value: LENS.whiteGlow },
+    uNovaSize: { value: LENS.novaSize },
+    uBlueRing: { value: LENS.blueRing },
+    uRingRadius: { value: LENS.ringRadius },
+    uRingWidth: { value: LENS.ringWidth },
+    uShimmer: { value: reduced || !LENS.shimmer ? 0 : 1 },
+    uShimmerFreq: { value: LENS.shimmerFreq },
+    uShimmerSpeed: { value: LENS.shimmerSpeed },
+    uShimmerDepth: { value: LENS.shimmerDepth },
+    uTime: { value: 0 },
+    uRimStart: { value: LENS.rimStart },
+    uRimTangential: { value: LENS.rimTangential },
+    uRimInward: { value: LENS.rimInward },
+    uRimFreq1: { value: LENS.rimFreq1 },
+    uRimFreq2: { value: LENS.rimFreq2 },
+    uBlueColor: { value: new THREE.Color(LENS.blueColor) },
+    uRimLine: { value: LENS.rimLine },
+    uRimLinePos: { value: LENS.rimLinePos },
+    uRimLineWidth: { value: LENS.rimLineWidth },
+    uVignette: { value: LENS.vignette },
+    uVignetteSize: { value: LENS.vignetteSize },
+    uSamples: { value: LENS.samples },
+  };
+  const lensMat = new THREE.ShaderMaterial({
+    uniforms: lensUniforms as unknown as THREE.ShaderMaterial["uniforms"],
+    vertexShader: LENS_VERTEX,
+    fragmentShader: LENS_FRAGMENT,
+  });
+  const lensQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), lensMat);
+  lensScene.add(lensQuad);
+
+  const focusState = {
+    active: false,
+    srcIndex: -1,
+    poolIdx: -1,
+    lensFx: entryOn ? 0 : 1,
+    anim: null as gsap.core.Timeline | null,
+  };
+  const drop = new Array(REPEATS * sources.length).fill(0);
+  let focusScale = 1;
+  const lastCenterX: Array<number | undefined> = new Array(
+    REPEATS * sources.length,
+  );
+  const pEntry = new Array(REPEATS * sources.length).fill(entryOn ? 0 : 1);
+  let entryActive = entryOn;
+  let entrySettled = false;
+  const growArr = new Array(REPEATS * sources.length).fill(entryOn ? 0 : 1);
+  let entryAnim: gsap.core.Timeline | null = null;
+
+  const lensFxFull: Record<(typeof LENS_FX_KEYS)[number], number> = {
+    uDispersion: lensUniforms.uDispersion.value,
+    uBlueRing: lensUniforms.uBlueRing.value,
+    uRimLine: lensUniforms.uRimLine.value,
+    uVignette: lensUniforms.uVignette.value,
+    uZoom: lensUniforms.uZoom.value,
+    uRimTangential: lensUniforms.uRimTangential.value,
+    uRimInward: lensUniforms.uRimInward.value,
+  };
+
+  let panelRects: PanelRect[] = [];
+  let centeredPanel: {
+    srcIndex: number;
+    centerX: number;
+    wPx: number;
+    h: number;
+    poolIdx: number;
+  } | null = null;
 
   function layout() {
-    rects = []
-    const half = W / 2
-    const shrink = 1 - 0.25 * energy
-    sources.forEach((s, i) => {
-      let x = (((slotCenter(i) - scroll) % total) + total) % total
-      // Every copy of this slot that can be seen: the row repeats forever.
-      for (x -= Math.ceil((x + half + panelH * 2) / total) * total; x < half + panelH * 2; x += total) {
-        if (x < -half - panelH * 2) continue
-        const loop = Math.round((scroll + x - slotCenter(i)) / total)
-        const key = `${i}@${loop}`
-        let h = panelH * shrink
-        let w = s.aspect * h
-        let y = H / 2
-        if (focus.active && key === focus.key) {
-          h *= focus.scale
-          w *= focus.scale
-        } else y += (drop.get(key) ?? 0) * H * 1.4
-        if (entering) y += (1 - (rise.get(key) ?? 0)) * H * 0.9
-        rects.push({ key, index: i, x, left: half + x - w / 2, right: half + x + w / 2, top: y - h / 2, bottom: y + h / 2 })
+    panelRects = [];
+    centeredPanel = null;
+    let centeredDist = Infinity;
+    const half = W / 2;
+    const buffer = PANEL_H;
+    pool.forEach((p, poolIdx) => {
+      const rep = Math.floor(poolIdx / sources.length);
+      const i = p.srcIndex;
+      const src = at(sources, i);
+      const slotCenterInLoop = at(offsets, i) + slotWidth(i) / 2 - GAP / 2;
+      let x = slotCenterInLoop - scroll;
+      x = ((x % totalWidth) + totalWidth) % totalWidth;
+      x += (rep - Math.floor(REPEATS / 2)) * totalWidth;
+      if (x > half + totalWidth) x -= totalWidth * REPEATS;
+
+      const centerX = x;
+      const inEntry = entryActive || entrySettled;
+      if (!inEntry && (centerX < -half - buffer || centerX > half + buffer)) {
+        p.mesh.visible = false;
+        lastCenterX[poolIdx] = undefined;
+        return;
       }
-    })
+      lastCenterX[poolIdx] = centerX;
+
+      const shrink = 1 - 0.25 * scrollEnergy;
+      const h = PANEL_H * shrink;
+      const wPx = src.aspect * PANEL_H * shrink;
+
+      if (src.tex && !p.bound) {
+        p.mat.map = src.tex;
+        p.mat.color.set(0xffffff);
+        p.mat.needsUpdate = true;
+        p.bound = true;
+      }
+
+      let y = 0;
+      const isFocused = focusState.active && focusState.poolIdx === poolIdx;
+      const d = drop[poolIdx] || 0;
+      let drawW = wPx;
+      let drawH = h;
+      if (isFocused) {
+        drawW = wPx * focusScale;
+        drawH = h * focusScale;
+      } else if (d > 0) {
+        y = -d * H * FOCUS.dropDist;
+      }
+
+      p.mesh.visible = true;
+      let finalX = centerX;
+      let finalY = y;
+      let finalW = drawW;
+      let finalH = drawH;
+      if (entryActive || entrySettled) {
+        const pe = pEntry[poolIdx] || 0;
+        const g = growArr[poolIdx] || 0;
+        const curH = ENTRY.startH + (drawH - ENTRY.startH) * g;
+        finalH = curH;
+        finalW = curH * src.aspect;
+
+        const cSrc = centerIndex(scroll);
+        let di = i - cSrc;
+        if (di > sources.length / 2) di -= sources.length;
+        if (di < -sources.length / 2) di += sources.length;
+        const N = sources.length;
+        const midRep = Math.floor(REPEATS / 2);
+        if (rep !== midRep) {
+          p.mesh.visible = false;
+          lastCenterX[poolIdx] = undefined;
+          return;
+        }
+        const slotH = (s: number) => {
+          const gg = growArr[midRep * N + s] || 0;
+          return ENTRY.startH + (PANEL_H - ENTRY.startH) * gg;
+        };
+        let off = 0;
+        if (di > 0) {
+          for (let k = 0; k < di; k++) {
+            const sa = (((cSrc + k) % N) + N) % N;
+            const sb = (((cSrc + k + 1) % N) + N) % N;
+            off +=
+              (at(sources, sa).aspect * slotH(sa) +
+                at(sources, sb).aspect * slotH(sb)) /
+                2 +
+              GAP;
+          }
+        } else if (di < 0) {
+          for (let k = 0; k < -di; k++) {
+            const sa = (((cSrc - k) % N) + N) % N;
+            const sb = (((cSrc - k - 1) % N) + N) % N;
+            off -=
+              (at(sources, sa).aspect * slotH(sa) +
+                at(sources, sb).aspect * slotH(sb)) /
+                2 +
+              GAP;
+          }
+        }
+        finalX = off;
+        if (finalX < -half - buffer || finalX > half + buffer) {
+          p.mesh.visible = false;
+          lastCenterX[poolIdx] = undefined;
+          return;
+        }
+        const below = -H * ENTRY.fromBelow;
+        finalY = below + (y - below) * pe;
+      }
+
+      p.mesh.position.set(finalX, finalY, 0);
+      p.mesh.scale.set(finalW, finalH, 1);
+
+      const sx = centerX + W / 2;
+      const sy = H / 2 - y;
+      panelRects.push({
+        left: sx - drawW / 2,
+        right: sx + drawW / 2,
+        top: sy - drawH / 2,
+        bottom: sy + drawH / 2,
+        poolIdx,
+        srcIndex: i,
+        centerX,
+      });
+
+      if (Math.abs(centerX) < centeredDist) {
+        centeredDist = Math.abs(centerX);
+        centeredPanel = { srcIndex: i, centerX, wPx, h, poolIdx };
+      }
+    });
   }
 
-  const centered = () => rects.reduce<Rect | null>((best, r) => (!best || Math.abs(r.x) < Math.abs(best.x) ? r : best), null)
-  const hit = (px: number, py: number) => rects.find((r) => px >= r.left && px <= r.right && py >= r.top && py <= r.bottom) ?? null
+  function panelAtPointer(px: number, py: number) {
+    for (const r of panelRects) {
+      if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom) {
+        return r;
+      }
+    }
+    return null;
+  }
+
+  function localPoint(e: { clientX: number; clientY: number }) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  const el = renderer.domElement;
+  let dragging = false;
+  let dragPointerId: number | null = null;
+  let dragLastX = 0;
+  let dragDist = 0;
+  let dragVel = 0;
+  let dragMoveT = 0;
+  let suppressClick = false;
+  let dragPointerType = "mouse";
+  let lastPointerX = Number.NaN;
+  let lastPointerY = Number.NaN;
+  let pointerInside = false;
+  let lastPointerType = "mouse";
+
+  if (cursorElement) {
+    gsap.set(cursorElement, {
+      xPercent: 20,
+      yPercent: 30,
+      scale: 0,
+      autoAlpha: 0,
+    });
+  }
+  const moveX = cursorElement
+    ? gsap.quickTo(cursorElement, "x", { duration: 0.5, ease: "power3.out" })
+    : null;
+  const moveY = cursorElement
+    ? gsap.quickTo(cursorElement, "y", { duration: 0.5, ease: "power3.out" })
+    : null;
+
+  let overPanel = false;
+  let hoverPanel = false;
+  let cursorNow = "";
+  function setCursor(v: string) {
+    if (v === cursorNow) return;
+    cursorNow = v;
+    el.style.cursor = v;
+  }
+
+  function updateCursor() {
+    if (focusState.active || entryActive || entrySettled) return setCursor("");
+    if (dragging) return setCursor("grabbing");
+    if (!hoverPanel) return setCursor("");
+    return setCursor("grab");
+  }
+
+  function setHover(on: boolean) {
+    hoverPanel = on;
+    setView(on);
+  }
+
+  function refreshHover() {
+    if (!pointerInside || lastPointerType !== "mouse") return;
+    if (!Number.isFinite(lastPointerX)) return;
+    if (focusState.active) {
+      setHover(false);
+      return;
+    }
+    setHover(panelAtPointer(lastPointerX, lastPointerY) !== null);
+  }
+
+  function setView(on: boolean) {
+    if (entryActive || entrySettled) on = false;
+    if (dragging) on = false;
+    if (on === overPanel) {
+      updateCursor();
+      return;
+    }
+    overPanel = on;
+    updateCursor();
+    if (!cursorElement) return;
+    gsap.killTweensOf(cursorElement, "scale,autoAlpha,opacity,visibility");
+    gsap.to(cursorElement, {
+      scale: on ? 1 : 0,
+      autoAlpha: on ? 1 : 0,
+      duration: on ? 0.35 : 0.25,
+      ease: on ? "power3.out" : "power3.in",
+    });
+  }
+
+  function inputLocked() {
+    return focusState.active || entryActive || entrySettled;
+  }
+
+  function onWheel(e: WheelEvent) {
+    e.preventDefault();
+    if (inputLocked()) return;
+    userInteracted = true;
+    pendingFocus = null;
+    target += (e.deltaY || e.deltaX) * WHEEL;
+    lastInput = performance.now();
+    snapped = false;
+  }
+
+  function onPointerDown(e: PointerEvent) {
+    suppressClick = false;
+    if (inputLocked()) return;
+    if (dragging) return;
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    dragging = true;
+    dragPointerId = e.pointerId;
+    dragPointerType = e.pointerType || "mouse";
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch {
+      /* capture is best-effort */
+    }
+    const p = localPoint(e);
+    dragLastX = p.x;
+    lastPointerX = p.x;
+    lastPointerY = p.y;
+    dragDist = 0;
+    dragVel = 0;
+    dragMoveT = performance.now();
+    setView(false);
+    velocity = 0;
+    pendingFocus = null;
+    userInteracted = true;
+    snapped = false;
+    lastInput = dragMoveT;
+  }
+
+  function onPointerMove(e: PointerEvent) {
+    const p = localPoint(e);
+    if (dragging && e.pointerId === dragPointerId) {
+      const sens = dragPointerType === "mouse" ? DRAG : TOUCH_DRAG;
+      const dx = p.x - dragLastX;
+      dragLastX = p.x;
+      dragDist += Math.abs(dx);
+      target -= dx * sens;
+      dragVel = dragVel * 0.6 + -dx * sens * 0.4;
+      dragMoveT = performance.now();
+      lastInput = dragMoveT;
+      snapped = false;
+    }
+    lastPointerX = p.x;
+    lastPointerY = p.y;
+    lastPointerType = e.pointerType || "mouse";
+    pointerInside = true;
+    if (e.pointerType !== "mouse") return;
+    if (moveX) moveX(p.x);
+    if (moveY) moveY(p.y);
+    if (focusState.active) {
+      setHover(false);
+      return;
+    }
+    setHover(panelAtPointer(p.x, p.y) !== null);
+  }
+
+  function onPointerUp(e?: PointerEvent) {
+    if (!dragging) return;
+    if (e && dragPointerId !== null && e.pointerId !== dragPointerId) return;
+    dragging = false;
+    if (dragPointerId !== null) {
+      try {
+        el.releasePointerCapture(dragPointerId);
+      } catch {
+        /* already released */
+      }
+      dragPointerId = null;
+    }
+    velocity =
+      performance.now() - dragMoveT > FLICK_IDLE_MS ? 0 : dragVel;
+    dragVel = 0;
+    lastInput = performance.now();
+    snapped = false;
+    suppressClick =
+      dragDist >
+      (dragPointerType === "mouse" ? CLICK_SLOP : TOUCH_CLICK_SLOP);
+    if (dragPointerType === "mouse") {
+      setHover(panelAtPointer(lastPointerX, lastPointerY) !== null);
+    } else {
+      updateCursor();
+    }
+  }
+
+  function onEnter(e: PointerEvent) {
+    pointerInside = true;
+    lastPointerType = e.pointerType || "mouse";
+  }
+  function onLeave() {
+    pointerInside = false;
+    setHover(false);
+  }
+
+  function onClick(e: MouseEvent) {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
+    if (inputLocked()) return;
+    const p = localPoint(e);
+    const hit = panelAtPointer(p.x, p.y);
+    if (!hit) return;
+    if (centeredPanel && hit.poolIdx === centeredPanel.poolIdx) {
+      pendingFocus = null;
+      openFocus();
+      return;
+    }
+    userInteracted = true;
+    velocity = 0;
+    target = centerForIndex(nearestIndex(scroll + hit.centerX));
+    snapped = true;
+    pendingFocus = { srcIndex: hit.srcIndex };
+    setView(false);
+  }
 
   function openFocus() {
-    const center = centered()
-    if (focus.active || !center || !sources[center.index].tex) return
-    focus.active = true
-    focus.key = center.key
-    goal = centerFor(nearest(scroll))
-    tween((v) => (fx.value = v), fx.value, 0, 0.85, easeOut(3))
-    tween((v) => (focus.scale = v), focus.scale, 1.18, 0.9, easeOut(3))
-    // Neighbours fall away, nearest first.
-    const others = rects.filter((r) => r.key !== center.key).sort((a, b) => Math.abs(a.x - center.x) - Math.abs(b.x - center.x))
-    others.forEach((r, rank) => tween((v) => drop.set(r.key, v), drop.get(r.key) ?? 0, 1, 0.7, easeOut(4), Math.ceil(rank / 2) * 0.06))
-    setView(false)
-    o.onFocus(true)
+    if (focusState.active || !centeredPanel) return;
+    const src = sources[centeredPanel.srcIndex];
+    if (!src?.tex) return;
+
+    focusState.active = true;
+    focusState.srcIndex = centeredPanel.srcIndex;
+    const focusPoolIdx = centeredPanel.poolIdx;
+    focusState.poolIdx = focusPoolIdx;
+    target = centerForIndex(nearestIndex(scroll));
+
+    const focusX = lastCenterX[focusPoolIdx] || 0;
+    const others = pool
+      .map((_, idx) => ({ idx, x: lastCenterX[idx] }))
+      .filter((o) => o.idx !== focusPoolIdx && o.x !== undefined)
+      .map((o) => ({ idx: o.idx, dist: Math.abs((o.x ?? 0) - focusX) }))
+      .sort((a, b) => a.dist - b.dist);
+
+    let rank = 0;
+    let prevDist = -1;
+    const ranked = others.map((o) => {
+      if (prevDist >= 0 && o.dist - prevDist > 1) rank += 1;
+      prevDist = o.dist;
+      return { idx: o.idx, rank };
+    });
+
+    for (const key of LENS_FX_KEYS) {
+      lensFxFull[key] = lensUniforms[key].value;
+    }
+
+    if (focusState.anim) focusState.anim.kill();
+    const scaleProxy = { v: focusScale };
+    const tl = gsap.timeline();
+    tl.to(focusState, { lensFx: 0, duration: FOCUS.lensFade, ease: "power3.out" }, 0);
+    tl.to(
+      scaleProxy,
+      {
+        v: FOCUS.centerScale,
+        duration: FOCUS.focusDuration,
+        ease: FOCUS.focusEase,
+        onUpdate() {
+          focusScale = scaleProxy.v;
+        },
+      },
+      0,
+    );
+    ranked.forEach((o) => {
+      tl.to(
+        drop,
+        { [o.idx]: 1, duration: FOCUS.cardDuration, ease: FOCUS.cardEase },
+        o.rank * FOCUS.stagger,
+      );
+    });
+    focusState.anim = tl;
+    setView(false);
+    options.onFocusChange(true);
   }
 
   function closeFocus() {
-    if (!focus.active) return
-    o.onFocus(false)
-    tween((v) => (fx.value = v), fx.value, 1, 0.68, easeInOut)
-    tween((v) => (focus.scale = v), focus.scale, 1, 0.76, easeOut(3), 0, () => {
-      focus.active = false
-      focus.key = ""
-    })
-    const center = rects.find((r) => r.key === focus.key)
-    const others = [...drop.keys()].sort((a, b) => {
-      const ra = rects.find((r) => r.key === a)
-      const rb = rects.find((r) => r.key === b)
-      return Math.abs((rb?.x ?? 0) - (center?.x ?? 0)) - Math.abs((ra?.x ?? 0) - (center?.x ?? 0))
-    })
-    others.forEach((key, rank) => tween((v) => drop.set(key, v), drop.get(key) ?? 1, 0, 0.6, easeOut(4), Math.floor(rank / 2) * 0.042, () => drop.delete(key)))
+    if (!focusState.active) return;
+    if (focusState.anim) focusState.anim.kill();
+
+    const focusX = lastCenterX[focusState.poolIdx] || 0;
+    const others = pool
+      .map((_, idx) => ({ idx, x: lastCenterX[idx] }))
+      .filter((o) => o.x !== undefined && (drop[o.idx] || 0) > 0)
+      .map((o) => ({ idx: o.idx, dist: Math.abs((o.x ?? 0) - focusX) }))
+      .sort((a, b) => b.dist - a.dist);
+
+    let rank = 0;
+    let prevDist = -1;
+    const ranked = others.map((o) => {
+      if (prevDist >= 0 && prevDist - o.dist > 1) rank += 1;
+      prevDist = o.dist;
+      return { idx: o.idx, rank };
+    });
+
+    options.onFocusChange(false);
+    const scaleProxy = { v: focusScale };
+    const tl = gsap.timeline({
+      onComplete: () => {
+        focusState.active = false;
+        focusState.srcIndex = -1;
+        updateCursor();
+      },
+    });
+    tl.to(
+      focusState,
+      { lensFx: 1, duration: FOCUS.lensFade * 0.8, ease: "power3.inOut" },
+      0,
+    );
+    tl.to(
+      scaleProxy,
+      {
+        v: 1,
+        duration: FOCUS.focusDuration * 0.85,
+        ease: FOCUS.focusEase,
+        onUpdate() {
+          focusScale = scaleProxy.v;
+        },
+      },
+      0,
+    );
+    ranked.forEach((o) => {
+      tl.to(
+        drop,
+        {
+          [o.idx]: 0,
+          duration: FOCUS.cardDuration * 0.85,
+          ease: FOCUS.cardEase,
+        },
+        o.rank * FOCUS.stagger * 0.7,
+      );
+    });
+    focusState.anim = tl;
   }
 
-  const locked = () => focus.active || entering
+  function playEntry() {
+    if (!entryOn) {
+      options.onEntryDone(true);
+      return;
+    }
+    if (entryAnim) entryAnim.kill();
+    for (let k = 0; k < pEntry.length; k++) pEntry[k] = 0;
+    entryActive = true;
+    entrySettled = false;
+    options.onEntryDone(false);
+    for (let k = 0; k < growArr.length; k++) growArr[k] = 0;
+    focusState.lensFx = 0;
+    target = centerForIndex(nearestIndex(scroll));
+    scroll = target;
+    velocity = 0;
+    snapped = true;
+    layout();
+    const visible: number[] = [];
+    for (let k = 0; k < lastCenterX.length; k++) {
+      if (lastCenterX[k] !== undefined) visible.push(k);
+    }
+    const tl = gsap.timeline({ delay: ENTRY.delay });
+    const spread = ENTRY.stagger * Math.max(visible.length - 1, 1);
+    let lastRiseEnd = 0;
+    visible.forEach((idx) => {
+      const at = Math.random() * spread;
+      lastRiseEnd = Math.max(lastRiseEnd, at + ENTRY.riseDuration);
+      tl.to(
+        pEntry,
+        { [idx]: 1, duration: ENTRY.riseDuration, ease: ENTRY.riseEase },
+        at,
+      );
+    });
+    tl.call(
+      () => {
+        entryActive = false;
+        entrySettled = true;
+      },
+      [],
+      lastRiseEnd,
+    );
+    const cSrcG = centerIndex(scroll);
+    const Ng = sources.length;
+    const midRepG = Math.floor(REPEATS / 2);
+    const growList: { idx: number; rank: number }[] = [];
+    let maxRank = 0;
+    for (let k = 0; k < lastCenterX.length; k++) {
+      if (lastCenterX[k] === undefined) continue;
+      if (Math.floor(k / Ng) !== midRepG) continue;
+      let di = (k % Ng) - cSrcG;
+      if (di > Ng / 2) di -= Ng;
+      if (di < -Ng / 2) di += Ng;
+      const r = Math.abs(di);
+      maxRank = Math.max(maxRank, r);
+      growList.push({ idx: k, rank: r });
+    }
+    const growRanked = growList.map((v) => ({
+      idx: v.idx,
+      rank: maxRank - v.rank,
+    }));
+    const growStart = lastRiseEnd + ENTRY.growDelay;
+    let growEnd = growStart;
+    tl.to(
+      focusState,
+      { lensFx: 1, duration: ENTRY.lensBloom, ease: ENTRY.lensBloomEase },
+      growStart,
+    );
+    growRanked.forEach((o) => {
+      const at = growStart + o.rank * ENTRY.growStagger;
+      growEnd = Math.max(growEnd, at + ENTRY.growDuration);
+      tl.to(
+        growArr,
+        { [o.idx]: 1, duration: ENTRY.growDuration, ease: ENTRY.growEase },
+        at,
+      );
+    });
+    tl.call(
+      () => {
+        entrySettled = false;
+        for (let k = 0; k < growArr.length; k++) growArr[k] = 1;
+        options.onEntryDone(true);
+        updateCursor();
+      },
+      [],
+      growEnd,
+    );
+    entryAnim = tl;
+  }
 
   function step(direction: number) {
-    if (locked()) return
-    touched = true
-    velocity = 0
-    pendingFocus = null
-    goal = centerFor(nearest(scroll) + direction)
-    snapped = true
-    lastInput = performance.now()
+    if (inputLocked()) return;
+    userInteracted = true;
+    velocity = 0;
+    pendingFocus = null;
+    target = centerForIndex(nearestIndex(scroll) + direction);
+    snapped = true;
+    lastInput = performance.now();
   }
 
-  // Pointer: drag with flick momentum, click the centre panel to focus it, click another to bring it in.
-  let dragging = false
-  let dragId = -1
-  let dragType = "mouse"
-  let dragX = 0
-  let dragDist = 0
-  let dragVel = 0
-  let dragTime = 0
-  let suppressClick = false
-  let viewing = false
-  let pointer = { x: -1, y: -1, inside: false }
-  const cursorPos = { x: 0, y: 0 }
-  const local = (e: { clientX: number; clientY: number }) => {
-    const b = canvas.getBoundingClientRect()
-    return { x: e.clientX - b.left, y: e.clientY - b.top }
-  }
-  function setView(on: boolean) {
-    on = on && !dragging && !locked()
-    if (on === viewing) return
-    viewing = on
-    cursor.style.opacity = on ? "1" : "0"
-    cursor.style.scale = on ? "1" : "0.6"
-    canvas.style.cursor = locked() ? "" : on ? "grab" : ""
-  }
+  el.addEventListener("wheel", onWheel, { passive: false });
+  el.addEventListener("pointerdown", onPointerDown);
+  el.addEventListener("pointermove", onPointerMove);
+  el.addEventListener("pointerup", onPointerUp);
+  el.addEventListener("pointercancel", onPointerUp);
+  el.addEventListener("pointerenter", onEnter);
+  el.addEventListener("pointerleave", onLeave);
+  el.addEventListener("click", onClick);
 
-  const onWheel = (e: WheelEvent) => {
-    e.preventDefault()
-    if (locked()) return
-    touched = true
-    pendingFocus = null
-    goal += (e.deltaY || e.deltaX) * WHEEL
-    lastInput = performance.now()
-    snapped = false
-  }
-  const onDown = (e: PointerEvent) => {
-    suppressClick = false
-    if (locked() || dragging || (e.pointerType === "mouse" && e.button !== 0)) return
-    dragging = true
-    dragId = e.pointerId
-    dragType = e.pointerType || "mouse"
-    canvas.setPointerCapture?.(e.pointerId)
-    dragX = local(e).x
-    dragDist = 0
-    dragVel = 0
-    dragTime = performance.now()
-    velocity = 0
-    pendingFocus = null
-    touched = true
-    snapped = false
-    lastInput = dragTime
-    setView(false)
-    canvas.style.cursor = "grabbing"
-  }
-  const onMove = (e: PointerEvent) => {
-    const p = local(e)
-    if (dragging && e.pointerId === dragId) {
-      const sens = dragType === "mouse" ? DRAG : TOUCH_DRAG
-      const dx = p.x - dragX
-      dragX = p.x
-      dragDist += Math.abs(dx)
-      goal -= dx * sens
-      dragVel = dragVel * 0.6 - dx * sens * 0.4
-      dragTime = lastInput = performance.now()
-      snapped = false
+  let raf = 0;
+  let running = true;
+  let visible = true;
+
+  function tick() {
+    if (!running) return;
+    if (!visible || document.hidden) {
+      raf = 0;
+      return;
     }
-    pointer = { ...p, inside: true }
-    if (e.pointerType === "mouse") setView(!focus.active && hit(p.x, p.y) !== null)
-  }
-  const onUp = (e: PointerEvent) => {
-    if (!dragging || e.pointerId !== dragId) return
-    dragging = false
-    canvas.releasePointerCapture?.(e.pointerId)
-    velocity = performance.now() - dragTime > FLICK_IDLE_MS ? 0 : dragVel
-    lastInput = performance.now()
-    snapped = false
-    suppressClick = dragDist > (dragType === "mouse" ? CLICK_SLOP : CLICK_SLOP * 2)
-    canvas.style.cursor = ""
-    if (dragType === "mouse") setView(hit(pointer.x, pointer.y) !== null)
-  }
-  const onLeave = () => {
-    pointer.inside = false
-    setView(false)
-  }
-  const onClick = (e: MouseEvent) => {
-    if (suppressClick) return void (suppressClick = false)
-    if (focus.active) return closeFocus()
-    if (entering) return
-    const p = local(e)
-    const r = hit(p.x, p.y)
-    if (!r) return
-    const center = centered()
-    if (center && r.key === center.key) return openFocus()
-    touched = true
-    velocity = 0
-    goal = centerFor(nearest(scroll + r.x))
-    snapped = true
-    pendingFocus = r.index
-    setView(false)
-  }
-
-  canvas.addEventListener("wheel", onWheel, { passive: false })
-  canvas.addEventListener("pointerdown", onDown)
-  canvas.addEventListener("pointermove", onMove)
-  canvas.addEventListener("pointerup", onUp)
-  canvas.addEventListener("pointercancel", onUp)
-  canvas.addEventListener("pointerleave", onLeave)
-  canvas.addEventListener("click", onClick)
-
-  function draw(now: number) {
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo)
-    gl!.viewport(0, 0, canvas.width, canvas.height)
-    gl!.clearColor(background[0], background[1], background[2], 1)
-    gl!.clear(gl!.COLOR_BUFFER_BIT)
-    gl!.enable(gl!.BLEND)
-    gl!.blendFunc(gl!.SRC_ALPHA, gl!.ONE_MINUS_SRC_ALPHA)
-    gl!.useProgram(panelProgram.program)
-    gl!.bindBuffer(gl!.ARRAY_BUFFER, quad)
-    const aPanel = gl!.getAttribLocation(panelProgram.program, "a")
-    gl!.enableVertexAttribArray(aPanel)
-    gl!.vertexAttribPointer(aPanel, 2, gl!.FLOAT, false, 0, 0)
-    gl!.uniform2f(panelProgram.u("uRes"), canvas.width, canvas.height)
-    gl!.uniform3fv(panelProgram.u("uTone"), tone)
-    gl!.uniform1i(panelProgram.u("uTex"), 0)
-    gl!.activeTexture(gl!.TEXTURE0)
-    for (const r of rects) {
-      if (r.right < 0 || r.left > W || r.top > H || r.bottom < 0) continue
-      const s = sources[r.index]
-      const w = (r.right - r.left) * dpr
-      const h = (r.bottom - r.top) * dpr
-      // Cover-fit the photo into the panel's aspect.
-      const panelAspect = w / h
-      const imageAspect = s.w / s.h
-      const cover = s.tex ? (imageAspect > panelAspect ? [panelAspect / imageAspect, 1] : [1, imageAspect / panelAspect]) : [1, 1]
-      gl!.bindTexture(gl!.TEXTURE_2D, s.tex)
-      gl!.uniform1f(panelProgram.u("uReady"), s.tex ? 1 : 0)
-      gl!.uniform2f(panelProgram.u("uCover"), cover[0], cover[1])
-      gl!.uniform2f(panelProgram.u("uSize"), w, h)
-      gl!.uniform1f(panelProgram.u("uRadius"), Math.min(o.radius * dpr, w / 2, h / 2))
-      gl!.uniform4f(panelProgram.u("uRect"), r.left * dpr, r.top * dpr, w, h)
-      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
-    }
-    gl!.disable(gl!.BLEND)
-
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, null)
-    gl!.useProgram(lensProgram.program)
-    const aLens = gl!.getAttribLocation(lensProgram.program, "a")
-    gl!.enableVertexAttribArray(aLens)
-    gl!.vertexAttribPointer(aLens, 2, gl!.FLOAT, false, 0, 0)
-    gl!.bindTexture(gl!.TEXTURE_2D, target)
-    gl!.uniform1i(lensProgram.u("uTex"), 0)
-    gl!.uniform1f(lensProgram.u("uAspect"), W / H)
-    gl!.uniform2f(lensProgram.u("uSize"), LENS.sizeX * o.lensSize, LENS.sizeY * o.lensSize)
-    gl!.uniform1f(lensProgram.u("uRotation"), LENS.rotation)
-    gl!.uniform1f(lensProgram.u("uDispersion"), o.dispersion * fx.value)
-    gl!.uniform1f(lensProgram.u("uRing"), 6 * fx.value)
-    gl!.uniform1f(lensProgram.u("uRimLine"), 1.4 * fx.value)
-    gl!.uniform1f(lensProgram.u("uRimSwirl"), 0.6 * fx.value)
-    gl!.uniform1f(lensProgram.u("uShimmer"), reduced ? 0 : 1)
-    gl!.uniform3fv(lensProgram.u("uBg"), background)
-    gl!.uniform1f(lensProgram.u("uTime"), now / 1000)
-    gl!.uniform3fv(lensProgram.u("uColor"), ringColor)
-    gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
-  }
-
-  let raf = 0
-  let last = performance.now()
-  let visible = true
-  let lastAuto = performance.now()
-  function tick(now: number) {
-    raf = 0
-    if (!visible || document.hidden) return
-    const frames = Math.min(4, (now - last) / 16.67)
-    last = now
-    const follow = (k: number) => 1 - Math.pow(1 - k, frames)
-
-    tweens = tweens.filter((t) => {
-      const p = Math.min(1, Math.max(0, (now - t.start) / t.duration))
-      if (now >= t.start) t.set(t.from + (t.to - t.from) * t.ease(p))
-      if (p >= 1) t.done?.()
-      return p < 1
-    })
-
     if (!dragging) {
-      goal += velocity * frames
-      velocity *= Math.pow(FRICTION, frames)
-      if (Math.abs(velocity) < 0.05) velocity = 0
-      if (!snapped && !focus.active && now - lastInput > SNAP_IDLE_MS) {
-        goal = centerFor(nearest(scroll))
-        snapped = true
+      target += velocity;
+      velocity *= FRICTION;
+      if (Math.abs(velocity) < 0.05) velocity = 0;
+      if (
+        !snapped &&
+        !focusState.active &&
+        performance.now() - lastInput > SNAP_IDLE_MS
+      ) {
+        target = centerForIndex(nearestIndex(scroll));
+        snapped = true;
       }
       // Copia: autoplay steps forward while nobody is touching it.
-      if (o.autoplay > 0 && !locked() && now - lastInput > IDLE_BEFORE_AUTOPLAY_MS * Number(touched) && now - lastAuto > o.autoplay * 1000) {
-        lastAuto = now
-        goal = centerFor(nearest(scroll) + 1)
-        snapped = true
+      const now = performance.now();
+      if (
+        options.autoplay > 0 &&
+        !inputLocked() &&
+        now - lastInput > (userInteracted ? 4000 : 0) &&
+        now - lastAuto > options.autoplay * 1000
+      ) {
+        lastAuto = now;
+        target = centerForIndex(nearestIndex(scroll) + 1);
+        snapped = true;
       }
     }
-    scroll += (goal - scroll) * follow(dragging && dragType !== "mouse" ? TOUCH_EASE : snapped && pendingFocus === null ? SNAP_EASE : EASE)
+    const follow =
+      dragging && dragPointerType !== "mouse"
+        ? TOUCH_EASE
+        : snapped && !pendingFocus
+          ? SNAP_EASE
+          : EASE;
+    scroll += (target - scroll) * follow;
 
-    const speed = Math.abs(scroll - previous) / Math.max(1, frames)
-    previous = scroll
-    const norm = Math.min(1, speed / SHRINK_MAX)
-    energy += (norm - energy) * follow(norm > energy ? 0.25 : 0.06)
-
-    layout()
-    const active = wrap(nearest(scroll))
-    if (active !== lastActive) {
-      lastActive = active
-      o.onActive(active)
+    const ci = centerIndex(scroll);
+    if (ci !== lastCenter) {
+      lastCenter = ci;
+      options.onActiveChange(ci);
     }
-    if (pendingFocus !== null && Math.abs(goal - scroll) < 0.5) {
-      const index = pendingFocus
-      pendingFocus = null
-      if (centered()?.index === index) openFocus()
-    }
-    // The "View" label trails the pointer.
-    cursorPos.x += (pointer.x - cursorPos.x) * follow(0.2)
-    cursorPos.y += (pointer.y - cursorPos.y) * follow(0.2)
-    cursor.style.translate = `${cursorPos.x + 14}px ${cursorPos.y + 18}px`
 
-    draw(now)
-    raf = requestAnimationFrame(tick)
+    const rawSpeed = scroll - prevScroll;
+    prevScroll = scroll;
+    const norm = Math.min(1, Math.abs(rawSpeed) / Math.max(1, SHRINK_MAX));
+    const k = norm > scrollEnergy ? SHRINK_ATTACK : SHRINK_DECAY;
+    scrollEnergy += (norm - scrollEnergy) * k;
+
+    layout();
+    refreshHover();
+
+    if (pendingFocus && !focusState.active) {
+      if (Math.abs(target - scroll) < 0.5) {
+        const pf = pendingFocus;
+        pendingFocus = null;
+        if (centeredPanel && centeredPanel.srcIndex === pf.srcIndex) {
+          openFocus();
+        }
+      }
+    }
+
+    lensUniforms.uCenter.value.set(LENS.posX, LENS.posY);
+    lensUniforms.uAspect.value = W / H;
+    lensUniforms.uTime.value = performance.now() * 0.001;
+    const rad = (a: number) => (a * Math.PI) / 180;
+    lensUniforms.uRotation.value =
+      rad(LENS.rotation) + rad(LENS.spin) * (performance.now() * 0.001);
+    const fx = focusState.lensFx;
+    for (const key of LENS_FX_KEYS) {
+      lensUniforms[key].value = lensFxFull[key] * fx;
+    }
+
+    renderer.setRenderTarget(rt);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    renderer.render(lensScene, lensCam);
+    raf = requestAnimationFrame(tick);
   }
-  const start = () => {
-    if (!raf && visible) {
-      last = performance.now()
-      raf = requestAnimationFrame(tick)
+
+  function startLoop() {
+    if (!running || raf) return;
+    raf = requestAnimationFrame(tick);
+  }
+
+  startLoop();
+  if (entryOn) playEntry();
+  else options.onEntryDone(true);
+
+  function onResize() {
+    W = Math.max(1, mount.clientWidth);
+    H = Math.max(1, mount.clientHeight);
+    PANEL_H = panelHFor();
+    recomputeTotal();
+    renderer.setSize(W, H);
+    camera.left = -W / 2;
+    camera.right = W / 2;
+    camera.top = H / 2;
+    camera.bottom = -H / 2;
+    camera.updateProjectionMatrix();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(ratio);
+    rt.setSize(W * ratio, H * ratio);
+    lensUniforms.uRes.value.set(W * ratio, H * ratio);
+    if (!userInteracted) {
+      scroll = centerForIndex(0);
+      target = scroll;
     }
   }
 
-  // Entry: panels rise from below in a loose stagger, then the lens blooms.
-  readTheme()
-  resize()
-  layout()
-  if (entering) {
-    const keys = rects.map((r) => r.key)
-    const spread = 0.07 * Math.max(keys.length - 1, 1)
-    let end = 0
-    keys.forEach((key) => {
-      const at = 0.5 + Math.random() * spread
-      end = Math.max(end, at + 1)
-      rise.set(key, 0)
-      tween((v) => rise.set(key, v), 0, 1, 1, easeOut(3), at)
-    })
-    tween((v) => (fx.value = v), 0, 1, 1.4, easeInOut, end + 0.1, () => {
-      entering = false
-      o.onReady()
-    })
-    // Keys not on screen at mount appear normally.
-    setTimeout(() => (entering = entering && rise.size > 0), 0)
-  } else o.onReady()
-  start()
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(mount);
+  const intersection = new IntersectionObserver(([entry]) => {
+    const box = entry?.boundingClientRect;
+    if (!box || (box.width === 0 && box.height === 0)) return;
+    visible = entry?.isIntersecting ?? true;
+    if (visible) startLoop();
+  });
+  intersection.observe(mount);
+  const onVisibility = () => {
+    if (!document.hidden) startLoop();
+  };
+  document.addEventListener("visibilitychange", onVisibility);
 
-  const ro = new ResizeObserver(() => {
-    resize()
-    start()
-  })
-  ro.observe(root)
-  const io = new IntersectionObserver(([entry]) => {
-    visible = entry?.isIntersecting ?? true
-    start()
-  })
-  io.observe(root)
-  const theme = new MutationObserver(readTheme)
-  theme.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] })
-  const onVisibility = () => start()
-  document.addEventListener("visibilitychange", onVisibility)
+  function destroy() {
+    running = false;
+    cancelAnimationFrame(raf);
+    resizeObserver.disconnect();
+    intersection.disconnect();
+    document.removeEventListener("visibilitychange", onVisibility);
+    el.removeEventListener("wheel", onWheel);
+    el.removeEventListener("pointerdown", onPointerDown);
+    el.removeEventListener("pointermove", onPointerMove);
+    el.removeEventListener("pointerup", onPointerUp);
+    el.removeEventListener("pointercancel", onPointerUp);
+    el.removeEventListener("pointerenter", onEnter);
+    el.removeEventListener("pointerleave", onLeave);
+    el.removeEventListener("click", onClick);
+    if (focusState.anim) focusState.anim.kill();
+    if (entryAnim) entryAnim.kill();
+    if (cursorElement) gsap.killTweensOf(cursorElement);
+    renderer.dispose();
+    rt.dispose();
+    lensQuad.geometry.dispose();
+    lensMat.dispose();
+    pool.forEach((p) => {
+      p.mesh.geometry.dispose();
+      p.mat.dispose();
+    });
+    sources.forEach((s) => {
+      s.tex?.dispose();
+    });
+    if (renderer.domElement.parentNode) {
+      renderer.domElement.parentNode.removeChild(renderer.domElement);
+    }
+  }
 
   return {
-    step,
-    focusCenter: () => (focus.active ? closeFocus() : openFocus()),
-    close: closeFocus,
-    destroy() {
-      cancelAnimationFrame(raf)
-      ro.disconnect()
-      io.disconnect()
-      theme.disconnect()
-      document.removeEventListener("visibilitychange", onVisibility)
-      canvas.removeEventListener("wheel", onWheel)
-      canvas.removeEventListener("pointerdown", onDown)
-      canvas.removeEventListener("pointermove", onMove)
-      canvas.removeEventListener("pointerup", onUp)
-      canvas.removeEventListener("pointercancel", onUp)
-      canvas.removeEventListener("pointerleave", onLeave)
-      canvas.removeEventListener("click", onClick)
-      sources.forEach((s) => s.tex && gl.deleteTexture(s.tex))
-      gl.deleteTexture(target)
-      gl.deleteFramebuffer(fbo)
-      gl.deleteBuffer(quad)
-      gl.deleteProgram(panelProgram.program)
-      gl.deleteProgram(lensProgram.program)
-    },
-  }
+    closeFocus,
+    next: () => step(1),
+    previous: () => step(-1),
+    destroy,
+  };
 }
 
-const pad = (n: number) => String(n).padStart(2, "0")
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
 
-/**
- * An endless row of photos seen through a liquid-glass lens: a rotated
- * ellipse that swirls, splits colour at its rim and glows with a ring. Drag,
- * flick, scroll or use the arrows; click the middle photo to focus it.
- * Give the container a height.
- */
+/** Infinite image row with a liquid-glass WebGL lens. Give the container an explicit height. */
 export function LiquidGlassCarousel({
-  items,
+  items = liquidGlassCarouselDefaultItems,
   panelHeight = 450,
   gap = 12,
-  radius = 6,
-  lensSize = 1,
-  lensColor = "#ff7a45",
-  dispersion = 11,
-  autoplay = 0,
+  background = "#ffffff",
   entry = true,
   className,
+  style,
   onActiveChange,
+  onFocusChange,
+  lens,
+  lensColor,
+  autoplay = 0,
 }: LiquidGlassCarouselProps) {
-  const root = useRef<HTMLDivElement>(null)
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const cursor = useRef<HTMLDivElement>(null)
-  const engine = useRef<Engine | null>(null)
-  const callback = useRef(onActiveChange)
-  const [active, setActive] = useState(0)
-  const [focused, setFocused] = useState(false)
-  const [ready, setReady] = useState(false)
-  const [failed, setFailed] = useState(false)
-  const labelId = useId()
+  // Copia: a stable key, so a new `lens` object with the same values does not rebuild the scene.
+  const lensKey = JSON.stringify({ ...LENS, ...lens, ...(lensColor ? { blueColor: lensColor } : {}) });
+  const mountRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<LiquidGlassCarouselHandle | null>(null);
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const counterRef = useRef<HTMLParagraphElement>(null);
+  const revealPlayedRef = useRef(false);
+  const [active, setActive] = useState(0);
+  const [focused, setFocused] = useState(false);
+  const [entryDone, setEntryDone] = useState(!entry);
+  const [failed, setFailed] = useState(false);
+  const labelId = useId();
+  const liveId = useId();
+  const current = items[active] ?? items[0];
+  const onActiveChangeRef = useRef(onActiveChange);
+  const onFocusChangeRef = useRef(onFocusChange);
+  onActiveChangeRef.current = onActiveChange;
+  onFocusChangeRef.current = onFocusChange;
 
   useEffect(() => {
-    callback.current = onActiveChange
-  })
+    const mount = mountRef.current;
+    if (!mount || items.length === 0) return;
 
-  useEffect(() => {
-    if (!root.current || !canvas.current || !cursor.current) return
-    let created: Engine | null = null
-    try {
-      created = createEngine(root.current, canvas.current, cursor.current, {
-        items,
-        panelHeight,
-        gap,
-        radius,
-        lensSize,
-        lensColor,
-        dispersion,
-        autoplay,
-        entry,
-        onActive: (index) => {
-          setActive(index)
-          callback.current?.(index)
-        },
-        onFocus: setFocused,
-        onReady: () => setReady(true),
-      })
-    } catch {
-      created = null
+    const engine = createCarousel(mount, cursorRef.current, {
+      items,
+      panelHeight,
+      gap,
+      background,
+      entry,
+      onActiveChange: (index) => {
+        setActive(index);
+        onActiveChangeRef.current?.(index);
+      },
+      onFocusChange: (open) => {
+        setFocused(open);
+        onFocusChangeRef.current?.(open);
+      },
+      onEntryDone: setEntryDone,
+      lens: JSON.parse(lensKey) as LiquidGlassLens,
+      autoplay,
+    });
+    if (!engine) {
+      setFailed(true);
+      return;
     }
-    if (!created) {
-      setFailed(true)
-      return
-    }
-    engine.current = created
+    engineRef.current = engine;
     return () => {
-      created?.destroy()
-      engine.current = null
-    }
-  }, [items, panelHeight, gap, radius, lensSize, lensColor, dispersion, autoplay, entry])
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [items, panelHeight, gap, background, entry, lensKey, autoplay]);
 
-  const current = items[active] ?? items[0]
+  useEffect(() => {
+    const title = titleRef.current;
+    const counter = counterRef.current;
+    if (!title || !counter) return;
+    const reduced = prefersReducedMotion();
+    gsap.set(title, { xPercent: -50 });
+    gsap.set(counter, { xPercent: -50 });
+
+    if (!entryDone && entry && !reduced) {
+      gsap.set([title, counter], { autoAlpha: 0 });
+      revealPlayedRef.current = false;
+      return;
+    }
+
+    const y = focused ? window.innerHeight * -0.05 : 0;
+    if (entryDone && !focused && !revealPlayedRef.current) {
+      revealPlayedRef.current = true;
+      gsap.fromTo(
+        title,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: reduced ? 0 : 1.6, ease: "power2.out" },
+      );
+      gsap.fromTo(
+        counter,
+        { autoAlpha: 0 },
+        {
+          autoAlpha: 1,
+          duration: reduced ? 0 : 1.6,
+          ease: "power2.out",
+          delay: reduced ? 0 : 0.18,
+        },
+      );
+      return;
+    }
+
+    gsap.to(title, {
+      y,
+      autoAlpha: 1,
+      duration: reduced ? 0 : 0.4,
+      ease: "power3.out",
+    });
+    gsap.to(counter, {
+      autoAlpha: focused ? 0 : 1,
+      duration: reduced ? 0 : 0.4,
+      ease: "power3.out",
+    });
+  }, [focused, entryDone, entry]);
+
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      engineRef.current?.next();
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      engineRef.current?.previous();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      engineRef.current?.closeFocus();
+    }
+  };
 
   return (
     <div
-      ref={root}
+      className={cn(
+        "relative h-full min-h-[420px] w-full overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-black/20",
+        className,
+      )}
+      style={{ background, color: "#111111", ...style }}
+      tabIndex={0}
       role="region"
       aria-roledescription="carousel"
       aria-labelledby={labelId}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        const keys: Record<string, () => void> = {
-          ArrowRight: () => engine.current?.step(1),
-          ArrowLeft: () => engine.current?.step(-1),
-          Enter: () => engine.current?.focusCenter(),
-          Escape: () => engine.current?.close(),
-        }
-        if (!keys[e.key]) return
-        e.preventDefault()
-        keys[e.key]()
-      }}
-      className={cn("relative h-full min-h-[420px] w-full overflow-hidden bg-background text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
+      onKeyDown={onKeyDown}
     >
       <p id={labelId} className="sr-only">
-        Photo carousel
+        Liquid glass project carousel
       </p>
-      <p className="sr-only" aria-live="polite">
-        {current?.title}, {active + 1} of {items.length}
+      <p id={liveId} className="sr-only" aria-live="polite">
+        {current?.title ?? ""}, {pad(active + 1)} of {pad(items.length)}
         {focused ? ", focused" : ""}
       </p>
-      <canvas ref={canvas} aria-hidden className="absolute inset-0 size-full touch-none select-none" />
-      {failed && <p className="absolute inset-0 grid place-items-center text-sm text-muted-foreground">This carousel needs WebGL.</p>}
+
+      <WebGLErrorBoundary
+        fallback={
+          <WebGLFallback
+            className="absolute inset-0"
+            message="This carousel needs WebGL, which is unavailable in this browser."
+          />
+        }
+      >
+        {failed ? (
+          <WebGLFallback
+            className="absolute inset-0"
+            message="This carousel needs WebGL, which is unavailable in this browser."
+          />
+        ) : (
+          <div ref={mountRef} className="absolute inset-0" />
+        )}
+      </WebGLErrorBoundary>
+
       <p
-        className="pointer-events-none absolute top-[4.5%] left-1/2 m-0 text-[15px] font-medium tracking-[-0.02em] transition-[opacity,translate] duration-500 sm:text-[17px]"
-        style={{ opacity: ready ? 1 : 0, translate: focused ? "-50% -0.5rem" : "-50% 0" }}
+        ref={titleRef}
+        className="pointer-events-none absolute left-1/2 top-[4.5%] z-10 m-0 text-center text-[15px] font-medium tracking-[-0.02em] text-black opacity-0 sm:text-[17px]"
       >
         {current?.title}
       </p>
       <p
-        className="pointer-events-none absolute bottom-[6%] left-1/2 m-0 -translate-x-1/2 text-[13px] font-medium tracking-[-0.02em] tabular-nums transition-opacity duration-500 sm:text-[15px]"
-        style={{ opacity: ready && !focused ? 1 : 0 }}
+        ref={counterRef}
+        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 m-0 text-center text-[13px] font-medium tabular-nums tracking-[-0.02em] text-black opacity-0 sm:text-[15px]"
       >
         {pad(active + 1)}/{pad(items.length)}
       </p>
+
       <div
-        ref={cursor}
-        aria-hidden
-        className="pointer-events-none absolute top-0 left-0 text-[13px] font-medium text-white mix-blend-difference transition-[opacity,scale] duration-300"
-        style={{ opacity: 0, scale: "0.6" }}
+        ref={cursorRef}
+        className="pointer-events-none absolute left-0 top-0 z-20 text-[13px] font-medium text-black mix-blend-exclusion"
       >
         View
       </div>
+
       <button
         type="button"
-        onClick={() => engine.current?.close()}
-        aria-label="Close the focused photo"
-        className="absolute top-[4.5%] right-[4%] text-[13px] font-medium text-white mix-blend-difference transition-opacity duration-300"
-        style={{ opacity: focused ? 1 : 0, pointerEvents: focused ? "auto" : "none" }}
+        onClick={() => engineRef.current?.closeFocus()}
+        aria-label="Close focused project"
+        className="absolute right-[4%] top-[4.5%] z-20 text-[13px] font-medium text-black mix-blend-exclusion transition-opacity duration-300"
+        style={{
+          opacity: focused ? 1 : 0,
+          pointerEvents: focused ? "auto" : "none",
+        }}
       >
         Close
       </button>
     </div>
-  )
+  );
 }

@@ -5,7 +5,7 @@ import { MetaSchema, SLUG_RE } from "./schema"
 
 export type Problem = { file: string; rule: string; fix: string }
 
-export const ALLOWED_IMPORTS = ["react", "motion", "motion/react", "lucide-react", "@/lib/utils"]
+export const ALLOWED_IMPORTS = ["react", "motion", "motion/react", "lucide-react", "@/lib/utils", "three", "gsap"]
 const PREVIEW_SIZE = { width: 1280, height: 800 }
 const PREVIEW_SECONDS = { min: 3, max: 8 }
 
