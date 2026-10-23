@@ -3,7 +3,7 @@
   "name": "Spring Switch",
   "description": "An iOS-style switch with a spring thumb that stretches toward its destination while you hold it and springs across on release; real switch role, keyboard, haptic tick, on colour as a prop.",
   "category": "buttons",
-  "collection": "components",
+  "collection": "craft",
   "tags": [
     "switch",
     "toggle",

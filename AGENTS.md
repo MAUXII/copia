@@ -20,7 +20,7 @@ Copia also makes its own pieces, the **Components** collection (the site's
 `/components`): small, clean interactions that morph and settle. To create
 one from scratch rather than copy, follow
 **[`.agents/skills/craft-component/SKILL.md`](.agents/skills/craft-component/SKILL.md)**
-(`"collection": "components"` in `meta.json`). Copies are
+(`"collection": "craft"` in `meta.json`). Copies are
 `"collection": "copies"`, the default.
 
 To only look for options without building, use

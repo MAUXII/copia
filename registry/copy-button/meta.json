@@ -3,7 +3,7 @@
   "name": "Copy Button",
   "description": "A copy button whose icon morphs into a check and whose label swaps to Copied while the button resizes to fit, with blur cross-fades and a spring; announced to screen readers, colour of the check as a prop.",
   "category": "buttons",
-  "collection": "components",
+  "collection": "craft",
   "tags": [
     "copy",
     "clipboard",

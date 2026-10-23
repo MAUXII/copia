@@ -3,7 +3,7 @@
   "name": "Number Ticker",
   "description": "A number whose digits roll to their new value like an odometer, each column a beat after its right-hand neighbour; Intl formatting (currency, compact…) stays put and the full value is announced.",
   "category": "text",
-  "collection": "components",
+  "collection": "craft",
   "tags": [
     "number",
     "counter",

@@ -57,7 +57,7 @@ function DockButton({ label, onClick, active, children }: { label: string; onCli
 }
 
 /** Full-screen component page: the demo fills the viewport, specs slide in from the left. */
-export function ComponentViewer({ name, installTarget, slug, componentName, controls, info, section = { label: "Copies", href: "/copies" } }: Props) {
+export function ComponentViewer({ name, installTarget, slug, componentName, controls, info, section = { label: "Copies", href: "/components/copies" } }: Props) {
   // The demo renders on the client so customizer values can flow into it as props.
   const Demo = useMemo(() => lazy(demos[slug]), [slug])
   const [values, setValues] = useState<ControlValues>(() => defaultValues(controls))

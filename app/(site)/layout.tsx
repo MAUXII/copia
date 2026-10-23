@@ -7,8 +7,9 @@ const COLUMNS = [
   {
     title: "Library",
     links: [
-      { label: "Components", href: "/components", badge: "New" },
-      { label: "Copies", href: "/copies" },
+      { label: "Components", href: "/components" },
+      { label: "Craft", href: "/components/craft", badge: "New" },
+      { label: "Copies", href: "/components/copies" },
     ],
   },
   {

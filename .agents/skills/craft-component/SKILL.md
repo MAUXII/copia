@@ -71,7 +71,7 @@ npm run new <slug> <category>
   `{ "type": "color" }` control. No hard-coded colour classes.
 - **Light and dark:** it must look right in both; check the viewer's light
   preview.
-- `meta.json`: `"collection": "components"`, and
+- `meta.json`: `"collection": "craft"`, and
   `"inspiration": { "author": "original", "url": null }`. If a system or a
   person's work shaped it (Apple's segmented control, Emil's Sonner), add
   them to `credits` with a `handle`.

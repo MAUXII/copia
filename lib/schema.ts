@@ -27,8 +27,8 @@ export const MetaSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   category: z.enum(CATEGORIES),
-  /** "copies": credited recreations (the default). "components": Copia's own originals. */
-  collection: z.enum(["copies", "components"]).default("copies"),
+  /** "copies": credited recreations (the default). "craft": Copia's own originals. */
+  collection: z.enum(["copies", "craft"]).default("copies"),
   tags: z.array(z.string()),
   author: z.object({ name: z.string().min(1), github: z.string().min(1) }),
   inspiration: z.object({

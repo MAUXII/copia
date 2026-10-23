@@ -3,7 +3,7 @@
   "name": "Segmented Control",
   "description": "An Apple-style segmented control: the selected pill slides to your pick on a spring and the labels settle under it; arrow keys, roving focus, icons, controlled or not, and a haptic tick on change.",
   "category": "navigation",
-  "collection": "components",
+  "collection": "craft",
   "tags": [
     "segmented",
     "tabs",
