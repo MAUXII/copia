@@ -23,6 +23,13 @@ one from scratch rather than copy, follow
 (`"collection": "craft"` in `meta.json`). Copies are
 `"collection": "copies"`, the default.
 
+## Style agents
+
+Skills in `.agents/skills/style-<name>/` make components in one look (the
+site's `/agents`). Each has `title` and `tagline` under `metadata`, rules for
+the look and motion, and a look-and-fix step in light and dark. Components
+made with one set `"style": "<name>"` in `meta.json` and show on its page.
+
 To only look for options without building, use
 [`.agents/skills/find-component/SKILL.md`](.agents/skills/find-component/SKILL.md).
 

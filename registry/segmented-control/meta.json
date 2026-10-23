@@ -4,6 +4,7 @@
   "description": "An Apple-style segmented control: the selected pill slides to your pick on a spring and the labels settle under it; arrow keys, roving focus, icons (optionally with only the selected label shown), controlled or not, and a haptic tick on change.",
   "category": "navigation",
   "collection": "craft",
+  "style": "apple-minimal",
   "tags": [
     "segmented",
     "tabs",

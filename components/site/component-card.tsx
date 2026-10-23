@@ -13,7 +13,7 @@ function shortCredit(meta: Meta) {
   return `after ${meta.inspiration.author.split(/,| \(/)[0]}`
 }
 
-/** Craft and agent pieces are small and light, so their card runs the demo live; you can use it right there. */
+/** Craft pieces are small and light, so their card runs the demo live; you can use it right there. */
 function LiveCard({ meta }: { meta: Meta }) {
   return (
     <div className="group relative rounded-2xl border bg-card p-2 transition-colors hover:border-foreground/20">

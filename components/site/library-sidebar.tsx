@@ -6,7 +6,7 @@ import { CollectionSwitch } from "@/components/site/collection-switch"
 import { CATEGORIES, type Meta } from "@/lib/schema"
 import { cn } from "@/lib/utils"
 
-type Collection = "all" | "craft" | "copies" | "agents"
+type Collection = "all" | "craft" | "copies"
 
 const CATEGORY_LABELS: Record<string, string> = { buttons: "Buttons", text: "Text", cards: "Cards", navigation: "Navigation", effects: "Effects" }
 
@@ -41,9 +41,9 @@ function SectionLabel({ children, count }: { children: React.ReactNode; count: n
 export function LibrarySidebar({ all }: { all: Meta[] }) {
   // Lives in the shared layout, so it stays mounted between collections and the switch animates.
   const pathname = usePathname()
-  const active = ((["craft", "copies", "agents"] as const).find((c) => pathname.endsWith(`/${c}`)) ?? "all") as Collection
+  const active = ((["craft", "copies"] as const).find((c) => pathname.endsWith(`/${c}`)) ?? "all") as Collection
   const items = active === "all" ? all : all.filter((m) => m.collection === active)
-  const counts = { all: all.length, craft: 0, copies: 0, agents: 0 }
+  const counts = { all: all.length, craft: 0, copies: 0 }
   for (const m of all) counts[m.collection]++
   // "New" marks the most recent day components were added.
   const newest = all.reduce((latest, m) => (m.createdAt > latest ? m.createdAt : latest), "")

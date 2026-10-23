@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/suggest", destination: "/requests", permanent: true },
       { source: "/copies", destination: "/components/copies", permanent: true },
+      { source: "/components/agents", destination: "/agents", permanent: false },
     ]
   },
   async rewrites() {
