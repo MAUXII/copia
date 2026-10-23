@@ -1,0 +1,214 @@
+{
+  "slug": "inverted-perspective-carousel",
+  "name": "Inverted Perspective Carousel",
+  "description": "Coverflow carousel: side slides turn 40° on their vertical axis and fall back in depth with their far edge in shadow; drag or flick it, it loops and snaps. Copia rebuilds Swiper's coverflow with Motion (no Swiper) and adds horizontal wheel and trackpad scrolling, click-to-centre, keyboard arrows, autoplay that pauses on hover or focus, and an optional floor reflection.",
+  "category": "cards",
+  "tags": [
+    "carousel",
+    "coverflow",
+    "3d",
+    "perspective",
+    "drag",
+    "keyboard",
+    "spring"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Swiper.js (coverflow effect)",
+    "url": "https://swiperjs.com/demos#effect-coverflow",
+    "handle": "nolimits4web"
+  },
+  "credits": [
+    {
+      "author": "Skiper UI (skiper49)",
+      "url": "https://skiper-ui.com/v1/skiper49",
+      "handle": "skiper-ui"
+    },
+    {
+      "author": "AarzooAly (illustrations in the reference)",
+      "url": "https://x.com/AarzooAly"
+    }
+  ],
+  "assets": [
+    {
+      "file": "blurred-monochrome-portrait.webp",
+      "author": "rena",
+      "source": "https://www.lummi.ai/photo/blurred-monochrome-portrait-noadq",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "abstract-black-and-white.webp",
+      "author": "ricardomatos",
+      "source": "https://www.lummi.ai/photo/abstract-black-and-white-tyvyn",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "expressive-eyes-close-up.webp",
+      "author": "kubadesign",
+      "source": "https://www.lummi.ai/photo/expressive-eyes-close-up-uhy7a",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "dramatic-dual-portrait.webp",
+      "author": "westkast",
+      "source": "https://www.lummi.ai/photo/dramatic-dual-portrait-cq4p2",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "focused-red-portrait.webp",
+      "author": "studiomiklus",
+      "source": "https://www.lummi.ai/photo/focused-red-portrait-yrenf",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "ethereal-dancer-motion.webp",
+      "author": "studiomiklus",
+      "source": "https://www.lummi.ai/photo/ethereal-dancer-motion-br7um",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "freckled-beauty-close-up.webp",
+      "author": "oddatide",
+      "source": "https://www.lummi.ai/photo/freckled-beauty-close-up-wpw0y",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "abstract-face-illustration.webp",
+      "author": "nikadominguez_",
+      "source": "https://www.lummi.ai/photo/minimalist-abstract-face-illustration-ae_2g",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "spiral-glow-abstract.webp",
+      "author": "kubadesign",
+      "source": "https://www.lummi.ai/photo/spiral-glow-abstract-jbwko",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ],
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
+  "props": [
+    {
+      "name": "images",
+      "type": "{ src, alt }[]",
+      "default": "-",
+      "description": "Slides in order."
+    },
+    {
+      "name": "size",
+      "type": "number",
+      "default": "300",
+      "description": "Slide width and height in px."
+    },
+    {
+      "name": "spaceBetween",
+      "type": "number",
+      "default": "0",
+      "description": "Space between slides in px."
+    },
+    {
+      "name": "rotate",
+      "type": "number",
+      "default": "40",
+      "description": "Degrees each slide turns per slide from the centre; negative turns the other way."
+    },
+    {
+      "name": "depth",
+      "type": "number",
+      "default": "100",
+      "description": "How far back each slide sits per slide from the centre, in px."
+    },
+    {
+      "name": "modifier",
+      "type": "number",
+      "default": "1",
+      "description": "Multiplies rotate and depth."
+    },
+    {
+      "name": "slideShadows",
+      "type": "boolean",
+      "default": "true",
+      "description": "Shade the far edge of each side slide."
+    },
+    {
+      "name": "loop",
+      "type": "boolean",
+      "default": "true",
+      "description": "Wrap around at the ends."
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "default": "0",
+      "description": "Advance every N ms; hover, focus and touch pause it."
+    },
+    {
+      "name": "showPagination / showNavigation",
+      "type": "boolean",
+      "default": "true / false",
+      "description": "Dots under the slides / arrow buttons."
+    },
+    {
+      "name": "reflection",
+      "type": "boolean",
+      "default": "false",
+      "description": "A soft mirror of the slides on the floor."
+    },
+    {
+      "name": "onActiveChange",
+      "type": "(index) => void",
+      "default": "-",
+      "description": "Called when the centred slide changes."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "rotate",
+      "type": "number",
+      "min": -80,
+      "max": 80,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "prop": "depth",
+      "type": "number",
+      "min": 0,
+      "max": 400,
+      "step": 10,
+      "default": 100
+    },
+    {
+      "prop": "spaceBetween",
+      "type": "number",
+      "min": -120,
+      "max": 60,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "prop": "autoplay",
+      "type": "number",
+      "min": 0,
+      "max": 4000,
+      "step": 100,
+      "default": 1800
+    },
+    {
+      "prop": "slideShadows",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "prop": "reflection",
+      "type": "boolean",
+      "default": false
+    }
+  ],
+  "createdAt": "2026-10-23"
+}
