@@ -161,6 +161,14 @@ stagger children in after ~150 ms; reverse order on exit.
 **Seen in.** Dennis Snellenberg's work list; Olivier Larose's Project Gallery tutorial; Copia `hover-reel`.
 **Pitfalls.** Reset the position on pointerleave or the frame slides in from the last exit. Gate the follow to `pointerType === "mouse"`; on touch show inline thumbnails. Put the scale on an inner box so the outer translate (written every frame) never fights a CSS transition.
 
+## Flex-basis accordion (spines)
+
+**Idea.** Panels that widen one at a time without measuring anything.
+**Mechanism.** Animate only `flex-basis`: closed `var(--spine)`, open `100%`, everyone `flex-shrink: 1` and floored by `min-width: var(--spine)`. Flex hands the open panel all the remaining space for any count. Inside a `@container`, switch `flex-direction` under a breakpoint and the same rule stacks. Sideways titles via `writing-mode: vertical-rl` + `rotate(180deg)`.
+**Numbers.** 700 ms `cubic-bezier(0.22, 1, 0.36, 1)`; spine 4rem; picture inset 0.75rem; cross-fade 700 ms.
+**Seen in.** Crafter UI Spine Accordion; Copia `spine-accordion`.
+**Pitfalls.** Keep every picture mounted (opacity only) or opening waits on decode. Open on hover only for mouse pointers. Give the container a height.
+
 ## Recording tip
 
 The preview recorder uses Chrome's screencast, which only sends frames when

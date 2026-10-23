@@ -1,0 +1,111 @@
+{
+  "slug": "spine-accordion",
+  "name": "Spine Accordion",
+  "description": "A shelf of work opened one piece at a time: closed pieces are thin spines with their titles set sideways, and the one you point at, tap or focus unfurls into a framed picture while the others close back; it stacks into rows in a narrow container. Copia adds arrow-key navigation, a picture that settles from a slight zoom, numbered spines and autoplay that pauses on hover or focus.",
+  "category": "cards",
+  "tags": [
+    "accordion",
+    "gallery",
+    "portfolio",
+    "hover",
+    "keyboard"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Crafter UI",
+    "url": "https://21st.dev/@crafterui/components/spine-accordion",
+    "handle": "crafterui"
+  },
+  "assets": [
+    {
+      "file": "northern-lights.webp",
+      "author": "pablostanley",
+      "source": "https://www.lummi.ai/photo/majestic-snowy-mountains-and-northern-lights-5pag0",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "desert-bloom.webp",
+      "author": "milan-bundalo",
+      "source": "https://www.lummi.ai/photo/desert-bloom-serenity-uh2u7",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "coastal-ruins.webp",
+      "author": "mariana",
+      "source": "https://www.lummi.ai/photo/ancient-coastal-ruins-at-sunset-xvyJ1",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "twilight-city.webp",
+      "author": "steph",
+      "source": "https://www.lummi.ai/photo/twilight-urban-landscape-wzl5w",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "night-desert.webp",
+      "author": "steph",
+      "source": "https://www.lummi.ai/photo/nighttime-desert-scene-pszfg",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "items",
+      "type": "{ title, image, meta? }[]",
+      "default": "-",
+      "description": "Pieces in shelf order."
+    },
+    {
+      "name": "index / defaultIndex / onIndexChange",
+      "type": "number / number / (i) => void",
+      "default": "- / 0 / -",
+      "description": "Controlled or uncontrolled open panel."
+    },
+    {
+      "name": "spine",
+      "type": "string (CSS length)",
+      "default": "\"4rem\"",
+      "description": "Thickness of a closed spine; also the open picture's inset."
+    },
+    {
+      "name": "numbered",
+      "type": "boolean",
+      "default": "false",
+      "description": "Number the spines (01, 02…)."
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "default": "0",
+      "description": "Open the next piece every N ms; hover, focus and touch pause it."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "spine",
+      "type": "number",
+      "min": 2.5,
+      "max": 7,
+      "step": 0.25,
+      "default": 4
+    },
+    {
+      "prop": "numbered",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "prop": "autoplay",
+      "type": "number",
+      "min": 0,
+      "max": 4000,
+      "step": 100,
+      "default": 1600
+    }
+  ],
+  "createdAt": "2026-10-23"
+}
