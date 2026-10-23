@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react"
 import type { Meta } from "@/lib/schema"
 import { PREVIEW_THEMES } from "@/lib/previews"
 import { cn } from "@/lib/utils"
+import { LiveDemo } from "./live-demo"
 
 /** "Apple (iPhone Dynamic Island), studied via …" -> "after Apple". */
 function shortCredit(meta: Meta) {
@@ -12,7 +13,28 @@ function shortCredit(meta: Meta) {
   return `after ${meta.inspiration.author.split(/,| \(/)[0]}`
 }
 
+/** Craft pieces are small and light, so their card runs the demo live; you can use it right there. */
+function LiveCard({ meta }: { meta: Meta }) {
+  return (
+    <div className="group relative rounded-2xl border bg-card p-2 transition-colors hover:border-foreground/20">
+      <LiveDemo slug={meta.slug} />
+      <Link href={`/c/${meta.slug}`} className="flex items-end justify-between gap-2 rounded-lg px-2 pt-3 pb-1 outline-none focus-visible:outline-2 focus-visible:outline-highlight">
+        <span className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium">{meta.name}</span>
+          <span className="truncate text-xs text-muted-foreground">{shortCredit(meta)}</span>
+        </span>
+        <span className="text-xs text-muted-foreground transition-colors group-hover:text-foreground">Open →</span>
+      </Link>
+    </div>
+  )
+}
+
 export function ComponentCard({ meta }: { meta: Meta }) {
+  if (meta.collection === "craft") return <LiveCard meta={meta} />
+  return <VideoCard meta={meta} />
+}
+
+function VideoCard({ meta }: { meta: Meta }) {
   // One take per theme; CSS shows the one that matches the page and only that one plays.
   const videos = useRef<(HTMLVideoElement | null)[]>([])
   const shown = () => videos.current.find((v) => v && v.offsetParent !== null) ?? null

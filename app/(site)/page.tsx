@@ -1,10 +1,35 @@
 import { CommandLine } from "@/components/site/copy-button"
-import { ComponentGrid } from "@/components/site/component-grid"
+import Link from "next/link"
+import { ComponentCard } from "@/components/site/component-card"
 import { KeysHero } from "@/components/site/keys-hero"
 import { GlyphRipple } from "@/components/site/glyph-ripple"
 import { Smoke } from "@/components/site/smoke"
 import { getComponents } from "@/lib/registry"
+import type { Meta } from "@/lib/schema"
 import { NAMESPACE } from "@/lib/site"
+
+/** A home section: a heading with a "See all" link and up to six cards. */
+function Strip({ title, text, href, items }: { title: string; text: string; href: string; items: Meta[] }) {
+  if (!items.length) return null
+  return (
+    <section className="flex flex-col gap-6">
+      <div className="flex items-end justify-between gap-6">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-medium tracking-tight">{title}</h2>
+          <p className="text-sm text-muted-foreground">{text}</p>
+        </div>
+        <Link href={href} className="shrink-0 text-sm text-muted-foreground transition-colors hover:text-foreground">
+          See all →
+        </Link>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((meta) => (
+          <ComponentCard key={meta.slug} meta={meta} />
+        ))}
+      </div>
+    </section>
+  )
+}
 
 export default function Home() {
   const items = getComponents()
@@ -30,8 +55,9 @@ export default function Home() {
         </span>
         <span className="absolute right-6 bottom-5 hidden font-mono text-[11px] tracking-wide text-black/45 dark:text-white/45 sm:block">LAT. &quot;ABUNDANCE&quot;</span>
       </section>
-      <div className="mx-auto max-w-6xl px-4 pt-16">
-        <ComponentGrid items={items} />
+      <div id="components" className="mx-auto flex max-w-6xl flex-col gap-20 px-4 pt-16">
+        <Strip title="New craft" text="Copia's own pieces: small interactions that morph and settle. Try them right here." href="/components/craft" items={items.filter((m) => m.collection === "craft").slice(0, 6)} />
+        <Strip title="Latest copies" text="The best interfaces on the web, recreated and credited." href="/components/copies" items={items.filter((m) => m.collection === "copies").slice(0, 6)} />
       </div>
     </>
   )
