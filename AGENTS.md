@@ -14,6 +14,15 @@ It walks through: find every good version → investigate how it works (with
 [REA](https://github.com/morluto/rea) when available) → rebuild it the Copia
 way → add a feature → preview → check → credit → case study → pull request.
 
+## The other core: craft a component
+
+Copia also makes its own pieces, the **Components** collection (the site's
+`/components`): small, clean interactions that morph and settle. To create
+one from scratch rather than copy, follow
+**[`.agents/skills/craft-component/SKILL.md`](.agents/skills/craft-component/SKILL.md)**
+(`"collection": "components"` in `meta.json`). Copies are
+`"collection": "copies"`, the default.
+
 To only look for options without building, use
 [`.agents/skills/find-component/SKILL.md`](.agents/skills/find-component/SKILL.md).
 

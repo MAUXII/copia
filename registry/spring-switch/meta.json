@@ -1,0 +1,72 @@
+{
+  "slug": "spring-switch",
+  "name": "Spring Switch",
+  "description": "An iOS-style switch with a spring thumb that stretches toward its destination while you hold it and springs across on release; real switch role, keyboard, haptic tick, on colour as a prop.",
+  "category": "buttons",
+  "collection": "components",
+  "tags": [
+    "switch",
+    "toggle",
+    "spring",
+    "press",
+    "keyboard"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "original",
+    "url": null
+  },
+  "credits": [
+    {
+      "author": "Apple (Human Interface Guidelines: Toggles)",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/toggles",
+      "handle": "apple"
+    }
+  ],
+  "dependencies": [
+    "motion"
+  ],
+  "props": [
+    {
+      "name": "checked / defaultChecked / onCheckedChange",
+      "type": "boolean / boolean / (on) => void",
+      "default": "- / false / -",
+      "description": "Controlled or uncontrolled."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "-",
+      "description": "Visible label beside the switch."
+    },
+    {
+      "name": "onColor",
+      "type": "string",
+      "default": "\"#34c759\"",
+      "description": "Track colour when on."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "description": "Dims it and ignores input."
+    },
+    {
+      "name": "haptics",
+      "type": "boolean",
+      "default": "true",
+      "description": "Vibrate briefly on toggle, where supported."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "onColor",
+      "type": "color",
+      "default": "#34c759"
+    }
+  ],
+  "createdAt": "2026-10-23"
+}

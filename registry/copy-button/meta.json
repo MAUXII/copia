@@ -1,0 +1,80 @@
+{
+  "slug": "copy-button",
+  "name": "Copy Button",
+  "description": "A copy button whose icon morphs into a check and whose label swaps to Copied while the button resizes to fit, with blur cross-fades and a spring; announced to screen readers, colour of the check as a prop.",
+  "category": "buttons",
+  "collection": "components",
+  "tags": [
+    "copy",
+    "clipboard",
+    "morph",
+    "button",
+    "feedback"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "original",
+    "url": null
+  },
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
+  "props": [
+    {
+      "name": "value",
+      "type": "string",
+      "default": "-",
+      "description": "Text written to the clipboard."
+    },
+    {
+      "name": "label / copiedLabel",
+      "type": "string",
+      "default": "\"Copy\" / \"Copied\"",
+      "description": "The two labels."
+    },
+    {
+      "name": "timeout",
+      "type": "number",
+      "default": "1600",
+      "description": "How long the copied state stays, in ms."
+    },
+    {
+      "name": "copied",
+      "type": "boolean",
+      "default": "-",
+      "description": "Show the copied state without copying (controlled)."
+    },
+    {
+      "name": "onCopy",
+      "type": "(value) => void",
+      "default": "-",
+      "description": "Called after a successful copy."
+    },
+    {
+      "name": "successColor",
+      "type": "string",
+      "default": "\"#30d158\"",
+      "description": "Colour of the check."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "successColor",
+      "type": "color",
+      "default": "#30d158"
+    },
+    {
+      "prop": "timeout",
+      "type": "number",
+      "min": 600,
+      "max": 4000,
+      "step": 100,
+      "default": 1600
+    }
+  ],
+  "createdAt": "2026-10-23"
+}

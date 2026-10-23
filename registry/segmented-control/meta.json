@@ -1,0 +1,78 @@
+{
+  "slug": "segmented-control",
+  "name": "Segmented Control",
+  "description": "An Apple-style segmented control: the selected pill slides to your pick on a spring and the labels settle under it; arrow keys, roving focus, icons, controlled or not, and a haptic tick on change.",
+  "category": "navigation",
+  "collection": "components",
+  "tags": [
+    "segmented",
+    "tabs",
+    "toggle",
+    "layout",
+    "keyboard",
+    "spring"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "original",
+    "url": null
+  },
+  "credits": [
+    {
+      "author": "Apple (Human Interface Guidelines: Segmented controls)",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/segmented-controls",
+      "handle": "apple"
+    }
+  ],
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
+  "props": [
+    {
+      "name": "options",
+      "type": "{ value, label, icon? }[]",
+      "default": "-",
+      "description": "Segments in order."
+    },
+    {
+      "name": "value / defaultValue / onValueChange",
+      "type": "string / string / (v) => void",
+      "default": "first option",
+      "description": "Controlled or uncontrolled."
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\"",
+      "default": "\"md\"",
+      "description": "Height and text size."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "\"Options\"",
+      "description": "Accessible name of the group."
+    },
+    {
+      "name": "haptics",
+      "type": "boolean",
+      "default": "true",
+      "description": "Vibrate briefly on change, where supported."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "size",
+      "type": "select",
+      "options": [
+        "md",
+        "sm"
+      ],
+      "default": "md"
+    }
+  ],
+  "createdAt": "2026-10-23"
+}

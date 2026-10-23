@@ -1,0 +1,62 @@
+{
+  "slug": "number-ticker",
+  "name": "Number Ticker",
+  "description": "A number whose digits roll to their new value like an odometer, each column a beat after its right-hand neighbour; Intl formatting (currency, compact…) stays put and the full value is announced.",
+  "category": "text",
+  "collection": "components",
+  "tags": [
+    "number",
+    "counter",
+    "odometer",
+    "text",
+    "spring"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "original",
+    "url": null
+  },
+  "dependencies": [
+    "motion"
+  ],
+  "props": [
+    {
+      "name": "value",
+      "type": "number",
+      "default": "-",
+      "description": "The number to show."
+    },
+    {
+      "name": "format",
+      "type": "Intl.NumberFormatOptions",
+      "default": "-",
+      "description": "Currency, decimals, compact notation…"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "default": "browser",
+      "description": "Formatting locale."
+    },
+    {
+      "name": "stagger",
+      "type": "number",
+      "default": "0.04",
+      "description": "Seconds between neighbouring columns starting to roll."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "stagger",
+      "type": "number",
+      "min": 0,
+      "max": 0.15,
+      "step": 0.01,
+      "default": 0.04
+    }
+  ],
+  "createdAt": "2026-10-23"
+}
