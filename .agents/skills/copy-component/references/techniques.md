@@ -169,6 +169,14 @@ stagger children in after ~150 ms; reverse order on exit.
 **Seen in.** Crafter UI Spine Accordion; Copia `spine-accordion`.
 **Pitfalls.** Keep every picture mounted (opacity only) or opening waits on decode. Open on hover only for mouse pointers. Give the container a height.
 
+## Gooey (liquid shapes)
+
+**Idea.** Shapes that fuse when close and stretch apart like liquid.
+**Mechanism.** SVG filter on the wrapper: `feGaussianBlur` (stdDeviation 8–14) → `feColorMatrix` alpha row `0 0 0 a b` with a ≈ 20, b ≈ −9 to harden the blurred edge → `feComposite operator="atop"` with the source to keep colours crisp. Same-coloured solid blobs inside; text and icons in a layer above.
+**Numbers.** stdDeviation 10 with `20 −9` is a good start; springs with bounce 0.3–0.45.
+**Seen in.** Lucas Bebber's Codrops "Creative Gooey Effects" (2015); Copia craft pieces.
+**Pitfalls.** Text inside the filter smears; gradients and borders turn to mud; filters repaint every animated frame, so keep the area small; ids must be unique per instance (`useId`).
+
 ## Recording tip
 
 The preview recorder uses Chrome's screencast, which only sends frames when

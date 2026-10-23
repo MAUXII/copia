@@ -1,6 +1,6 @@
 ---
 name: craft-component
-description: Copia's workflow for its own components (the "Components" collection), as opposed to copies. Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
+description: Copia's workflow for its own components (the "Components" collection), as opposed to copies. Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button, a gooey menu that blobs open…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
 metadata:
   version: "1"
 ---
@@ -10,7 +10,9 @@ metadata:
 Copies recreate something that exists; **Components** are Copia's own pieces:
 small, quiet, useful interactions in the spirit of Apple's system controls,
 Family, Emil Kowalski, Rauno Freiberg and beUI. Each one does **one thing**
-and makes it feel physical. If what you are asked for already exists
+and makes it feel physical. Two looks belong here: **morph** (shapes and
+content that turn into each other) and **gooey** (shapes that melt and pull
+apart like liquid, see below). If what you are asked for already exists
 somewhere and the point is to reproduce it, use
 [copy-component](../copy-component/SKILL.md) instead.
 
@@ -49,6 +51,42 @@ nothing pops in or swaps cold. Write the list in the craft note (step 7).
   roving focus for groups, arrows where they make sense, visible focus.
 - **Accessibility:** the right role (`radiogroup`, `switch`, `status`),
   live announcements for changes the eye would catch.
+
+## 3b. Gooey
+
+Gooey pieces look like liquid: when two shapes get close they fuse with a
+soft neck, and they stretch apart before snapping free (a button that drips
+a menu out, tabs whose indicator flows from one to the next, a toast that
+splits off a pill, a loader of merging dots). Use it where the separation or
+joining *is* the moment; it is not a skin for everything.
+
+- **The trick:** render the shapes inside a wrapper with an SVG filter:
+  blur them, then push the alpha contrast so the blur's soft edges become a
+  single hard edge.
+  ```html
+  <filter id="goo">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+    <feColorMatrix in="blur" mode="matrix"
+      values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
+    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+  </filter>
+  ```
+  Apply it with `style={{ filter: "url(#goo)" }}` on the wrapper; give the
+  filter a `useId()` id so two instances do not clash.
+- **Tune it together:** `stdDeviation` (8–14) sets how far apart shapes
+  start to merge; the alpha row `… 0 0 0 a b` (≈ 18–24 and −7 to −10) sets
+  how crisp the edge is. More blur needs more contrast.
+- **Keep text and icons out of the filter:** it rounds and smears them.
+  Put the blobs in the filtered layer and the labels in a layer on top,
+  moving with the same springs.
+- **Shapes must be solid and the same colour** inside the filter; gradients
+  and borders melt into mud. Shadows go on an outer wrapper.
+- **Motion:** springs with a little more bounce (0.3–0.45) sell the liquid;
+  move blobs apart along one axis so the neck reads.
+- **Cost and fallbacks:** filters repaint every frame they animate; keep
+  the filtered area small. With reduced motion keep the end states and skip
+  the stretch. Safari renders SVG filters on HTML well, but test it.
+- The colour of the blobs is a prop with a `color` control, like any other.
 
 Reuse what [techniques](../copy-component/references/techniques.md) already
 measured, and add a section when you find a new one.
