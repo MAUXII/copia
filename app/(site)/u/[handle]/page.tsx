@@ -46,7 +46,7 @@ function Grid({ title, items }: { title: string; items: Meta[] }) {
   )
 }
 
-/** Author page, after 21st.dev: credited people get a page before they ever sign up, and can claim it. */
+/** Author page: credited people get a page before they ever sign up, and can claim it. */
 export default async function AuthorPage({ params }: Params) {
   const person = getPerson((await params).handle)
   if (!person) notFound()

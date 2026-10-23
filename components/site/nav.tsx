@@ -13,7 +13,7 @@ function GitHubIcon() {
   )
 }
 
-/** Luma-style nav: full width, transparent with a backdrop blur, no border. */
+/** Nav: full width, transparent with a backdrop blur, no border. */
 export async function Nav() {
   const stars = await getStars()
   return (

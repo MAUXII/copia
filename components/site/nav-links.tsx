@@ -76,7 +76,7 @@ function CommunityMenu() {
   )
 }
 
-/** Luma-style text links: small icon + label, dim until active or hovered. */
+/** Text links: small icon + label, dim until active or hovered. */
 export function NavLinks() {
   const pathname = usePathname()
   return (
@@ -92,7 +92,7 @@ export function NavLinks() {
   )
 }
 
-/** Local time with the time zone, like Luma ("18:26 BRT"). Rendered after mount to avoid a hydration mismatch. */
+/** Local time with the time zone ("18:26 BRT"). Rendered after mount to avoid a hydration mismatch. */
 export function LocalTime() {
   const [time, setTime] = useState("")
   useEffect(() => {

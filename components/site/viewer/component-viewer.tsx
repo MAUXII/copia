@@ -62,7 +62,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
   const Demo = useMemo(() => lazy(demos[slug]), [slug])
   const [values, setValues] = useState<ControlValues>(() => defaultValues(controls))
   const [customize, setCustomize] = useState(false)
-  // Docs column open by default on desktop, like Componentry; closed on small screens.
+  // Docs column open by default on desktop; closed on small screens.
   const [panel, setPanel] = useState(true)
   const root = useRef<HTMLDivElement>(null)
   const docs = useRef<HTMLDivElement>(null)

@@ -10,7 +10,7 @@ type Collection = "all" | "craft" | "copies" | "agents"
 
 const CATEGORY_LABELS: Record<string, string> = { buttons: "Buttons", text: "Text", cards: "Cards", navigation: "Navigation", effects: "Effects" }
 
-/** Measured from beui.dev's sidebar: 14px links, 4×10 padding, 8px corners, the active one on a 6% foreground wash. */
+/** Sidebar links: 14px, 4×10 padding, 8px corners, the active one on a 6% foreground wash. */
 function SidebarLink({ href, active, isNew, children }: { href: string; active?: boolean; isNew?: boolean; children: React.ReactNode }) {
   return (
     <Link
@@ -27,7 +27,7 @@ function SidebarLink({ href, active, isNew, children }: { href: string; active?:
   )
 }
 
-/** 11px semibold uppercase section label with a count pill, as on beui.dev. */
+/** 11px semibold uppercase section label with a count pill. */
 function SectionLabel({ children, count }: { children: React.ReactNode; count: number }) {
   return (
     <p className="mb-1.5 flex items-center gap-2 px-2.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
@@ -37,7 +37,7 @@ function SectionLabel({ children, count }: { children: React.ReactNode; count: n
   )
 }
 
-/** Left column, pinned to the edge like beui.dev: collection switch, then the components by category. */
+/** Left column, pinned to the edge: collection switch, then the components by category. */
 export function LibrarySidebar({ all }: { all: Meta[] }) {
   // Lives in the shared layout, so it stays mounted between collections and the switch animates.
   const pathname = usePathname()

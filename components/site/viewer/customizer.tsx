@@ -18,7 +18,7 @@ function format(value: number, step: number) {
   return value.toFixed(decimals)
 }
 
-/** Wide slider with tick marks and the value on the right, like Great UI's customizer. */
+/** Wide slider with tick marks and the value on the right. */
 function Slider({ control, value, onChange }: { control: Extract<Control, { type: "number" }>; value: number; onChange: (v: number) => void }) {
   const ratio = (value - control.min) / (control.max - control.min)
   return (
