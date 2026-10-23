@@ -32,7 +32,7 @@ export function CollectionSwitch({ active }: { active: Collection; counts?: Reco
         setValue(next as Collection)
         router.push(HREF[next as Collection])
       }}
-      className="self-start [&>button]:px-2.5"
+      className="self-start bg-foreground/[0.05] [&>button]:px-2.5"
     />
   )
 }
