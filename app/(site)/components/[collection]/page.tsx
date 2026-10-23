@@ -5,7 +5,6 @@ import { COLLECTIONS, Library } from "@/components/site/library"
 type Params = { params: Promise<{ collection: string }> }
 
 export const dynamicParams = false
-export const revalidate = 600
 
 export function generateStaticParams() {
   return [{ collection: "craft" }, { collection: "copies" }]

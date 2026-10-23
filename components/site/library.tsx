@@ -1,149 +1,131 @@
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { Avatar } from "@/components/site/avatar"
+import { Copy, LayoutGrid, Sparkles } from "lucide-react"
 import { ComponentGrid } from "@/components/site/component-grid"
-import { avatarUrl, getPeople } from "@/lib/authors"
+import { PublishNudge } from "@/components/site/publish-nudge"
 import { getComponents } from "@/lib/registry"
-import { getRequests } from "@/lib/requests"
 import { CATEGORIES, type Meta } from "@/lib/schema"
 import { cn } from "@/lib/utils"
 
 export type Collection = "all" | "craft" | "copies"
 
-export const COLLECTIONS: Record<Collection, { label: string; href: string; title: string; intro: string }> = {
+export const COLLECTIONS: Record<Collection, { label: string; href: string; title: string; intro: string; icon: typeof LayoutGrid }> = {
   all: {
-    label: "Overview",
+    label: "All",
     href: "/components",
     title: "Components",
     intro: "Everything in Copia: our own crafted pieces and credited copies of the best interfaces on the web. One file each, free and open source.",
+    icon: LayoutGrid,
   },
-  craft: { label: "Craft", href: "/components/craft", title: "Craft", intro: "Copia's own pieces: small, clean interactions that morph and settle, made here from scratch." },
+  craft: { label: "Craft", href: "/components/craft", title: "Craft", intro: "Copia's own pieces: small, clean interactions that morph and settle, made here from scratch.", icon: Sparkles },
   copies: {
     label: "Copies",
     href: "/components/copies",
     title: "Copies",
     intro: "The best interfaces on the web, recreated as one file each, often with a feature more, and always credited to whoever made them first.",
+    icon: Copy,
   },
 }
 
 const CATEGORY_LABELS: Record<string, string> = { buttons: "Buttons", text: "Text", cards: "Cards", navigation: "Navigation", effects: "Effects" }
 
-function SidebarLink({ href, active, children, count }: { href: string; active?: boolean; children: React.ReactNode; count?: number }) {
+/** Measured from beui.dev's sidebar: 14px links, 4×10 padding, 8px corners, the active one on a 6% foreground wash. */
+function SidebarLink({ href, active, isNew, children }: { href: string; active?: boolean; isNew?: boolean; children: React.ReactNode }) {
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex items-center justify-between rounded-lg px-3 py-1.5 text-sm transition-colors",
-        active ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
+        "flex items-center justify-between gap-2 rounded-lg px-2.5 py-1 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+        active ? "bg-foreground/[0.06] font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
       )}
     >
       <span className="truncate">{children}</span>
-      {count !== undefined && <span className="ml-2 rounded-full bg-muted px-1.5 font-mono text-[10px] text-muted-foreground tabular-nums">{count}</span>}
+      {isNew && <span className="rounded-full bg-[color-mix(in_oklab,var(--highlight)_14%,transparent)] px-1.5 py-px text-[10px] font-semibold tracking-wide text-highlight uppercase">New</span>}
     </Link>
   )
 }
 
-function Heading({ children }: { children: React.ReactNode }) {
-  return <p className="mt-6 mb-1.5 px-3 font-mono text-[10.5px] tracking-[0.12em] text-muted-foreground uppercase">{children}</p>
+/** 11px semibold uppercase section label with a count pill, as on beui.dev. */
+function SectionLabel({ children, count }: { children: React.ReactNode; count: number }) {
+  return (
+    <p className="mb-1.5 flex items-center gap-2 px-2.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+      {children}
+      <span className="rounded-md bg-muted px-1.5 font-mono text-[10px] font-medium tabular-nums">{count}</span>
+    </p>
+  )
 }
 
-/** Left column, after beui.dev: collections, then every component by category. */
-function Sidebar({ all, active }: { all: Meta[]; active: Collection }) {
-  const count = (c: Collection) => (c === "all" ? all.length : all.filter((m) => m.collection === c).length)
+/** Collection switch: icons in a pill group, the active one opens to show its label. */
+function CollectionSwitch({ active, counts }: { active: Collection; counts: Record<Collection, number> }) {
   return (
-    <nav aria-label="Library" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] self-start overflow-y-auto pr-2 pb-10 [scrollbar-width:thin] lg:block">
-      <p className="mb-1.5 px-3 font-mono text-[10.5px] tracking-[0.12em] text-muted-foreground uppercase">Collections</p>
-      {(Object.keys(COLLECTIONS) as Collection[]).map((c) => (
-        <SidebarLink key={c} href={COLLECTIONS[c].href} active={c === active} count={count(c)}>
-          {COLLECTIONS[c].label}
-        </SidebarLink>
-      ))}
-      {CATEGORIES.map((category) => {
-        const items = all.filter((m) => m.category === category)
-        if (!items.length) return null
+    <div className="inline-flex min-h-9 items-center gap-1 rounded-full bg-muted p-0.5">
+      {(Object.keys(COLLECTIONS) as Collection[]).map((c) => {
+        const { label, href, icon: Icon } = COLLECTIONS[c]
+        const on = c === active
         return (
-          <div key={category}>
-            <Heading>
-              {CATEGORY_LABELS[category]} <span className="opacity-60">{items.length}</span>
-            </Heading>
-            {items.map((m) => (
-              <SidebarLink key={m.slug} href={`/c/${m.slug}`}>
-                {m.name}
-              </SidebarLink>
-            ))}
-          </div>
+          <Link
+            key={c}
+            href={href}
+            aria-current={on ? "page" : undefined}
+            title={`${label} (${counts[c]})`}
+            className={cn(
+              "inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-full px-2.5 text-xs font-medium transition-colors",
+              on ? "bg-background text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.1)]" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Icon className="size-3.5" aria-hidden />
+            {on && label}
+          </Link>
         )
       })}
-    </nav>
+    </div>
   )
 }
 
-/** Right column: where beUI sells Pro, Copia shows its community. */
-async function Aside() {
-  const requests = ((await getRequests()) ?? []).filter((r) => !r.done).slice(0, 3)
-  const people = getPeople().slice(0, 6)
-  const box = "rounded-2xl bg-muted/50 p-4"
+/** Left column, pinned to the edge like beui.dev: collection switch, then the components by category. */
+function Sidebar({ all, items, active }: { all: Meta[]; items: Meta[]; active: Collection }) {
+  const counts = { all: all.length, craft: all.filter((m) => m.collection === "craft").length, copies: all.filter((m) => m.collection === "copies").length }
+  // "New" marks the most recent day components were added.
+  const newest = all.reduce((latest, m) => (m.createdAt > latest ? m.createdAt : latest), "")
   return (
-    <aside className="sticky top-20 hidden flex-col gap-4 self-start xl:flex">
-      <section className={box}>
-        <h2 className="text-sm font-medium">Most wanted</h2>
-        {requests.length ? (
-          <ul className="mt-3 flex flex-col gap-2 text-sm">
-            {requests.map((r) => (
-              <li key={r.number} className="flex justify-between gap-2">
-                <a href={r.url} target="_blank" rel="noreferrer" className="truncate text-muted-foreground hover:text-foreground">
-                  {r.title}
-                </a>
-                <span className="font-mono text-xs text-muted-foreground tabular-nums">{r.votes}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm text-muted-foreground">No requests yet.</p>
-        )}
-        <Link href="/requests" className="mt-3 inline-block text-xs text-foreground underline-offset-4 hover:underline">
-          Request a component →
-        </Link>
-      </section>
-      <section className={box}>
-        <h2 className="text-sm font-medium">Publish yours</h2>
-        <p className="mt-1.5 text-sm text-muted-foreground">Copy something great or craft your own; it lands on your page, credited.</p>
-        <Link href="/publish" className="mt-3 inline-flex h-8 items-center rounded-lg bg-foreground px-3 text-xs font-medium text-background">
-          How to publish
-        </Link>
-      </section>
-      <section className={box}>
-        <h2 className="text-sm font-medium">Authors</h2>
-        <div className="mt-3 flex -space-x-2">
-          {people.map((p) => (
-            <Link key={p.handle} href={`/@${p.handle}`} title={p.name} className="rounded-full ring-2 ring-background">
-              <Avatar src={avatarUrl(p)} name={p.name} seed={p.handle} className="size-8" />
-            </Link>
-          ))}
-        </div>
-        <Link href="/authors" className="mt-3 inline-flex items-center gap-0.5 text-xs text-foreground underline-offset-4 hover:underline">
-          Everyone <ArrowUpRight className="size-3" />
-        </Link>
-      </section>
-    </aside>
+    <div className="hidden md:block">
+      <div className="sticky top-14 h-[calc(100dvh-3.5rem)] w-60 overflow-y-auto py-6 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="Components" className="flex flex-col gap-6">
+          <CollectionSwitch active={active} counts={counts} />
+          {CATEGORIES.map((category) => {
+            const list = items.filter((m) => m.category === category)
+            if (!list.length) return null
+            return (
+              <div key={category} className="flex flex-col">
+                <SectionLabel count={list.length}>{CATEGORY_LABELS[category]}</SectionLabel>
+                {list.map((m) => (
+                  <SidebarLink key={m.slug} href={`/c/${m.slug}`} isNew={m.createdAt === newest}>
+                    {m.name}
+                  </SidebarLink>
+                ))}
+              </div>
+            )
+          })}
+        </nav>
+      </div>
+    </div>
   )
 }
 
-/** /components, /components/craft and /components/copies: three columns like beui.dev. */
-export async function Library({ collection }: { collection: Collection }) {
+/** /components, /components/craft and /components/copies: the sidebar pinned left, the grid beside it. */
+export function Library({ collection }: { collection: Collection }) {
   const all = getComponents()
   const items = collection === "all" ? all : all.filter((m) => m.collection === collection)
   const meta = COLLECTIONS[collection]
   return (
-    <div className="mx-auto grid max-w-[90rem] grid-cols-1 gap-10 px-4 pt-24 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_17rem]">
-      <Sidebar all={all} active={collection} />
-      <div className="min-w-0">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] px-4 pt-14 md:grid-cols-[15rem_minmax(0,1fr)] md:gap-10 md:px-8">
+      <Sidebar all={all} items={items} active={collection} />
+      <div className="min-w-0 pt-10 pb-24">
         <p className="text-sm font-medium">{collection === "all" ? "Library" : "Components"}</p>
         <h1 className="mt-2 text-4xl font-medium tracking-tight">{meta.title}</h1>
-        <p className="mt-3 mb-6 max-w-2xl text-muted-foreground">{meta.intro}</p>
+        <p className="mt-3 mb-8 max-w-2xl text-muted-foreground">{meta.intro}</p>
         {/* Collections as tabs on small screens, where the sidebar is hidden. */}
-        <div className="mb-8 flex gap-5 text-sm lg:hidden">
+        <div className="mb-8 flex gap-5 text-sm md:hidden">
           {(Object.keys(COLLECTIONS) as Collection[]).map((c) => (
             <Link key={c} href={COLLECTIONS[c].href} className={c === collection ? "font-medium text-foreground" : "text-muted-foreground"}>
               {COLLECTIONS[c].label}
@@ -152,7 +134,7 @@ export async function Library({ collection }: { collection: Collection }) {
         </div>
         {items.length ? <ComponentGrid items={items} /> : <p className="border-t border-border pt-10 text-sm text-muted-foreground">Nothing here yet.</p>}
       </div>
-      <Aside />
+      <PublishNudge />
     </div>
   )
 }
