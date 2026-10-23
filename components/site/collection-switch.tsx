@@ -1,5 +1,6 @@
 "use client"
 
+import { Bot, Copy, LayoutGrid, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { SegmentedControl } from "@/registry/segmented-control/segmented-control"
@@ -15,15 +16,15 @@ export function CollectionSwitch({ active }: { active: Collection; counts?: Reco
   const [value, setValue] = useState(active)
   useEffect(() => setValue(active), [active])
   const options = [
-    // Four short names fit the 15rem sidebar without icons.
-    { value: "all", label: "All" },
-    { value: "craft", label: "Craft" },
-    { value: "copies", label: "Copies" },
-    { value: "agents", label: "Agents" },
+    { value: "all", label: "All", icon: <LayoutGrid /> },
+    { value: "craft", label: "Craft", icon: <Sparkles /> },
+    { value: "copies", label: "Copies", icon: <Copy /> },
+    { value: "agents", label: "Agents", icon: <Bot /> },
   ]
   return (
     <SegmentedControl
       label="Collection"
+      labels="active"
       size="sm"
       options={options}
       value={value}
@@ -31,7 +32,7 @@ export function CollectionSwitch({ active }: { active: Collection; counts?: Reco
         setValue(next as Collection)
         router.push(HREF[next as Collection])
       }}
-      className="flex w-full [&>button]:flex-1 [&>button]:justify-center [&>button]:px-2 [&>button]:whitespace-nowrap"
+      className="self-start [&>button]:px-2.5"
     />
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutGroup, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
 import { useId, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -16,6 +16,8 @@ export type SegmentedControlProps = {
   size?: "sm" | "md"
   /** A short vibration when the selection changes, where supported. */
   haptics?: boolean
+  /** "always" shows every label; "active" shows icons only and opens the selected one's label. Needs icons. */
+  labels?: "always" | "active"
   className?: string
 }
 
@@ -26,7 +28,7 @@ const SLIDE = { type: "spring", bounce: 0.2, duration: 0.45 } as const
  * you pick and stretches a little on the way, the label underneath settles
  * into place. Arrow keys move the selection; it works controlled or not.
  */
-export function SegmentedControl({ options, value, defaultValue, onValueChange, label = "Options", size = "md", haptics = true, className }: SegmentedControlProps) {
+export function SegmentedControl({ options, value, defaultValue, onValueChange, label = "Options", size = "md", haptics = true, labels = "always", className }: SegmentedControlProps) {
   const [internal, setInternal] = useState(defaultValue ?? options[0]?.value)
   const selected = value ?? internal
   const group = useId()
@@ -60,6 +62,7 @@ export function SegmentedControl({ options, value, defaultValue, onValueChange, 
       >
         {options.map((option, i) => {
           const active = option.value === selected
+          const showLabel = labels === "always" || active || !option.icon
           return (
             <button
               key={option.value}
@@ -69,6 +72,8 @@ export function SegmentedControl({ options, value, defaultValue, onValueChange, 
               type="button"
               role="radio"
               aria-checked={active}
+              aria-label={showLabel ? undefined : option.label}
+              title={showLabel ? undefined : option.label}
               tabIndex={active ? 0 : -1}
               onClick={() => pick(option.value)}
               className={cn(
@@ -84,9 +89,23 @@ export function SegmentedControl({ options, value, defaultValue, onValueChange, 
                   className="absolute inset-0 z-0 rounded-full bg-background shadow-[0_1px_2px_rgb(0_0_0/0.12),0_0_0_0.5px_rgb(0_0_0/0.06)]"
                 />
               )}
-              <span className="relative z-10 flex items-center gap-1.5">
+              <span className="relative z-10 flex items-center">
                 {option.icon && <span className="[&_svg]:size-4">{option.icon}</span>}
-                {option.label}
+                {/* Copia: with labels="active" the label opens and closes, its width animating with the pill. */}
+                <AnimatePresence initial={false}>
+                  {showLabel && (
+                    <motion.span
+                      key="label"
+                      initial={{ width: 0, opacity: 0, filter: "blur(4px)" }}
+                      animate={{ width: "auto", opacity: 1, filter: "blur(0px)" }}
+                      exit={{ width: 0, opacity: 0, filter: "blur(4px)" }}
+                      transition={reduced ? { duration: 0 } : SLIDE}
+                      className="overflow-hidden whitespace-nowrap"
+                    >
+                      <span className={option.icon ? "pl-1.5" : undefined}>{option.label}</span>
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </span>
             </button>
           )

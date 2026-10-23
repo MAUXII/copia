@@ -1,7 +1,7 @@
 {
   "slug": "segmented-control",
   "name": "Segmented Control",
-  "description": "An Apple-style segmented control: the selected pill slides to your pick on a spring and the labels settle under it; arrow keys, roving focus, icons, controlled or not, and a haptic tick on change.",
+  "description": "An Apple-style segmented control: the selected pill slides to your pick on a spring and the labels settle under it; arrow keys, roving focus, icons (optionally with only the selected label shown), controlled or not, and a haptic tick on change.",
   "category": "navigation",
   "collection": "craft",
   "tags": [
@@ -61,6 +61,12 @@
       "type": "boolean",
       "default": "true",
       "description": "Vibrate briefly on change, where supported."
+    },
+    {
+      "name": "labels",
+      "type": "\"always\" | \"active\"",
+      "default": "\"always\"",
+      "description": "\"active\" shows icons only and opens the selected option's label, its width animating with the pill."
     }
   ],
   "controls": [
@@ -72,6 +78,15 @@
         "sm"
       ],
       "default": "md"
+    },
+    {
+      "prop": "labels",
+      "type": "select",
+      "options": [
+        "always",
+        "active"
+      ],
+      "default": "always"
     }
   ],
   "createdAt": "2026-10-23"

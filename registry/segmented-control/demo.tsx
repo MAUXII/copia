@@ -12,7 +12,7 @@ const VIEWS = [
 const PERIODS = ["Day", "Week", "Month", "Year"].map((p) => ({ value: p.toLowerCase(), label: p }))
 
 /** Two controls that step through their options on their own until you touch one. */
-export default function Demo({ size = "md" }: Pick<SegmentedControlProps, "size">) {
+export default function Demo({ size = "md", labels = "always" }: Pick<SegmentedControlProps, "size" | "labels">) {
   const [view, setView] = useState("grid")
   const [period, setPeriod] = useState("week")
   const [touched, setTouched] = useState(false)
@@ -32,7 +32,7 @@ export default function Demo({ size = "md" }: Pick<SegmentedControlProps, "size"
     <div className="grid flex-1 place-items-center p-6" onPointerDown={() => setTouched(true)} onKeyDown={() => setTouched(true)}>
       <div className="flex flex-col items-center gap-5">
         <SegmentedControl label="Period" options={PERIODS} value={period} onValueChange={setPeriod} size={size} />
-        <SegmentedControl label="View" options={VIEWS} value={view} onValueChange={setView} size={size} />
+        <SegmentedControl label="View" options={VIEWS} value={view} onValueChange={setView} size={size} labels={labels} />
       </div>
     </div>
   )
