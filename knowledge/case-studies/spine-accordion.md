@@ -26,6 +26,9 @@
   shelf with a roving tabindex.
 - The picture settles from `scale(1.12)` to 1 over 1.4 s as its panel opens.
 - `numbered`: 01, 02… beside each title.
+- `orientation`: `auto` (the original container-query switch), or pin
+  `horizontal` / `vertical`. Each layout is a full literal class set, since
+  the row and stack placements set the same properties.
 - `autoplay`: opens the next piece every N ms, paused on hover, focus or
   touch.
 - One file in Copia's style; colours come only from theme tokens.

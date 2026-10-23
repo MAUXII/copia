@@ -1,7 +1,7 @@
 {
   "slug": "spine-accordion",
   "name": "Spine Accordion",
-  "description": "A shelf of work opened one piece at a time: closed pieces are thin spines with their titles set sideways, and the one you point at, tap or focus unfurls into a framed picture while the others close back; it stacks into rows in a narrow container. Copia adds arrow-key navigation, a picture that settles from a slight zoom, numbered spines and autoplay that pauses on hover or focus.",
+  "description": "A shelf of work opened one piece at a time: closed pieces are thin spines with their titles set sideways, and the one you point at, tap or focus unfurls into a framed picture while the others close back; it stacks into rows in a narrow container. Copia adds arrow-key navigation, a picture that settles from a slight zoom, numbered spines, a pinned orientation and autoplay that pauses on hover or focus.",
   "category": "cards",
   "tags": [
     "accordion",
@@ -82,6 +82,12 @@
       "type": "number",
       "default": "0",
       "description": "Open the next piece every N ms; hover, focus and touch pause it."
+    },
+    {
+      "name": "orientation",
+      "type": "\"auto\" | \"horizontal\" | \"vertical\"",
+      "default": "\"auto\"",
+      "description": "auto stacks below a 48rem-wide container; horizontal and vertical pin a layout."
     }
   ],
   "controls": [
@@ -105,6 +111,16 @@
       "max": 4000,
       "step": 100,
       "default": 1600
+    },
+    {
+      "prop": "orientation",
+      "type": "select",
+      "options": [
+        "horizontal",
+        "vertical",
+        "auto"
+      ],
+      "default": "horizontal"
     }
   ],
   "createdAt": "2026-10-23"

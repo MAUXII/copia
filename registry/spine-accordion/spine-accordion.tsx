@@ -25,10 +25,43 @@ export type SpineAccordionProps = Omit<React.ComponentProps<"section">, "childre
   numbered?: boolean
   /** Open the next panel every N ms; hover, focus and touch pause it. 0 turns it off. */
   autoplay?: number
+  /** "auto" stacks below a 48rem-wide container; "horizontal" and "vertical" pin a layout. */
+  orientation?: "auto" | "horizontal" | "vertical"
 }
 
 // Crafter UI's curve and timing: a long, soft settle.
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)"
+
+// Copia: full class sets per layout (Tailwind needs literal class names, and the row and stack
+// placements set the same properties, so they cannot simply be layered).
+const ROW = {
+  list: "flex-row overflow-y-visible",
+  panel: "border-r",
+  picture: "inset-y-3 right-3 left-(--spine)",
+  spine: "inset-y-4 left-4 flex-col-reverse gap-0",
+  title: "rotate-180 overflow-visible [writing-mode:vertical-rl]",
+  titleText: "text-lg @5xl:text-xl",
+  meta: "rotate-180 text-sm [writing-mode:vertical-rl]",
+}
+const STACK = {
+  list: "flex-col overflow-y-auto",
+  panel: "border-b",
+  picture: "inset-x-3 top-(--spine) bottom-3",
+  spine: "inset-x-4 top-4 gap-3",
+  title: "truncate",
+  titleText: "text-base",
+  meta: "text-xs",
+}
+const AUTO = {
+  list: "flex-col overflow-y-auto @3xl:flex-row @3xl:overflow-y-visible",
+  panel: "border-b @3xl:border-r @3xl:border-b-0",
+  picture: "inset-x-3 top-(--spine) bottom-3 @3xl:inset-x-auto @3xl:inset-y-3 @3xl:right-3 @3xl:left-(--spine)",
+  spine: "inset-x-4 top-4 gap-3 @3xl:inset-x-auto @3xl:inset-y-4 @3xl:left-4 @3xl:flex-col-reverse @3xl:gap-0",
+  title: "truncate @3xl:rotate-180 @3xl:overflow-visible @3xl:[writing-mode:vertical-rl]",
+  titleText: "text-base @3xl:text-lg @5xl:text-xl",
+  meta: "text-xs @3xl:rotate-180 @3xl:text-sm @3xl:[writing-mode:vertical-rl]",
+}
+const LAYOUTS = { auto: AUTO, horizontal: ROW, vertical: STACK }
 
 /**
  * A shelf of work opened one piece at a time. Closed, every piece is a spine:
@@ -45,6 +78,7 @@ export function SpineAccordion({
   spine = "4rem",
   numbered = false,
   autoplay = 0,
+  orientation = "auto",
   className,
   style,
   ...props
@@ -53,6 +87,7 @@ export function SpineAccordion({
   const [paused, setPaused] = useState(false)
   const open = index ?? internal
   const buttons = useRef<(HTMLButtonElement | null)[]>([])
+  const L = LAYOUTS[orientation]
 
   const select = useCallback(
     (next: number) => {
@@ -93,7 +128,7 @@ export function SpineAccordion({
       className={cn("@container relative h-full min-h-[24rem] w-full overflow-hidden bg-background text-foreground select-none", className)}
       style={{ "--spine": spine, ...style } as React.CSSProperties}
     >
-      <div className="flex h-full w-full flex-col overflow-y-auto @3xl:flex-row @3xl:overflow-y-visible">
+      <div className={cn("flex h-full w-full", L.list)}>
         {items.map((item, i) => {
           const isOpen = i === open
           return (
@@ -114,16 +149,16 @@ export function SpineAccordion({
               }}
               style={{ flexBasis: isOpen ? "100%" : "var(--spine)", transitionTimingFunction: EASE }}
               className={cn(
-                "relative min-h-(--spine) min-w-(--spine) shrink cursor-pointer border-b border-border text-left outline-none transition-[flex-basis] duration-700 last:border-0",
+                "relative min-h-(--spine) min-w-(--spine) shrink cursor-pointer border-border text-left outline-none transition-[flex-basis] duration-700 last:border-0",
                 "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-foreground motion-reduce:transition-none",
-                "@3xl:border-r @3xl:border-b-0",
+                L.panel,
               )}
             >
               {/* Mounted in every panel and only transparent while closed, so opening cross-fades a decoded picture. */}
               <span
                 className={cn(
-                  "absolute inset-x-3 top-(--spine) bottom-3 block overflow-hidden bg-muted transition-opacity duration-700 motion-reduce:transition-none",
-                  "@3xl:inset-y-3 @3xl:top-3 @3xl:right-3 @3xl:left-(--spine)",
+                  "absolute block overflow-hidden bg-muted transition-opacity duration-700 motion-reduce:transition-none",
+                  L.picture,
                   isOpen ? "opacity-100" : "opacity-0",
                 )}
               >
@@ -141,19 +176,20 @@ export function SpineAccordion({
               {/* The spine: writing-mode turns the text without a measured rotate box. */}
               <span
                 className={cn(
-                  "absolute inset-x-4 top-4 flex items-start justify-between gap-3 overflow-hidden transition-colors duration-500 motion-reduce:transition-none",
-                  "@3xl:inset-x-auto @3xl:inset-y-4 @3xl:left-4 @3xl:flex-col-reverse @3xl:gap-0",
+                  "absolute flex items-start justify-between overflow-hidden transition-colors duration-500 motion-reduce:transition-none",
+                  L.spine,
                   isOpen ? "text-foreground" : "text-muted-foreground",
                 )}
               >
-                <span className="flex items-baseline gap-3 truncate @3xl:rotate-180 @3xl:overflow-visible @3xl:[writing-mode:vertical-rl]">
-                  <span className="text-base font-medium tracking-tight @3xl:text-lg @5xl:text-xl">{item.title}</span>
+                <span className={cn("flex items-baseline gap-3", L.title)}>
+                  <span className={cn("font-medium tracking-tight", L.titleText)}>{item.title}</span>
                   {numbered && <span className="font-mono text-[11px] tabular-nums opacity-60">{String(i + 1).padStart(2, "0")}</span>}
                 </span>
                 {item.meta && (
                   <span
                     className={cn(
-                      "shrink-0 text-xs tabular-nums transition-opacity duration-500 @3xl:rotate-180 @3xl:text-sm @3xl:[writing-mode:vertical-rl] motion-reduce:transition-none",
+                      "shrink-0 tabular-nums transition-opacity duration-500 motion-reduce:transition-none",
+                      L.meta,
                       isOpen ? "opacity-100" : "opacity-0",
                     )}
                   >
