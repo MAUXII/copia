@@ -145,7 +145,15 @@ void main() {
   col *= mix(0.91, 1.0, smoothstep(0.0, 0.38, nd));
   // Copia: the glass only glows where it bends an image. The reference adds its glow onto a white
   // page, where it clips to white and vanishes; on any other page this keeps that look.
+  // Measured around the point, not only on it, so the glow spills a little past each image edge
+  // (the bright fringe the reference shows where the glass folds over a photo's edge).
+  float near = distance(col, uBg);
+  for (int k = 0; k < 8; k++) {
+    float a = float(k) * 0.785398;
+    near = max(near, distance(texture2D(uTex, uv + vec2(cos(a) / uAspect, sin(a)) * 0.022).rgb, uBg));
+  }
   float content = smoothstep(0.03, 0.18, distance(col, uBg));
+  float fringe = smoothstep(0.03, 0.18, near);
 
   // Soft white nova in the middle, a coloured ring and a thin bright line at the rim.
   float r2 = nd * nd * 0.25;
@@ -155,8 +163,8 @@ void main() {
   float ring = exp(-pow((dC - RING_RADIUS) / RING_WIDTH, 2.0)) * uRing * (GLOW / 17.0) * 1.8;
   ring *= sin(angle * 12.0 + uTime * 3.5) * 0.12 * uShimmer + (1.0 - 0.12 * uShimmer);
   float aura = exp(-pow((dC - RING_RADIUS) / (RING_WIDTH * 6.0), 2.0)) * 0.28 * uRing * (GLOW / 17.0);
-  col += uColor * (ring + aura) * content;
-  col += vec3(exp(-pow((dC - RIM_LINE_POS) / RIM_LINE_WIDTH, 2.0)) * uRimLine) * content;
+  col += uColor * (ring + aura) * fringe;
+  col += vec3(exp(-pow((dC - RIM_LINE_POS) / RIM_LINE_WIDTH, 2.0)) * uRimLine) * fringe;
 
   gl_FragColor = vec4(mix(base, col, smoothstep(1.0, 0.93, dist)), 1.0);
 }`

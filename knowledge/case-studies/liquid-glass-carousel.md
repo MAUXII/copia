@@ -46,7 +46,11 @@
   onto a white page, where they clip to white and only show over photos (the
   "peeled glass" look). On a dark page the same maths draws a giant glowing
   pill, so the glow is masked by how far the refracted colour is from the
-  background: `smoothstep(0.03, 0.18, distance(col, bg))`.
+  background: `smoothstep(0.03, 0.18, distance(col, bg))`. The ring and the
+  rim line use the largest distance among 8 taps 2.2% around the point, so
+  their glow spills a little past each image edge (the bright fringe at the
+  tips of the folds); the white nova keeps the point-only mask, or every
+  photo gets a grey outline.
 - **Rounded panels** (`radius`) and **cover-fit** photos of any aspect.
 - Keyboard: Enter focuses the centred photo, Escape closes it.
 
