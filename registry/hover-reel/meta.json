@@ -1,0 +1,107 @@
+{
+  "slug": "hover-reel",
+  "name": "Hover Reel",
+  "description": "A list of projects: point at a title and a picture blooms under the cursor and follows it; move to another row and the pictures roll past inside the frame instead of swapping. Copia adds a frame that leans into fast moves, a round \"View\" badge riding it, theme colours and inline pictures on touch screens.",
+  "category": "text",
+  "tags": [
+    "hover",
+    "cursor",
+    "list",
+    "portfolio",
+    "keyboard"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "Dennis Snellenberg",
+    "url": "https://dennissnellenberg.com/work",
+    "handle": "dennissnellenberg"
+  },
+  "credits": [
+    {
+      "author": "Olivier Larose (Project Gallery tutorial)",
+      "url": "https://blog.olivierlarose.com/tutorials/project-gallery-mouse-hover",
+      "handle": "olivierlarose"
+    }
+  ],
+  "assets": [
+    {
+      "file": "modern-building-corner.webp",
+      "author": "mikiwa",
+      "source": "https://www.lummi.ai/photo/modern-building-corner-dr5dz",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "abstract-toroidal-form.webp",
+      "author": "ricardomatos",
+      "source": "https://www.lummi.ai/photo/abstract-toroidal-form-wb7ko",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "minimalist-geometric-composition.webp",
+      "author": "viridianagdz",
+      "source": "https://www.lummi.ai/photo/minimalist-geometric-composition-SBDGZ",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "monochromatic-staircase.webp",
+      "author": "cayetanogros",
+      "source": "https://www.lummi.ai/photo/monochromatic-staircase-in-light-and-shadow-ytmfu",
+      "license": "Lummi License (free, credit appreciated)"
+    },
+    {
+      "file": "modern-workspace-setup.webp",
+      "author": "ui.jaymez",
+      "source": "https://www.lummi.ai/photo/modern-workspace-setup-ldidg",
+      "license": "Lummi License (free, credit appreciated)"
+    }
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "projects",
+      "type": "{ title, label, image, href? }[]",
+      "default": "-",
+      "description": "Rows in order; image is the picture shown on hover."
+    },
+    {
+      "name": "width",
+      "type": "number",
+      "default": "320",
+      "description": "Frame width in px; height follows at 16:10."
+    },
+    {
+      "name": "cursorLabel",
+      "type": "string",
+      "default": "\"View\"",
+      "description": "Text on the round badge riding the frame; empty hides it."
+    },
+    {
+      "name": "tilt",
+      "type": "number",
+      "default": "6",
+      "description": "Max degrees the frame leans into fast horizontal moves; 0 keeps it upright."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "width",
+      "type": "number",
+      "min": 200,
+      "max": 480,
+      "step": 10,
+      "default": 320
+    },
+    {
+      "prop": "tilt",
+      "type": "number",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "createdAt": "2026-10-23"
+}

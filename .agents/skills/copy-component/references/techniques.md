@@ -153,6 +153,14 @@ stagger children in after ~150 ms; reverse order on exit.
 **Seen in.** Be UI Arc Picker (Saurabh); Copia `arc-picker`.
 **Pitfalls.** Render the options after mount: server-serialized motion transforms differ from the client's first frame and React reports a hydration mismatch. Re-measure label widths after they mount. A drag that ends on an option must swallow its click (`onClickCapture`). Release the wheel at either end so the page can scroll.
 
+## Hover reel (one frame, rolling strip)
+
+**Idea.** A project list where a picture follows the cursor and, between rows, the pictures roll past inside one frame instead of swapping.
+**Mechanism.** A single absolutely positioned frame per list, moved by a rAF lerp (`x += (tx − x)·k`) that stops when close, clamped inside the list. Inside, a strip of all pictures stacked vertically, `translate: 0 −100%·active`. Open/close by scaling the frame's inner box from 0. Lean = clamp(dx·0.35, ±tilt) from the per-frame step.
+**Numbers.** k 0.16; inset 16 px; scale 0.4 s and roll 0.5 s on `cubic-bezier(0.76, 0, 0.24, 1)`; other rows at 35% opacity.
+**Seen in.** Dennis Snellenberg's work list; Olivier Larose's Project Gallery tutorial; Copia `hover-reel`.
+**Pitfalls.** Reset the position on pointerleave or the frame slides in from the last exit. Gate the follow to `pointerType === "mouse"`; on touch show inline thumbnails. Put the scale on an inner box so the outer translate (written every frame) never fights a CSS transition.
+
 ## Recording tip
 
 The preview recorder uses Chrome's screencast, which only sends frames when
