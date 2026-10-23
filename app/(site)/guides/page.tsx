@@ -14,7 +14,7 @@ const BLOB = `${REPO_URL}/blob/main`
 
 const START = [
   { title: "How Copia copies", hint: "The skill your agent follows to recreate anything", href: `${BLOB}/.agents/skills/copy-component/SKILL.md` },
-  { title: "How Copia crafts", hint: "Feel rules for our own small interactions", href: `${BLOB}/.agents/skills/craft-component/SKILL.md` },
+  { title: "Copia's style", hint: "The craft skill: install it to make your own", href: `${BLOB}/.agents/skills/craft-component/SKILL.md` },
   { title: "Agent guide", hint: "AGENTS.md: rules, commands, definition of done", href: `${BLOB}/AGENTS.md` },
   { title: "Previews", hint: "Recording the light and dark loops", href: `${BLOB}/docs/previews.md` },
 ]

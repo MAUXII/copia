@@ -2,14 +2,14 @@
 
 import { Check, Copy } from "lucide-react"
 import { useState } from "react"
-import { buildAgentPrompt } from "@/lib/agent-prompt"
+import { buildCraftPrompt } from "@/lib/agent-prompt"
 
-/** "Make your own": describe a component, copy a prompt that hands it to the agent's skill. */
-export function MakeYourOwn({ skill, title }: { skill: string; title: string }) {
+/** "Make your own": describe a component, copy a prompt that has your agent make it in Copia's style. */
+export function MakeYourOwn() {
   const [idea, setIdea] = useState("")
   const [copied, setCopied] = useState(false)
   const copy = async () => {
-    await navigator.clipboard.writeText(buildAgentPrompt({ skill, title }, idea))
+    await navigator.clipboard.writeText(buildCraftPrompt(idea))
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }

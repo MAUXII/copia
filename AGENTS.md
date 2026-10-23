@@ -20,15 +20,10 @@ Copia also makes its own pieces, the **Components** collection (the site's
 `/components`): small, clean interactions that morph and settle. To create
 one from scratch rather than copy, follow
 **[`.agents/skills/craft-component/SKILL.md`](.agents/skills/craft-component/SKILL.md)**
-(`"collection": "craft"` in `meta.json`). Copies are
+(`"collection": "craft"` in `meta.json`). That skill is also Copia's style:
+every Craft piece follows it, and people can install it to make their own
+in the same look. Copies are
 `"collection": "copies"`, the default.
-
-## Style agents
-
-Skills in `.agents/skills/style-<name>/` make components in one look (the
-site's `/agents`). Each has `title` and `tagline` under `metadata`, rules for
-the look and motion, and a look-and-fix step in light and dark. Components
-made with one set `"style": "<name>"` in `meta.json` and show on its page.
 
 To only look for options without building, use
 [`.agents/skills/find-component/SKILL.md`](.agents/skills/find-component/SKILL.md).

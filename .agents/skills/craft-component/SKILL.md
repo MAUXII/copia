@@ -1,6 +1,6 @@
 ---
 name: craft-component
-description: Copia's workflow for its own components (the "Components" collection), as opposed to copies. Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button, a gooey menu that blobs open…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
+description: Copia's own style and the workflow for its Craft components, as opposed to copies. Install it in any project to make components in Copia's style ("make a kitchen timer in Copia's style"). Use when someone wants a new original piece — a small, clean interaction that morphs and settles (a segmented control, a copy button, a switch, a number ticker, a toast stack, a morphing button, a gooey menu that blobs open…) — rather than a recreation of something seen elsewhere. Pins one interaction, designs its states and motion with the feel rules below, builds one Copia file, records light and dark previews, passes `npm run check`, and writes a short craft note.
 metadata:
   version: "1"
 ---
@@ -34,7 +34,28 @@ List every state and how each one becomes the next (idle → hover → pressed
 move and resize (`layout`, `layoutId`), content cross-fades with a short blur,
 nothing pops in or swaps cold. Write the list in the craft note (step 7).
 
-## 3. Feel rules
+## 3. The look (Copia's style)
+
+Every Craft piece shares one look, so the collection reads as one hand.
+It owes a lot to Apple's system controls.
+
+- **Surfaces:** flat, no borders or only a hairline (`0 0 0 0.5px` at 6–8%
+  black). Depth from one soft shadow (`0 1px 2px / 12%`), never a stack.
+- **Colour:** theme tokens for everything structural (`bg-background`,
+  `bg-muted`, `text-foreground`, `text-muted-foreground`). Accents are
+  system colours and always props with a default: blue `#0a84ff`, green
+  `#34c759`, red `#ff3b30`, orange `#ff9f0a`, yellow `#ffd60a`, purple
+  `#bf5af2`, pink `#ff375f`, teal `#64d2ff`. One accent per component.
+- **Shape:** pills (`rounded-full`) for controls, 12–20 px radii for
+  surfaces; concentric radii when surfaces nest (inner = outer − padding).
+- **Type:** the page's sans, 13–15 px, medium for the active state,
+  `tabular-nums` for anything that counts. Short noun labels.
+- **Space:** 4 px grid; controls 28–44 px tall.
+- **Never:** gradients on controls, glass for its own sake, more than one
+  accent, bounce above 0.35 (0.45 for gooey), durations instead of springs
+  for movement, letter-by-letter text, decorative spinning icons.
+
+## 3a. Feel rules
 
 - **Springs, not durations,** for anything that moves or resizes
   (`{ type: "spring", bounce: 0.15–0.35, duration: 0.3–0.6 }` or
@@ -117,7 +138,14 @@ npm run new <slug> <category>
   seconds without clicks (auto-cycle states, stop on user input), and takes
   customizer values as props.
 
-## 5. Preview and check
+## 5. Look and fix
+
+Render it and look at it in **light and dark**, at desktop and phone width:
+nothing pinned to one theme (no `bg-white`, `text-black`), every accent a
+prop, motion that settles without popping, usable by keyboard alone with a
+visible focus. Fix what you see and look again.
+
+## 5b. Preview and check
 
 ```bash
 npm run preview <slug>

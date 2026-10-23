@@ -177,6 +177,13 @@ export default async function ComponentPage({ params }: Params) {
             .
           </p>
         )}
+        {meta.skill && (
+          <p className="mt-2 text-sm text-neutral-400">
+            The original has its own agent skill,{" "}
+            <ExternalLink href={meta.skill.url}>{meta.skill.name}</ExternalLink>:{" "}
+            <code className="font-mono text-[13px] text-[#ffc48a]">{meta.skill.install}</code>
+          </p>
+        )}
         <p className="mt-2 text-sm">
           <a href={`${REPO_URL}/blob/main/knowledge/case-studies/${slug}.md`} className="text-neutral-400 underline-offset-4 hover:text-white hover:underline">
             Read how it was reverse engineered
