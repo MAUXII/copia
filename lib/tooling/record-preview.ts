@@ -17,6 +17,14 @@ const VIEW_H = HEIGHT / SCALE
 const FPS = 30
 const LEAD_IN = 0.8 // seconds captured before the clip starts, so the cursor is already moving
 
+// Use the real GPU: headless Chromium otherwise renders WebGL in software (SwiftShader), and
+// shader-heavy demos record at ~5 fps instead of 60.
+const GPU_ARGS = [
+  "--ignore-gpu-blocklist",
+  "--enable-gpu-rasterization",
+  ...(process.platform === "win32" ? ["--use-angle=d3d11"] : process.platform === "darwin" ? ["--use-angle=metal"] : []),
+]
+
 type Options = { baseUrl: string; outDir: string; seconds?: number; theme?: PreviewTheme }
 type Frame = { data: string; timestamp: number }
 
@@ -60,7 +68,7 @@ export async function recordPreview(slug: string, { baseUrl, outDir, seconds = 5
   const work = mkdtempSync(path.join(tmpdir(), "copia-frames-"))
   const frames: Frame[] = []
   let endTimestamp = 0
-  const browser = await chromium.launch()
+  const browser = await chromium.launch({ args: GPU_ARGS })
   try {
     const page = await browser.newPage({ viewport: { width: VIEW_W, height: VIEW_H }, deviceScaleFactor: SCALE, colorScheme: theme })
     await page.goto(`${baseUrl}/preview/${slug}?theme=${theme}`, { waitUntil: "networkidle" })

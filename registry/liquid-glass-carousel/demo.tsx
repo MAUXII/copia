@@ -17,7 +17,7 @@ const ITEMS = [
   photo("fiery-profile.webp", "Fiery Profile"),
 ]
 
-type DemoProps = { dispersion?: number; ring?: number; rotation?: number; gap?: number; autoplay?: number; lensColor?: string }
+type DemoProps = { dispersion?: number; ring?: number; rotation?: number; gap?: number; autoplay?: number; lensColor?: string; entry?: boolean }
 
 /** Any CSS colour (rgb, oklch…) to #rrggbb, by painting one pixel. */
 const toHex = (color: string) => {
@@ -49,13 +49,13 @@ function useThemeColors(ref: React.RefObject<HTMLElement | null>) {
   return colors
 }
 
-/** Customizer values flow into the lens (dispersion, ring, rotation), the row (gap) and autoplay. */
-export default function Demo({ dispersion = 11, ring = 6, rotation = 65, gap = 12, autoplay = 1.8, lensColor = "#009dff" }: DemoProps) {
+/** Customizer values flow into the lens (dispersion, ring, rotation), the row (gap), autoplay and the intro (off by default, so the preview shows the lens at work). */
+export default function Demo({ dispersion = 11, ring = 6, rotation = 65, gap = 12, autoplay = 1.8, lensColor = "#009dff", entry = false }: DemoProps) {
   const root = useRef<HTMLDivElement>(null)
   const theme = useThemeColors(root)
   return (
     <div ref={root} className="relative min-h-[560px] flex-1 bg-background text-foreground">
-      <LiquidGlassCarousel items={ITEMS} background={theme.background} foreground={theme.foreground} gap={gap} autoplay={autoplay} lens={{ dispersion, blueRing: ring, rotation }} lensColor={lensColor} className="absolute inset-0" />
+      <LiquidGlassCarousel items={ITEMS} entry={entry} background={theme.background} foreground={theme.foreground} gap={gap} autoplay={autoplay} lens={{ dispersion, blueRing: ring, rotation }} lensColor={lensColor} className="absolute inset-0" />
     </div>
   )
 }

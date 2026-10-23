@@ -27,3 +27,11 @@ ffmpeg (required on your PATH).
 - Do not pause animations on hover in the demo (the cursor stays over it).
 - Check the poster after recording; if the effect is not visible, fix the
   demo, not the recorder.
+
+## WebGL and canvas demos
+
+The recorder launches Chromium on the real GPU (`--use-angle=d3d11` on
+Windows, `metal` on macOS). Without it, headless Chromium renders WebGL in
+software and shader-heavy demos record at about 5 fps. Long intros eat the
+clip: if a demo has one, let the customizer turn it on but keep it off by
+default, so the preview shows the effect itself.

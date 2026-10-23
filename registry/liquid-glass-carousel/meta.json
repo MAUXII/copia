@@ -196,6 +196,11 @@
       "prop": "lensColor",
       "type": "color",
       "default": "#009dff"
+    },
+    {
+      "prop": "entry",
+      "type": "boolean",
+      "default": false
     }
   ],
   "createdAt": "2026-10-22"
