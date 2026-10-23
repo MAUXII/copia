@@ -39,5 +39,13 @@
 - `lensColor`: the ring colour without spelling out `lens.blueColor`.
 - `autoplay`: steps forward every N seconds, pauses 4 s after any input.
 
+- `foreground`: the title and counter colour (`#111111` by default), so they
+  read on a dark `background`.
+- The glow only shows where the lens bends an image: ring, rim line and nova
+  are masked by the distance between the refracted colour and the page
+  colour (8 taps around the point for the ring's fringe). Identical to the
+  original on white; on a dark page it stops the giant glowing ellipse. The
+  demo passes the theme's colours, so it follows light and dark.
+
 ## Known differences from the original
 - None in behaviour; only the three props above.

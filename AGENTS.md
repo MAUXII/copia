@@ -65,7 +65,13 @@ npm test                 # unit tests for the tooling
 listed in `dependencies`; every colour the component uses is a prop
 (default: the reference's own colour, not Copia's orange) with a
 `{ "type": "color" }` control, so the viewer shows a colour picker, and no
-hard-coded colour classes such as `bg-[#ff4d1c]`; previews exist at
+hard-coded colour classes such as `bg-[#ff4d1c]`; the component and its demo
+follow the theme: switching the viewer to light or dark must turn the
+background, text, borders, pills and every surface light or dark (use
+`bg-background`, `text-foreground`, `border-border`, `bg-muted`… or the
+`dark:` variant, never a fixed page colour like `bg-[#f5f4f3]` or
+`text-black`; a WebGL or canvas piece that needs a hex reads the theme's
+computed colour and updates when the theme class changes); previews exist at
 1280x800, the mp4 lasts 3–8 s without audio. `npm run lint` and
 `npx tsc --noEmit` pass (CI runs both). Also expected: a case study and at
 least one feature beyond the reference.

@@ -112,7 +112,7 @@
       "name": "background",
       "type": "string",
       "default": "\"#ffffff\"",
-      "description": "Page colour behind the row (hex). The glass looks right on light pages."
+      "description": "Page colour behind the row (hex). Copia masks the glow to the images, so dark pages work too."
     },
     {
       "name": "entry",
@@ -137,6 +137,12 @@
       "type": "number",
       "default": "0",
       "description": "Copia: seconds between automatic steps; input pauses it for 4 s."
+    },
+    {
+      "name": "foreground",
+      "type": "string",
+      "default": "\"#111111\"",
+      "description": "Copia: title and counter colour, for dark backgrounds."
     },
     {
       "name": "onActiveChange / onFocusChange",

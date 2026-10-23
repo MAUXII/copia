@@ -104,6 +104,19 @@ or a CSS variable, never a hard-coded class like `bg-[#ff4d1c]` (`npm run
 check` rejects those), and give it a `{ "prop": "...", "type": "color",
 "default": "#rrggbb" }` control so the viewer offers a colour picker.
 
+### Light and dark
+
+The viewer has a light/dark switch and the component must follow it. Use
+theme tokens (`bg-background`, `text-foreground`, `text-muted-foreground`,
+`border-border`, `bg-muted`, `bg-foreground` for active pills) or the `dark:`
+variant, in the component and in the demo. Never pin a page colour
+(`bg-[#f5f4f3]`, `bg-white`, `text-black`): it stays put when the theme
+flips. Objects that are dark by nature (an iPhone island, a black toolbar)
+may stay dark. WebGL and canvas pieces that need a colour value read the
+computed theme colour (paint it to a 1 px canvas to get a hex) and redraw
+when the `class` of any ancestor changes. Before calling it done, toggle the
+viewer's light preview and look.
+
 ### Customizer controls
 
 Add `controls` to `meta.json` for the props worth tweaking live and make the

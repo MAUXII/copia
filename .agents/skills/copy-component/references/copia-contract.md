@@ -66,6 +66,9 @@ Categories: `buttons`, `text`, `cards`, `navigation`, `effects`. Use
 - Every colour the component uses is a prop, defaulting to the reference's
   colour, with a `{ "type": "color", "default": "#rrggbb" }` control; no
   hard-coded colour classes (`bg-[#...]`), which `npm run check` rejects.
+- Light and dark: switching the viewer's theme must turn every surface
+  (background, text, borders, pills); no fixed page colours like `bg-white`
+  or `text-black` in the component or the demo.
 - Colors through theme CSS variables (`bg-background`, `text-foreground`,
   `var(--border)` …). No hard-coded palette unless it is the point of the
   effect and overridable by a prop.

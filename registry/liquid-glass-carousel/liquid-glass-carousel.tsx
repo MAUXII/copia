@@ -101,6 +101,8 @@ export interface LiquidGlassCarouselProps {
   lensColor?: string;
   /** Copia: seconds between automatic steps; any input pauses it for 4 s. 0 turns it off. */
   autoplay?: number;
+  /** Copia: colour of the title and counter, so they read on a dark `background`. */
+  foreground?: string;
 }
 
 const PORTRAIT_ASPECT = 3 / 4;
@@ -226,6 +228,8 @@ uniform float uShape;
 uniform float uSquareRound;
 uniform float uRotation;
 uniform int uSamples;
+// Copia: the page colour behind the row, so the glass glows only where it bends an image.
+uniform vec3 uBgColor;
 
 const int MAX_SAMPLES = 16;
 
@@ -309,11 +313,23 @@ vec3 discLens(vec2 center, float aspectCorrect, out float outA) {
 
   col *= mix(0.91, 1.0, smoothstep(0.0, 0.38, shapeND));
 
+  // Copia: on the original white page the added glow clips to white and only shows over photos.
+  // On any other background the same glow paints a giant ellipse, so mask it by how far the
+  // refracted colour is from the page: identical on white, right on dark. The ring and rim line
+  // sample around the point so their fringe still spills past each image edge.
+  float content = smoothstep(0.03, 0.18, distance(col, uBgColor));
+  float near = distance(col, uBgColor);
+  for (int k = 0; k < 8; k++) {
+    float ka = float(k) * 0.785398;
+    near = max(near, distance(texture2D(uTex, baseUV + vec2(cos(ka) / aspectCorrect, sin(ka)) * 0.022).rgb, uBgColor));
+  }
+  float fringe = smoothstep(0.03, 0.18, near);
+
   float r2 = shapeND * shapeND * 0.25;
   float gs = max(uNovaSize * uGlow * 0.003, 0.004);
   float nova = exp(-r2 / gs) + exp(-r2 / (gs * 7.0)) * 0.18;
   nova *= uWhiteGlow * (uGlow / 17.0) * 1.15;
-  col += vec3(nova);
+  col += vec3(nova) * content;
 
   float dC = shapeND * 0.5;
   float tR = clamp(uRingRadius, 0.1, 0.49);
@@ -322,8 +338,8 @@ vec3 discLens(vec2 center, float aspectCorrect, out float outA) {
   ring *= uBlueRing * (uGlow / 17.0) * 1.8;
   if (uShimmer > 0.5) ring *= sin(angle * uShimmerFreq + uTime * uShimmerSpeed) * uShimmerDepth + (1.0 - uShimmerDepth);
   float ringAura = exp(-pow((dC - tR) / (rW * 6.0), 2.0)) * 0.28 * uBlueRing * (uGlow / 17.0);
-  col += uBlueColor * (ring + ringAura);
-  col += vec3(exp(-pow((dC - uRimLinePos) / max(uRimLineWidth, 0.0001), 2.0)) * uRimLine);
+  col += uBlueColor * (ring + ringAura) * fringe;
+  col += vec3(exp(-pow((dC - uRimLinePos) / max(uRimLineWidth, 0.0001), 2.0)) * uRimLine) * fringe;
 
   outA = smoothstep(1.0, 0.93, maskND);
   return col;
@@ -646,6 +662,7 @@ function createCarousel(
     uVignette: { value: LENS.vignette },
     uVignetteSize: { value: LENS.vignetteSize },
     uSamples: { value: LENS.samples },
+    uBgColor: { value: new THREE.Color(hexToNumber(options.background)) },
   };
   const lensMat = new THREE.ShaderMaterial({
     uniforms: lensUniforms as unknown as THREE.ShaderMaterial["uniforms"],
@@ -1455,6 +1472,7 @@ export function LiquidGlassCarousel({
   lens,
   lensColor,
   autoplay = 0,
+  foreground = "#111111",
 }: LiquidGlassCarouselProps) {
   // Copia: a stable key, so a new `lens` object with the same values does not rebuild the scene.
   const lensKey = JSON.stringify({ ...LENS, ...lens, ...(lensColor ? { blueColor: lensColor } : {}) });
@@ -1576,7 +1594,7 @@ export function LiquidGlassCarousel({
         "relative h-full min-h-[420px] w-full overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-black/20",
         className,
       )}
-      style={{ background, color: "#111111", ...style }}
+      style={{ background, color: foreground, ...style }}
       tabIndex={0}
       role="region"
       aria-roledescription="carousel"
@@ -1611,13 +1629,13 @@ export function LiquidGlassCarousel({
 
       <p
         ref={titleRef}
-        className="pointer-events-none absolute left-1/2 top-[4.5%] z-10 m-0 text-center text-[15px] font-medium tracking-[-0.02em] text-black opacity-0 sm:text-[17px]"
+        className="pointer-events-none absolute left-1/2 top-[4.5%] z-10 m-0 text-center text-[15px] font-medium tracking-[-0.02em] text-current opacity-0 sm:text-[17px]"
       >
         {current?.title}
       </p>
       <p
         ref={counterRef}
-        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 m-0 text-center text-[13px] font-medium tabular-nums tracking-[-0.02em] text-black opacity-0 sm:text-[15px]"
+        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 m-0 text-center text-[13px] font-medium tabular-nums tracking-[-0.02em] text-current opacity-0 sm:text-[15px]"
       >
         {pad(active + 1)}/{pad(items.length)}
       </p>

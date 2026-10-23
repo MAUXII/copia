@@ -41,19 +41,19 @@ export default function Demo(props: Pick<ProgressiveBlurProps, "layers" | "maxBl
   const root = useRef<HTMLDivElement>(null)
   useDemoAutoScroll(root)
   return (
-    <div ref={root} className="flex-1 bg-[#f5f4f3] text-black">
+    <div ref={root} className="flex-1 bg-background text-foreground">
       <ProgressiveBlur {...props} direction="top" sticky className="h-32" />
       <article className="mx-auto flex max-w-xl flex-col items-center gap-12 px-8 pt-[28vh] pb-[30vh]">
         <div className="flex flex-col items-center gap-3">
-          <span className="text-center text-[10px] leading-tight tracking-wide text-black/50 uppercase">
+          <span className="text-center text-[10px] leading-tight tracking-wide text-foreground/50 uppercase">
             Scroll down
             <br />
             to see the effect
           </span>
-          <span className="h-14 w-px bg-black/40" />
+          <span className="h-14 w-px bg-foreground/40" />
         </div>
         {Array.from({ length: 6 }, (_, i) => (
-          <p key={i} className="text-justify text-base leading-relaxed text-black/40">
+          <p key={i} className="text-justify text-base leading-relaxed text-foreground/40">
             {paragraph}
           </p>
         ))}

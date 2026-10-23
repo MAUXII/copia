@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* `.light` inside a `.dark` page (the viewer's light preview) switches the theme back for its subtree. */
+@custom-variant dark (&:is(.dark *):not(.light, .light *));
 
 @theme inline {
   --color-background: var(--background);
@@ -51,7 +52,8 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
+:root,
+.light {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

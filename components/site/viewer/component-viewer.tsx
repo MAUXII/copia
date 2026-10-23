@@ -173,7 +173,7 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
             data-copia-scroll
             className={cn("h-full overflow-x-hidden overflow-y-auto transition-colors", light ? "bg-[#f2f2f0] text-neutral-900" : "bg-[#0b0b0c]")}
           >
-            <div key={run} className={cn("flex min-h-full w-full flex-col", !light && "dark")}>
+            <div key={run} className={cn("flex min-h-full w-full flex-col bg-background text-foreground", light ? "light" : "dark")}>
               <Suspense fallback={<div className="flex-1" />}>
                 <Demo {...values} />
               </Suspense>
