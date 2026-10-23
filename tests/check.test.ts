@@ -52,6 +52,21 @@ describe("checkComponent", () => {
     expect(checkComponent(dir, previews)).toEqual([])
   })
 
+  it("rejects a hard-coded colour class in the component", () => {
+    const { dir } = setup("color", (d) => {
+      const file = path.join(d, "ok-button.tsx")
+      writeFileSync(file, readFileSync(file, "utf8").replace('"rounded-md px-4 py-2"', '"rounded-md bg-[#ff4d1c] px-4 py-2"'))
+    })
+    expect(rules(checkComponent(dir, previews))).toMatch(/hard-coded colour class bg-\[#ff4d1c\]/)
+  })
+
+  it("accepts a color control and rejects a non-hex default", () => {
+    const ok = setup("color-control", (d) => editMeta(d, (m) => (m.controls = [{ prop: "accent", type: "color", default: "#2b7fff" }])))
+    expect(checkComponent(ok.dir, previews)).toEqual([])
+    const bad = setup("color-control-bad", (d) => editMeta(d, (m) => (m.controls = [{ prop: "accent", type: "color", default: "blue" }])))
+    expect(rules(checkComponent(bad.dir, previews))).toMatch(/#rrggbb/)
+  })
+
   it("rejects extra files", () => {
     const { dir } = setup("extra", (d) => writeFileSync(path.join(d, "utils.ts"), "export {}"))
     expect(rules(checkComponent(dir, previews))).toMatch(/only ok-button\.tsx, demo\.tsx, meta\.json allowed/)

@@ -1,7 +1,7 @@
 {
   "slug": "hover-reel",
   "name": "Hover Reel",
-  "description": "A list of projects: point at a title and a picture blooms under the cursor and follows it; move to another row and the pictures roll past inside the frame instead of swapping. Copia adds a frame that leans into fast moves, a round \"View\" badge riding it, theme colours and inline pictures on touch screens.",
+  "description": "A list of projects: point at a title and a picture blooms under the cursor and follows it; move to another row and the pictures roll past inside the frame instead of swapping. Copia adds a frame that leans into fast moves, a round \"View\" badge riding it in a colour of your choice, theme colours and inline pictures on touch screens.",
   "category": "text",
   "tags": [
     "hover",
@@ -83,6 +83,18 @@
       "type": "number",
       "default": "6",
       "description": "Max degrees the frame leans into fast horizontal moves; 0 keeps it upright."
+    },
+    {
+      "name": "cursorColor",
+      "type": "string",
+      "default": "\"#455ce9\"",
+      "description": "Badge colour (Dennis Snellenberg's cursor blue)."
+    },
+    {
+      "name": "cursorTextColor",
+      "type": "string",
+      "default": "\"#ffffff\"",
+      "description": "Badge text colour."
     }
   ],
   "controls": [
@@ -101,6 +113,16 @@
       "max": 15,
       "step": 1,
       "default": 6
+    },
+    {
+      "prop": "cursorColor",
+      "type": "color",
+      "default": "#455ce9"
+    },
+    {
+      "prop": "cursorTextColor",
+      "type": "color",
+      "default": "#ffffff"
     }
   ],
   "createdAt": "2026-10-23"

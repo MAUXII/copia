@@ -16,13 +16,13 @@ const ITEMS = [
   photo("fiery-profile.webp", "Fiery Profile"),
 ]
 
-type DemoProps = { dispersion?: number; ring?: number; rotation?: number; gap?: number; autoplay?: number }
+type DemoProps = { dispersion?: number; ring?: number; rotation?: number; gap?: number; autoplay?: number; lensColor?: string }
 
 /** Customizer values flow into the lens (dispersion, ring, rotation), the row (gap) and autoplay. */
-export default function Demo({ dispersion = 11, ring = 6, rotation = 65, gap = 12, autoplay = 1.8 }: DemoProps) {
+export default function Demo({ dispersion = 11, ring = 6, rotation = 65, gap = 12, autoplay = 1.8, lensColor = "#009dff" }: DemoProps) {
   return (
     <div className="relative min-h-[560px] flex-1">
-      <LiquidGlassCarousel items={ITEMS} gap={gap} autoplay={autoplay} lens={{ dispersion, blueRing: ring, rotation }} className="absolute inset-0" />
+      <LiquidGlassCarousel items={ITEMS} gap={gap} autoplay={autoplay} lens={{ dispersion, blueRing: ring, rotation }} lensColor={lensColor} className="absolute inset-0" />
     </div>
   )
 }

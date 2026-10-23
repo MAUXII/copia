@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { generateJsx, type ControlValues } from "@/lib/jsx"
 import type { Control } from "@/lib/schema"
 import { CopyButton } from "../copy-button"
+import { ColorPicker } from "./color-picker"
 
 const TICKS = 10
 
@@ -107,6 +108,7 @@ export function Customizer({ name, controls, values, onChange, onReset, onClose 
           <span className="font-mono text-xs tracking-wide text-neutral-400">{label(control.prop)}</span>
           {control.type === "number" && <Slider control={control} value={Number(values[control.prop])} onChange={(v) => onChange(control.prop, v)} />}
           {control.type === "boolean" && <Switch checked={Boolean(values[control.prop])} onChange={(v) => onChange(control.prop, v)} labelText={control.prop} />}
+          {control.type === "color" && <ColorPicker label={control.prop} value={String(values[control.prop])} onChange={(v) => onChange(control.prop, v)} />}
           {control.type === "select" && (
             <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={control.prop}>
               {control.options.map((option) => (

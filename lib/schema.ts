@@ -14,6 +14,8 @@ const Handle = z.string().regex(HANDLE_RE, "handle must be a lowercase GitHub-st
 const ControlSchema = z.discriminatedUnion("type", [
   z.object({ prop: z.string().min(1), type: z.literal("number"), min: z.number(), max: z.number(), step: z.number().positive(), default: z.number() }),
   z.object({ prop: z.string().min(1), type: z.literal("boolean"), default: z.boolean() }),
+  /** Every colour a component uses is a prop with one of these, so the viewer can offer a picker. */
+  z.object({ prop: z.string().min(1), type: z.literal("color"), default: z.string().regex(/^#[0-9a-f]{6}$/i, "color default must be #rrggbb") }),
   z
     .object({ prop: z.string().min(1), type: z.literal("select"), options: z.array(z.string()).min(2), default: z.string() })
     .refine((c) => c.options.includes(c.default), { message: "select default must be one of its options" }),

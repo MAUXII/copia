@@ -18,6 +18,10 @@ export type HoverReelProps = {
   cursorLabel?: string
   /** Degrees the frame leans into fast horizontal moves. 0 keeps it upright. */
   tilt?: number
+  /** Badge colour; Dennis Snellenberg's cursor blue by default. */
+  cursorColor?: string
+  /** Badge text colour. */
+  cursorTextColor?: string
   className?: string
 }
 
@@ -31,7 +35,7 @@ const INSET = 16 // px the frame keeps from the list's edges
  * and follows it; move to another row and the pictures roll past inside the
  * frame instead of swapping. Touch screens show a small picture inline.
  */
-export function HoverReel({ projects, width = 320, cursorLabel = "View", tilt = 6, className }: HoverReelProps) {
+export function HoverReel({ projects, width = 320, cursorLabel = "View", tilt = 6, cursorColor = "#455ce9", cursorTextColor = "#ffffff", className }: HoverReelProps) {
   const host = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(-1)
@@ -164,8 +168,8 @@ export function HoverReel({ projects, width = 320, cursorLabel = "View", tilt = 
         {/* Copia: a round badge rides the frame, after Dennis Snellenberg's "View" cursor. */}
         {cursorLabel && (
           <span
-            className="absolute top-1/2 left-1/2 grid size-20 -translate-1/2 place-items-center rounded-full bg-[#ff4d1c] text-sm font-medium text-white transition-[scale] duration-[400ms]"
-            style={{ scale: open ? "1" : "0", transitionTimingFunction: EASE, transitionDelay: open ? "60ms" : "0ms" }}
+            className="absolute top-1/2 left-1/2 grid size-20 -translate-1/2 place-items-center rounded-full text-sm font-medium transition-[scale] duration-[400ms]"
+            style={{ background: cursorColor, color: cursorTextColor, scale: open ? "1" : "0", transitionTimingFunction: EASE, transitionDelay: open ? "60ms" : "0ms" }}
           >
             {cursorLabel}
           </span>

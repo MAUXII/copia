@@ -1,7 +1,7 @@
 {
   "slug": "arc-picker",
   "name": "Arc Picker",
-  "description": "A curved text dial you drag, flick, scroll or arrow-key through, with momentum and springing brackets; Copia adds a tick dial on an inner arc, depth (far options shrink and blur), haptic detents and an accent prop.",
+  "description": "A curved text dial you drag, flick, scroll or arrow-key through, with momentum and springing brackets; Copia adds a tick dial on an inner arc, depth (far options shrink and blur), haptic detents and an accent colour prop.",
   "category": "navigation",
   "tags": [
     "picker",
@@ -88,8 +88,8 @@
     {
       "name": "accent",
       "type": "string (CSS color)",
-      "default": "\"#ff7a45\"",
-      "description": "Color of the selected label, its brackets and its tick."
+      "default": "\"#2b7fff\"",
+      "description": "Color of the selected label, its brackets and its tick (the reference's blue by default)."
     },
     {
       "name": "name",
@@ -99,11 +99,51 @@
     }
   ],
   "controls": [
-    { "prop": "radius", "type": "number", "min": 160, "max": 520, "step": 10, "default": 280 },
-    { "prop": "visibleCount", "type": "number", "min": 5, "max": 13, "step": 2, "default": 7 },
-    { "prop": "depth", "type": "number", "min": 0, "max": 1, "step": 0.05, "default": 0.6 },
-    { "prop": "side", "type": "select", "options": ["right", "left", "top", "bottom"], "default": "right" },
-    { "prop": "ticks", "type": "boolean", "default": true }
+    {
+      "prop": "radius",
+      "type": "number",
+      "min": 160,
+      "max": 520,
+      "step": 10,
+      "default": 280
+    },
+    {
+      "prop": "visibleCount",
+      "type": "number",
+      "min": 5,
+      "max": 13,
+      "step": 2,
+      "default": 7
+    },
+    {
+      "prop": "depth",
+      "type": "number",
+      "min": 0,
+      "max": 1,
+      "step": 0.05,
+      "default": 0.6
+    },
+    {
+      "prop": "side",
+      "type": "select",
+      "options": [
+        "right",
+        "left",
+        "top",
+        "bottom"
+      ],
+      "default": "right"
+    },
+    {
+      "prop": "ticks",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "prop": "accent",
+      "type": "color",
+      "default": "#2b7fff"
+    }
   ],
   "createdAt": "2026-10-22"
 }

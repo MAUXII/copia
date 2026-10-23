@@ -62,7 +62,10 @@ npm test                 # unit tests for the tooling
 `meta.json` is valid and has `inspiration`; imports are limited to `react`,
 `motion`, `motion/react`, `lucide-react`, `@/lib/utils`, plus `three` and
 `gsap` for WebGL pieces (and `./<slug>` in the demo), and used packages are
-listed in `dependencies`; previews exist at
+listed in `dependencies`; every colour the component uses is a prop
+(default: the reference's own colour, not Copia's orange) with a
+`{ "type": "color" }` control, so the viewer shows a colour picker, and no
+hard-coded colour classes such as `bg-[#ff4d1c]`; previews exist at
 1280x800, the mp4 lasts 3–8 s without audio. `npm run lint` and
 `npx tsc --noEmit` pass (CI runs both). Also expected: a case study and at
 least one feature beyond the reference.

@@ -28,7 +28,8 @@
 - The frame leans into fast horizontal moves (`tilt`, up to 6° by default),
   after the skew in SmoothUI's version.
 - A round "View" badge rides the frame (`cursorLabel`), after Dennis's
-  cursor; it scales in 60 ms after the frame.
+  cursor; it scales in 60 ms after the frame. Its colours are props
+  (`cursorColor`, Dennis's blue `#455ce9` by default, and `cursorTextColor`).
 - Rows dim to 35% while another is active, and the active title and label
   slide apart by 10 px, as on Dennis's site.
 - Touch screens (`pointer: coarse`) hide the frame and show a small picture

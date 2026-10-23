@@ -34,7 +34,8 @@
   away, scaled by a `depth` prop (0 turns it off; reduced motion turns it off).
 - **Haptic detents:** `navigator.vibrate(4)` on each detent crossed by a
   gesture, behind `haptics`.
-- **Accent prop** instead of the theme's primary color.
+- **Accent colour prop** (with a colour picker in the viewer), defaulting
+  to the reference's blue instead of following the theme's primary.
 - Rewritten in about half the code, with no extra dependencies
   (`clsx`, `tailwind-merge` and the shared ease file are gone).
 - Options render after mount, which removes a hydration mismatch the

@@ -95,6 +95,15 @@ Put files in `public/demo/<slug>/` and credit every one in `meta.json` →
 on any uncredited file. Images belong to the demo only; the component itself
 takes images as props.
 
+### Colours are props
+
+Every colour the component uses is a prop. Its default is the colour the
+reference uses (blue stays blue: do not swap in Copia's Ember orange), or a
+theme token when the reference follows the theme. Apply it through `style`
+or a CSS variable, never a hard-coded class like `bg-[#ff4d1c]` (`npm run
+check` rejects those), and give it a `{ "prop": "...", "type": "color",
+"default": "#rrggbb" }` control so the viewer offers a colour picker.
+
 ### Customizer controls
 
 Add `controls` to `meta.json` for the props worth tweaking live and make the

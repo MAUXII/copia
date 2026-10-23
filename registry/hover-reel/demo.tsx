@@ -12,8 +12,8 @@ const PROJECTS = [
   { title: "Vitrine", label: "Component library", image: shot("abstract-toroidal-form") },
 ]
 
-/** Customizer values (width, tilt) flow into the reel. */
-export default function Demo(props: Pick<HoverReelProps, "width" | "tilt">) {
+/** Customizer values (width, tilt, badge colours) flow into the reel. */
+export default function Demo(props: Pick<HoverReelProps, "width" | "tilt" | "cursorColor" | "cursorTextColor">) {
   return (
     <div className="flex flex-1 flex-col justify-center py-12">
       <div className="mx-auto w-full max-w-[72rem] px-[clamp(1.25rem,5vw,4rem)]">

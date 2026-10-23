@@ -5,6 +5,9 @@ import { MetaSchema, SLUG_RE } from "./schema"
 
 export type Problem = { file: string; rule: string; fix: string }
 
+/** Tailwind arbitrary colour classes such as bg-[#ff4d1c] or text-[#fff]. */
+const HARDCODED_COLOR = /\b(?:bg|text|from|via|to|border|ring|fill|stroke|outline|decoration|shadow|accent|caret)-\[#[0-9a-f]{3,8}\]/gi
+
 export const ALLOWED_IMPORTS = ["react", "motion", "motion/react", "lucide-react", "@/lib/utils", "three", "gsap"]
 const PREVIEW_SIZE = { width: 1280, height: 800 }
 const PREVIEW_SECONDS = { min: 3, max: 8 }
@@ -151,6 +154,19 @@ export function checkComponent(dir: string, previewsDir: string, demoAssetsDir =
       if (!spec.startsWith("@/") && packageOf(spec) !== "react") used.add(packageOf(spec))
     }
   }
+  // Colours come from props (with a "color" control) or theme tokens, never a hard-coded class.
+  const componentFile = path.join(dir, `${folder}.tsx`)
+  if (existsSync(componentFile)) {
+    const fixed = readFileSync(componentFile, "utf8").match(HARDCODED_COLOR)
+    if (fixed) {
+      problems.push({
+        file: at(`${folder}.tsx`),
+        rule: `hard-coded colour class ${[...new Set(fixed)].join(", ")}`,
+        fix: `Make the colour a prop (default: the reference's colour), use it through style or a CSS variable, and add a { "type": "color" } control.`,
+      })
+    }
+  }
+
   for (const pkg of used) {
     if (!dependencies.includes(pkg)) {
       problems.push({ file: at("meta.json"), rule: `"${pkg}" must be listed in meta.dependencies`, fix: `Add "${pkg}" to the dependencies array.` })

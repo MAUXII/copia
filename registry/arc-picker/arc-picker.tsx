@@ -169,7 +169,7 @@ export function ArcPicker({
   depth = 0.6,
   ticks = true,
   haptics = true,
-  accent = "#ff7a45",
+  accent = "#2b7fff",
   disabled = false,
   name,
   className,

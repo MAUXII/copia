@@ -5,7 +5,13 @@ import { DynamicIsland, type DynamicIslandProps, type IslandView } from "./dynam
 
 const VIEWS: IslandView[] = ["idle", "ring", "silent", "timer", "recording", "call", "music", "notification"]
 
-export default function Demo(props: Pick<DynamicIslandProps, "timerSeconds">) {
+type DemoProps = Pick<DynamicIslandProps, "timerSeconds"> & { alertColor?: string; acceptColor?: string; timerColor?: string; musicColor?: string; notificationColor?: string }
+
+/** Customizer values: the timer length and the activity colours. */
+export default function Demo({ timerSeconds, alertColor, acceptColor, timerColor, musicColor, notificationColor }: DemoProps) {
+  const colors = { alert: alertColor, accept: acceptColor, timer: timerColor, music: musicColor, notification: notificationColor }
+  // Unset controls fall back to Apple's colours.
+  const props = { timerSeconds, colors: Object.fromEntries(Object.entries(colors).filter(([, v]) => v)) }
   const [index, setIndex] = useState(1)
   const [auto, setAuto] = useState(true)
 

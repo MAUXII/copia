@@ -1,7 +1,7 @@
 {
   "slug": "dynamic-island",
   "name": "Dynamic Island",
-  "description": "iPhone-style island that morphs between live activities: ring/silent, timer with rolling digits, recording, music, plus call, notification and custom content.",
+  "description": "iPhone-style island that morphs between live activities: ring/silent, timer with rolling digits, recording, music, plus call, notification and custom content; every colour is a prop (Apple's by default).",
   "category": "effects",
   "tags": [
     "apple",
@@ -66,6 +66,12 @@
       "type": "ReactNode + { width, height, radius? }",
       "default": "-",
       "description": "Custom content with its own size."
+    },
+    {
+      "name": "colors",
+      "type": "Partial<IslandColors>",
+      "default": "Apple's system colours",
+      "description": "alert, accept, timer, timerButton, control, music, notification."
     }
   ],
   "createdAt": "2026-10-18",
@@ -77,6 +83,31 @@
       "max": 300,
       "step": 5,
       "default": 60
+    },
+    {
+      "prop": "alertColor",
+      "type": "color",
+      "default": "#fd4f30"
+    },
+    {
+      "prop": "acceptColor",
+      "type": "color",
+      "default": "#2fd057"
+    },
+    {
+      "prop": "timerColor",
+      "type": "color",
+      "default": "#fdb000"
+    },
+    {
+      "prop": "musicColor",
+      "type": "color",
+      "default": "#159bf4"
+    },
+    {
+      "prop": "notificationColor",
+      "type": "color",
+      "default": "#159bf4"
     }
   ]
 }

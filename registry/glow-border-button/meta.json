@@ -119,6 +119,16 @@
       "prop": "reverse",
       "type": "boolean",
       "default": false
+    },
+    {
+      "prop": "colorFrom",
+      "type": "color",
+      "default": "#ffaa40"
+    },
+    {
+      "prop": "colorTo",
+      "type": "color",
+      "default": "#9c40ff"
     }
   ]
 }

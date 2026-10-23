@@ -185,6 +185,11 @@
       "max": 5,
       "step": 0.1,
       "default": 1.8
+    },
+    {
+      "prop": "lensColor",
+      "type": "color",
+      "default": "#009dff"
     }
   ],
   "createdAt": "2026-10-22"
