@@ -96,7 +96,7 @@ uniform float uRing;
 uniform float uRimLine;
 uniform float uRimSwirl;
 uniform float uShimmer;
-uniform float uNova;
+uniform vec3 uBg;
 uniform float uTime;
 uniform vec3 uColor;
 const float GLOW = 4.2;
@@ -143,17 +143,20 @@ void main() {
   }
   col /= max(total, vec3(0.001));
   col *= mix(0.91, 1.0, smoothstep(0.0, 0.38, nd));
+  // Copia: the glass only glows where it bends an image. The reference adds its glow onto a white
+  // page, where it clips to white and vanishes; on any other page this keeps that look.
+  float content = smoothstep(0.03, 0.18, distance(col, uBg));
 
   // Soft white nova in the middle, a coloured ring and a thin bright line at the rim.
   float r2 = nd * nd * 0.25;
   float gs = max(NOVA * GLOW * 0.003, 0.004);
-  col += vec3((exp(-r2 / gs) + exp(-r2 / (gs * 7.0)) * 0.18) * WHITE_GLOW * uNova * (GLOW / 17.0) * 1.15);
+  col += vec3((exp(-r2 / gs) + exp(-r2 / (gs * 7.0)) * 0.18) * WHITE_GLOW * (GLOW / 17.0) * 1.15 * content);
   float dC = nd * 0.5;
   float ring = exp(-pow((dC - RING_RADIUS) / RING_WIDTH, 2.0)) * uRing * (GLOW / 17.0) * 1.8;
   ring *= sin(angle * 12.0 + uTime * 3.5) * 0.12 * uShimmer + (1.0 - 0.12 * uShimmer);
   float aura = exp(-pow((dC - RING_RADIUS) / (RING_WIDTH * 6.0), 2.0)) * 0.28 * uRing * (GLOW / 17.0);
-  col += uColor * (ring + aura);
-  col += vec3(exp(-pow((dC - RIM_LINE_POS) / RIM_LINE_WIDTH, 2.0)) * uRimLine);
+  col += uColor * (ring + aura) * content;
+  col += vec3(exp(-pow((dC - RIM_LINE_POS) / RIM_LINE_WIDTH, 2.0)) * uRimLine) * content;
 
   gl_FragColor = vec4(mix(base, col, smoothstep(1.0, 0.93, dist)), 1.0);
 }`
@@ -296,13 +299,10 @@ function createEngine(root: HTMLElement, canvas: HTMLCanvasElement, cursor: HTML
   // The background follows the page theme: read the root's computed colour when the theme flips.
   let background: [number, number, number] = [1, 1, 1]
   let tone: [number, number, number] = [0.9, 0.9, 0.9]
-  // The white nova reads as glow on paper but as haze on a dark page, so it dims there.
-  let nova = 1
   const readTheme = () => {
     background = parseColor(getComputedStyle(root).backgroundColor)
     const light = background[0] + background[1] + background[2] > 1.5
     tone = background.map((c) => c + (light ? -0.08 : 0.08)) as [number, number, number]
-    nova = light ? 1 : 0.3
   }
   const ringColor = parseColor(o.lensColor)
 
@@ -569,7 +569,7 @@ function createEngine(root: HTMLElement, canvas: HTMLCanvasElement, cursor: HTML
     gl!.uniform1f(lensProgram.u("uRimLine"), 1.4 * fx.value)
     gl!.uniform1f(lensProgram.u("uRimSwirl"), 0.6 * fx.value)
     gl!.uniform1f(lensProgram.u("uShimmer"), reduced ? 0 : 1)
-    gl!.uniform1f(lensProgram.u("uNova"), nova)
+    gl!.uniform3fv(lensProgram.u("uBg"), background)
     gl!.uniform1f(lensProgram.u("uTime"), now / 1000)
     gl!.uniform3fv(lensProgram.u("uColor"), ringColor)
     gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)

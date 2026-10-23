@@ -41,8 +41,12 @@
 - **Lens colour:** the ring is a prop (Ember by default, the original is a
   fixed blue).
 - **Theme-aware background:** the WebGL clear colour is read from the
-  component's computed background and re-read when the theme class changes;
-  the white nova dims to 30% on dark pages, where it read as haze.
+  component's computed background and re-read when the theme class changes.
+- **Glow only where there is an image.** The reference adds its ring and nova
+  onto a white page, where they clip to white and only show over photos (the
+  "peeled glass" look). On a dark page the same maths draws a giant glowing
+  pill, so the glow is masked by how far the refracted colour is from the
+  background: `smoothstep(0.03, 0.18, distance(col, bg))`.
 - **Rounded panels** (`radius`) and **cover-fit** photos of any aspect.
 - Keyboard: Enter focuses the centred photo, Escape closes it.
 
