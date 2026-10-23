@@ -13,7 +13,7 @@ function shortCredit(meta: Meta) {
   return `after ${meta.inspiration.author.split(/,| \(/)[0]}`
 }
 
-/** Craft pieces are small and light, so their card runs the demo live; you can use it right there. */
+/** Craft and agent pieces are small and light, so their card runs the demo live; you can use it right there. */
 function LiveCard({ meta }: { meta: Meta }) {
   return (
     <div className="group relative rounded-2xl border bg-card p-2 transition-colors hover:border-foreground/20">
@@ -30,7 +30,7 @@ function LiveCard({ meta }: { meta: Meta }) {
 }
 
 export function ComponentCard({ meta }: { meta: Meta }) {
-  if (meta.collection === "craft") return <LiveCard meta={meta} />
+  if (meta.collection !== "copies") return <LiveCard meta={meta} />
   return <VideoCard meta={meta} />
 }
 

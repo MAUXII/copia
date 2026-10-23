@@ -1,0 +1,67 @@
+{
+  "slug": "agent-status",
+  "name": "Agent Status",
+  "description": "What an AI agent is doing in one calm line: the running step shimmers, steps replace each other with a slide and blur, the spinner morphs into a check as it settles into \"Done in 4.2s\", and a click opens the steps it went through.",
+  "category": "text",
+  "collection": "agents",
+  "tags": [
+    "ai",
+    "agent",
+    "status",
+    "shimmer",
+    "streaming",
+    "morph"
+  ],
+  "author": {
+    "name": "Copia",
+    "github": "MAUXII"
+  },
+  "inspiration": {
+    "author": "original",
+    "url": null
+  },
+  "dependencies": [
+    "motion",
+    "lucide-react"
+  ],
+  "props": [
+    {
+      "name": "steps",
+      "type": "{ label, detail? }[]",
+      "default": "-",
+      "description": "Steps in order."
+    },
+    {
+      "name": "current",
+      "type": "number",
+      "default": "-",
+      "description": "Index of the running step; earlier ones are done."
+    },
+    {
+      "name": "done",
+      "type": "boolean",
+      "default": "false",
+      "description": "All steps finished."
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "default": "-",
+      "description": "Seconds the run took, shown once done."
+    },
+    {
+      "name": "doneColor",
+      "type": "string",
+      "default": "\"#30d158\"",
+      "description": "Colour of the finished check."
+    }
+  ],
+  "controls": [
+    {
+      "prop": "doneColor",
+      "type": "color",
+      "default": "#30d158"
+    }
+  ],
+  "createdAt": "2026-10-23"
+}

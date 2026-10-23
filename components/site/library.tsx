@@ -1,9 +1,9 @@
 import Link from "next/link"
-import { Copy, LayoutGrid, Sparkles } from "lucide-react"
+import { Bot, Copy, LayoutGrid, Sparkles } from "lucide-react"
 import { ComponentGrid } from "@/components/site/component-grid"
 import { getComponents } from "@/lib/registry"
 
-export type Collection = "all" | "craft" | "copies"
+export type Collection = "all" | "craft" | "copies" | "agents"
 
 export const COLLECTIONS: Record<Collection, { label: string; href: string; title: string; intro: string; icon: typeof LayoutGrid }> = {
   all: {
@@ -20,6 +20,13 @@ export const COLLECTIONS: Record<Collection, { label: string; href: string; titl
     title: "Copies",
     intro: "The best interfaces on the web, recreated as one file each, often with a feature more, and always credited to whoever made them first.",
     icon: Copy,
+  },
+  agents: {
+    label: "Agents",
+    href: "/components/agents",
+    title: "Agents",
+    intro: "Interfaces for AI agents: prompts, streaming answers, thinking and tool states, approvals. Calm, clear motion for software that talks back.",
+    icon: Bot,
   },
 }
 

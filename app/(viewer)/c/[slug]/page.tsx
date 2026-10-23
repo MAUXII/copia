@@ -233,7 +233,7 @@ export default async function ComponentPage({ params }: Params) {
       componentName={componentName(slug)}
       controls={meta.controls ?? []}
       info={info}
-      section={meta.collection === "craft" ? { label: "Craft", href: "/components/craft" } : { label: "Copies", href: "/components/copies" }}
+      section={{ craft: { label: "Craft", href: "/components/craft" }, agents: { label: "Agents", href: "/components/agents" }, copies: { label: "Copies", href: "/components/copies" } }[meta.collection]}
     />
   )
 }
