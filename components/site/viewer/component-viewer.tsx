@@ -22,6 +22,8 @@ type Props = {
   controls: Control[]
   /** The specification panel content. */
   info: React.ReactNode
+  /** The collection the breadcrumb leads back to. */
+  section?: { label: string; href: string }
 }
 
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const
@@ -55,7 +57,7 @@ function DockButton({ label, onClick, active, children }: { label: string; onCli
 }
 
 /** Full-screen component page: the demo fills the viewport, specs slide in from the left. */
-export function ComponentViewer({ name, installTarget, slug, componentName, controls, info }: Props) {
+export function ComponentViewer({ name, installTarget, slug, componentName, controls, info, section = { label: "Copies", href: "/copies" } }: Props) {
   // The demo renders on the client so customizer values can flow into it as props.
   const Demo = useMemo(() => lazy(demos[slug]), [slug])
   const [values, setValues] = useState<ControlValues>(() => defaultValues(controls))
@@ -146,8 +148,8 @@ export function ComponentViewer({ name, installTarget, slug, componentName, cont
                     <SidebarIcon open />
                   </button>
                   <span className="flex items-center gap-2 text-[15px]">
-                    <Link href="/#components" className="text-white/45 transition-colors hover:text-white/80">
-                      Components
+                    <Link href={section.href} className="text-white/45 transition-colors hover:text-white/80">
+                      {section.label}
                     </Link>
                     <span aria-hidden className="text-white/45">
                       ›

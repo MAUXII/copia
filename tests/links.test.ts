@@ -9,6 +9,7 @@ const meta: Meta = {
   name: "Magnetic Button",
   description: "Pulled toward the cursor.",
   category: "buttons",
+  collection: "copies",
   tags: [],
   author: { name: "Copia", github: "MAUXII" },
   inspiration: { author: "Olivier Larose", url: "https://blog.olivierlarose.com/tutorials/magnetic-button" },

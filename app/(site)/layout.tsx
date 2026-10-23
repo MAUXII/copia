@@ -7,9 +7,15 @@ const COLUMNS = [
   {
     title: "Library",
     links: [
-      { label: "Components", href: "/" },
+      { label: "Components", href: "/components", badge: "New" },
+      { label: "Copies", href: "/copies" },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
       { label: "Requests", href: "/requests" },
-      { label: "Publish", href: "/publish", badge: "New" },
+      { label: "Publish", href: "/publish" },
       { label: "Authors", href: "/authors" },
     ],
   },
