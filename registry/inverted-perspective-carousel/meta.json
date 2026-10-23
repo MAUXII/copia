@@ -145,7 +145,13 @@
       "name": "autoplay",
       "type": "number",
       "default": "0",
-      "description": "Advance every N ms; hover, focus and touch pause it."
+      "description": "Advance every N ms; focus and touch pause it."
+    },
+    {
+      "name": "pauseOnHover",
+      "type": "boolean",
+      "default": "true",
+      "description": "Pause autoplay while the pointer is over it."
     },
     {
       "name": "showPagination / showNavigation",

@@ -24,6 +24,8 @@ export type InvertedPerspectiveCarouselProps = {
   loop?: boolean
   /** Advance every N ms; hovering, focusing or touching pauses it. 0 turns it off. */
   autoplay?: number
+  /** Pause autoplay while the pointer is over the carousel. */
+  pauseOnHover?: boolean
   showPagination?: boolean
   showNavigation?: boolean
   /** A soft mirror of the slides on the floor. */
@@ -130,6 +132,7 @@ export function InvertedPerspectiveCarousel({
   slideShadows = true,
   loop = true,
   autoplay = 0,
+  pauseOnHover = true,
   showPagination = true,
   showNavigation = false,
   reflection = false,
@@ -199,7 +202,7 @@ export function InvertedPerspectiveCarousel({
         e.preventDefault()
         goTo(Math.round(position.get()) + (e.key === "ArrowRight" ? 1 : -1))
       }}
-      onPointerEnter={() => setPaused(true)}
+      onPointerEnter={() => pauseOnHover && setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}

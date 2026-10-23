@@ -27,7 +27,8 @@
   event.
 - Click a side slide or a dot to bring it to the centre the short way round.
 - Keyboard: ← / → (the region is focusable, with a live announcement).
-- Autoplay pauses while hovered, focused or touched.
+- Autoplay pauses while hovered (`pauseOnHover`), focused or touched; the
+  demo turns the hover pause off so the recorded preview keeps moving.
 - `reflection`: an optional floor mirror (`-webkit-box-reflect`).
 - Pagination is the same stretching pill as perspective-carousel (the active
   dot widens to a 16 px pill), in theme colours.
